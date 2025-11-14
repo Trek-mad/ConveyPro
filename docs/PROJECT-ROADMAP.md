@@ -573,3 +573,55 @@ APIs Required:
 - [Post-MVP Features](./POST-MVP-FEATURES.md)
 - [Development Checklist](./DEVELOPMENT-CHECKLIST.md)
 - [Database Schema](./DATABASE-SCHEMA.md)
+
+
+## ✅ Phase-1-MVP Technical Implementation (for Claude)  
+_This section outlines developer tasks tailored for Claude to execute on the `phase-1-mvp` branch._
+
+### Auth & Environment Setup  
+- [ ] Remove `@supabase/auth-helpers-nextjs` and add `@supabase/ssr`  
+- [ ] Implement `lib/supabase/server.ts` using `createServerClient` with cookies  
+- [ ] Implement `lib/supabase/client.ts` using `createBrowserClient` for Client Components  
+- [ ] Add runtime validation of environment variables in `lib/env.ts` (Zod) and fail build if missing  
+- [ ] Configure Next.js middleware (or route handler) to handle Supabase session token refresh per doc recommendations
+
+### Multi-Step Form System  
+- [ ] Port existing HTML/JS wizard into React functional component in `app/(dashboard)/quotes/new/page.tsx`  
+- [ ] Use `react-hook-form` + `zod` for validation; disallow “Next” until validations pass  
+- [ ] Use shadcn/ui components (`Form`, `Input`, `RadioGroup`, `Button`, `Card`) for consistent design  
+- [ ] Implement `useReducer` (or similar) to manage `currentStep`, `formPath`, and branching logic  
+- [ ] Refactor LBTT logic into `lib/lbtt.ts` (pure TS function) and import client- and server-side
+
+### API & Data Persistence  
+- [ ] Create `POST /api/forms/submit` route:  
+  - Validate payload via Zod  
+  - Insert into Supabase `form_responses` and `form_field_values` tables  
+  - Recompute LBTT server-side and return canonical totals  
+- [ ] Write minimal unit tests for `lib/lbtt.ts` covering standard bands, first-time buyer relief, additional property supplement  
+- [ ] Ensure “Submit” flow disables the button, displays feedback, and handles errors gracefully (no `alert()`; inline messages)
+
+### Database Schema Preparation (Phase-1)  
+- [ ] Create Supabase table `form_responses` with fields:  
+  - `id`, `form_key`, `created_at`, `staff_first_name`, `staff_last_name`, `client_email`, `client_phone`, `price`, `lbtt_standard`, `lbtt_ads`, `lbtt_total`, etc.  
+- [ ] Create Supabase table `form_field_values` with fields:  
+  - `id`, `response_id` (FK → `form_responses`), `field_name`, `field_value` (JSONB)  
+- [ ] Ensure basic indexing and tenant-aware columns if multi-tenant support is required later
+
+### UI/UX & Delivery  
+- [ ] Replace all `alert()` calls with inline error messaging components  
+- [ ] Update progress bar logic: calculate width based on `formPath.length` rather than absolute step number  
+- [ ] Add responsive styling tweaks for mobile (buttons, spacing) per brand guidelines  
+- [ ] Commit initial scaffold with clear commit messages (`chore(init): …`, `feat(form): …`) following the branch strategy
+
+### Branching & Deployment  
+- [ ] Ensure all work occurs on `phase-1-mvp` branch  
+- [ ] Once tasks above compile and pass basic QA, open a PR from `phase-1-mvp` → `develop` for internal review  
+- [ ] After review and smoke test, merge `develop` → `main`, tag version `v0.1.0-mvp`  
+
+---
+
+## What’s Not Covered in Phase-1  
+- Form builder UI for creating/editing templates  
+- Fully dynamic form definitions from database  
+- Analytics dashboard, notifications, client portal  
+*(These are reserved for future phases and remain out of scope for this sprint.)*
