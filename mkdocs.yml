@@ -1,0 +1,5 @@
+site_name: ConveyPro Repository
+nav:
+  - Home: index.md
+  - Docs: docs/
+docs_dir: docs
