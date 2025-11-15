@@ -1,7 +1,3 @@
-site_name: ConveyPro Documentation
-theme:
-  name: material
-
 nav:
   - Home: index.md
 
@@ -20,3 +16,4 @@ nav:
 
   - Misc:
       - Placeholder: placeholder.md
+      - README: README.md
