@@ -592,3 +592,47 @@ export async function updateQuoteStatus(
     }
   }
 }
+
+/**
+ * Get quotes for a specific property
+ */
+export async function getQuotesByProperty(
+  propertyId: string,
+  tenantId: string
+): Promise<{ quotes: Quote[] } | { error: string }> {
+  try {
+    const user = await requireAuth()
+    const supabase = await createClient()
+
+    // Verify user has access
+    const { data: membership } = await supabase
+      .from('tenant_memberships')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single()
+
+    if (!membership) {
+      return { error: 'Unauthorized' }
+    }
+
+    const { data: quotes, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('property_id', propertyId)
+      .eq('tenant_id', tenantId)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return { error: error.message }
+    }
+
+    return { quotes: quotes || [] }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
