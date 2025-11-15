@@ -323,8 +323,7 @@ export async function getQuote(
         `
         *,
         property:properties(*),
-        tenant:tenants(*),
-        created_by_user:profiles(*)
+        tenant:tenants(*)
       `
       )
       .eq('id', quoteId)
