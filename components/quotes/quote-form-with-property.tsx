@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -57,11 +57,13 @@ type QuoteFormData = z.infer<typeof quoteSchema>
 interface QuoteFormWithPropertyProps {
   tenantId: string
   properties: Property[]
+  defaultPropertyId?: string
 }
 
 export function QuoteFormWithProperty({
   tenantId,
   properties,
+  defaultPropertyId,
 }: QuoteFormWithPropertyProps) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
@@ -82,8 +84,20 @@ export function QuoteFormWithProperty({
       transaction_type: 'purchase',
       vat_rate: '20',
       disbursements: '0',
+      property_id: defaultPropertyId || undefined,
     },
   })
+
+  // Set initial selected property if defaultPropertyId is provided
+  useEffect(() => {
+    if (defaultPropertyId) {
+      const property = properties.find((p) => p.id === defaultPropertyId)
+      if (property) {
+        setSelectedProperty(property)
+        setValue('property_id', defaultPropertyId)
+      }
+    }
+  }, [defaultPropertyId, properties, setValue])
 
   // Watch values for auto-calculation
   const baseFee = watch('base_fee') || '0'

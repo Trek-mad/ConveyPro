@@ -12,7 +12,13 @@ export const metadata: Metadata = {
   description: 'Create a new conveyancing quote',
 }
 
-export default async function NewQuotePage() {
+interface PageProps {
+  searchParams: {
+    property?: string
+  }
+}
+
+export default async function NewQuotePage({ searchParams }: PageProps) {
   const membership = await getActiveTenantMembership()
 
   if (!membership) {
@@ -23,6 +29,9 @@ export default async function NewQuotePage() {
   const propertiesResult = await getProperties(membership.tenant_id)
   const properties =
     'properties' in propertiesResult ? propertiesResult.properties : []
+
+  // Get default property ID from query parameter
+  const defaultPropertyId = searchParams.property
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -48,6 +57,7 @@ export default async function NewQuotePage() {
         <QuoteFormWithProperty
           tenantId={membership.tenant_id}
           properties={properties}
+          defaultPropertyId={defaultPropertyId}
         />
       </Card>
     </div>
