@@ -7,7 +7,7 @@ import { QuotePDF } from '@/lib/pdf/quote-template'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -16,8 +16,11 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
+    // Await params in Next.js 15
+    const { id } = await params
+
     // Fetch the quote with relations
-    const quoteResult = await getQuote(params.id)
+    const quoteResult = await getQuote(id)
     if ('error' in quoteResult) {
       return new NextResponse('Quote not found', { status: 404 })
     }
