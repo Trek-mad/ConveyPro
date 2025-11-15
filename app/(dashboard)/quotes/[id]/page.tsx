@@ -5,7 +5,7 @@ import { getActiveTenantMembership } from '@/lib/auth'
 import { getQuote } from '@/services/quote.service'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ChevronLeft, Mail, Download, Edit, Trash2 } from 'lucide-react'
+import { ChevronLeft, Mail, Download, Edit, Trash2, MapPin } from 'lucide-react'
 import { QuoteActions } from '@/components/quotes/quote-actions'
 import { formatDistanceToNow, format } from 'date-fns'
 
@@ -122,6 +122,44 @@ export default async function QuoteDetailPage({ params }: PageProps) {
 
       {/* Actions */}
       <QuoteActions quote={quote} tenantId={membership.tenant_id} />
+
+      {/* Linked Property */}
+      {quote.property && (
+        <Card className="bg-blue-50 p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <MapPin className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Linked Property</h3>
+                <p className="mt-1 text-gray-900">{quote.property.address_line1}</p>
+                {quote.property.address_line2 && (
+                  <p className="text-gray-600">{quote.property.address_line2}</p>
+                )}
+                <p className="text-gray-600">
+                  {quote.property.city}, {quote.property.postcode}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800">
+                    {quote.property.property_type}
+                  </span>
+                  {quote.property.title_number && (
+                    <span className="text-xs text-gray-500">
+                      Title: {quote.property.title_number}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <Link href={`/properties/${quote.property.id}`}>
+              <Button variant="outline" size="sm">
+                View Property
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      )}
 
       {/* Quote Details */}
       <div className="grid gap-6 md:grid-cols-2">

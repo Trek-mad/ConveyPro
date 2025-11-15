@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { getActiveTenantMembership } from '@/lib/auth'
-import { QuoteForm } from '@/components/quotes/quote-form'
+import { getProperties } from '@/services/quote.service'
+import { QuoteFormWithProperty } from '@/components/quotes/quote-form-with-property'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
@@ -17,6 +18,11 @@ export default async function NewQuotePage() {
   if (!membership) {
     return null
   }
+
+  // Fetch properties for the property selector
+  const propertiesResult = await getProperties(membership.tenant_id)
+  const properties =
+    'properties' in propertiesResult ? propertiesResult.properties : []
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -39,7 +45,10 @@ export default async function NewQuotePage() {
 
       {/* Form */}
       <Card className="p-6">
-        <QuoteForm tenantId={membership.tenant_id} />
+        <QuoteFormWithProperty
+          tenantId={membership.tenant_id}
+          properties={properties}
+        />
       </Card>
     </div>
   )
