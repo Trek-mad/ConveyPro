@@ -491,3 +491,60 @@ export async function deleteQuote(
     }
   }
 }
+
+/**
+ * Update quote status
+ */
+export async function updateQuoteStatus(
+  quoteId: string,
+  tenantId: string,
+  newStatus: Quote['status']
+): Promise<{ quote: Quote } | { error: string }> {
+  try {
+    const user = await requireAuth()
+    const supabase = await createClient()
+
+    // Verify user has access
+    const canUpdate = await hasRole(tenantId, [
+      'owner',
+      'admin',
+      'manager',
+      'member',
+    ])
+
+    if (!canUpdate) {
+      return { error: 'Unauthorized' }
+    }
+
+    // Build update object based on status
+    const updates: any = {
+      status: newStatus,
+    }
+
+    if (newStatus === 'sent') {
+      updates.sent_at = new Date().toISOString()
+      updates.sent_by = user.id
+    } else if (newStatus === 'accepted') {
+      updates.accepted_at = new Date().toISOString()
+    }
+
+    const { data: quote, error } = await supabase
+      .from('quotes')
+      .update(updates)
+      .eq('id', quoteId)
+      .eq('tenant_id', tenantId)
+      .select()
+      .single()
+
+    if (error || !quote) {
+      return { error: error?.message || 'Failed to update quote' }
+    }
+
+    revalidatePath('/')
+    return { quote }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
