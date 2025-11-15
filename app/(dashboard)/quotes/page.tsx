@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     status?: string
     search?: string
-  }
+  }>
 }
 
 export default async function QuotesPage({ searchParams }: PageProps) {
@@ -27,17 +27,20 @@ export default async function QuotesPage({ searchParams }: PageProps) {
     return null
   }
 
+  // Await searchParams in Next.js 15
+  const params = await searchParams
+
   // Fetch all quotes
   const quotesResult = await getQuotes(membership.tenant_id)
   let quotes = 'quotes' in quotesResult ? quotesResult.quotes : []
 
   // Apply filters
-  if (searchParams.status && searchParams.status !== 'all') {
-    quotes = quotes.filter((q) => q.status === searchParams.status)
+  if (params.status && params.status !== 'all') {
+    quotes = quotes.filter((q) => q.status === params.status)
   }
 
-  if (searchParams.search) {
-    const search = searchParams.search.toLowerCase()
+  if (params.search) {
+    const search = params.search.toLowerCase()
     quotes = quotes.filter(
       (q) =>
         q.quote_number.toLowerCase().includes(search) ||
@@ -104,7 +107,7 @@ export default async function QuotesPage({ searchParams }: PageProps) {
       </div>
 
       {/* Filters */}
-      <QuotesFilters currentStatus={searchParams.status} />
+      <QuotesFilters currentStatus={params.status} />
 
       {/* Quotes table */}
       <Card className="p-6">
@@ -112,11 +115,11 @@ export default async function QuotesPage({ searchParams }: PageProps) {
           <div className="py-12 text-center">
             <p className="text-gray-600">No quotes found</p>
             <p className="mt-2 text-sm text-gray-500">
-              {searchParams.status || searchParams.search
+              {params.status || params.search
                 ? 'Try adjusting your filters'
                 : 'Create your first quote to get started'}
             </p>
-            {!searchParams.status && !searchParams.search && (
+            {!params.status && !params.search && (
               <Link href="/quotes/new">
                 <Button className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />

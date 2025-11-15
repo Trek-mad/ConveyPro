@@ -11,14 +11,15 @@ import { SendQuoteButton } from '@/components/quotes/send-quote-button'
 import { formatDistanceToNow, format } from 'date-fns'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
   return {
-    title: `Quote ${params.id} | ConveyPro`,
+    title: `Quote ${id} | ConveyPro`,
     description: 'View and manage quote',
   }
 }
@@ -30,7 +31,10 @@ export default async function QuoteDetailPage({ params }: PageProps) {
     return null
   }
 
-  const result = await getQuote(params.id)
+  // Await params in Next.js 15
+  const { id } = await params
+
+  const result = await getQuote(id)
 
   if ('error' in result) {
     notFound()
@@ -88,7 +92,7 @@ export default async function QuoteDetailPage({ params }: PageProps) {
         </div>
         <div className="flex gap-2">
           {quote.status === 'draft' && (
-            <Link href={`/quotes/${quote.id}/edit`}>
+            <Link href={`/quotes/${id}/edit`}>
               <Button variant="outline" size="sm">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
@@ -96,11 +100,11 @@ export default async function QuoteDetailPage({ params }: PageProps) {
             </Link>
           )}
           <SendQuoteButton
-            quoteId={quote.id}
+            quoteId={id}
             clientEmail={quote.client_email}
             status={quote.status}
           />
-          <Link href={`/api/quotes/${quote.id}/pdf`} target="_blank">
+          <Link href={`/api/quotes/${id}/pdf`} target="_blank">
             <Button variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
               Download PDF
