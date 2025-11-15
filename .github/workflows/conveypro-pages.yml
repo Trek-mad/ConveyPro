@@ -1,1 +1,48 @@
+name: Deploy ConveyPro Mirror to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build site
+        run: |
+          mkdir site
+          rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
+
+          echo "<h1>ConveyPro Repository Mirror</h1>" > site/index.html
+          echo "<p>Browse your repository content below:</p>" >> site/index.html
+          echo "<ul>" >> site/index.html
+          cd site
+          for item in *; do
+            echo "<li><a href=\"$item\">$item</a></li>" >> index.html
+          done
+          echo "</ul>" >> index.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
 
