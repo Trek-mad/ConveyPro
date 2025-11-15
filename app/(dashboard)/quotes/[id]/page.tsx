@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ChevronLeft, Mail, Download, Edit, Trash2, MapPin } from 'lucide-react'
 import { QuoteActions } from '@/components/quotes/quote-actions'
+import { SendQuoteButton } from '@/components/quotes/send-quote-button'
 import { formatDistanceToNow, format } from 'date-fns'
 
 interface PageProps {
@@ -94,6 +95,11 @@ export default async function QuoteDetailPage({ params }: PageProps) {
               </Button>
             </Link>
           )}
+          <SendQuoteButton
+            quoteId={quote.id}
+            clientEmail={quote.client_email}
+            status={quote.status}
+          />
           <Link href={`/api/quotes/${quote.id}/pdf`} target="_blank">
             <Button variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
