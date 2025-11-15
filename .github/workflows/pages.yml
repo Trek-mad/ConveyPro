@@ -22,6 +22,17 @@ jobs:
           mkdir site
           rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
 
+          # Create an index.html if none exists
+          if [ ! -f site/index.html ]; then
+            echo "<h1>ConveyPro Repository Mirror</h1>" > site/index.html
+            echo "<p>This page lists all files and folders in the repository.</p>" >> site/index.html
+            echo "<ul>" >> site/index.html
+            for item in $(ls -1); do
+              echo "<li><a href=\"$item\">$item</a></li>" >> site/index.html
+            done
+            echo "</ul>" >> site/index.html
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
