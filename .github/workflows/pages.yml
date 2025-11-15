@@ -14,17 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Prepare site
+      - name: Prepare site directory
         run: |
           mkdir site
-          cp -r . site/
-          rm -rf site/.git
-          rm -rf site/.github
+          rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
 
-      - name: Upload site artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
@@ -34,7 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Deploy to GitHub Pages
