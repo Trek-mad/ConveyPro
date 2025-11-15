@@ -161,6 +161,50 @@ export async function getProperties(
 }
 
 /**
+ * Get a single property by ID
+ */
+export async function getProperty(
+  propertyId: string,
+  tenantId: string
+): Promise<{ property: Property } | { error: string }> {
+  try {
+    const user = await requireAuth()
+    const supabase = await createClient()
+
+    // Verify user has access
+    const { data: membership } = await supabase
+      .from('tenant_memberships')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single()
+
+    if (!membership) {
+      return { error: 'Unauthorized' }
+    }
+
+    const { data: property, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('id', propertyId)
+      .eq('tenant_id', tenantId)
+      .is('deleted_at', null)
+      .single()
+
+    if (error || !property) {
+      return { error: error?.message || 'Property not found' }
+    }
+
+    return { property }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
  * Create a new quote
  */
 export async function createQuote(
