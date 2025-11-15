@@ -94,10 +94,12 @@ export default async function QuoteDetailPage({ params }: PageProps) {
               </Button>
             </Link>
           )}
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Download PDF
-          </Button>
+          <Link href={`/api/quotes/${quote.id}/pdf`} target="_blank">
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Download PDF
+            </Button>
+          </Link>
         </div>
       </div>
 
