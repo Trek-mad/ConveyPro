@@ -1,5 +1,8 @@
-site_name: ConveyPro Repository
+site_name: ConveyPro Docs
+
 nav:
   - Home: index.md
-  - Docs: docs/
+
 docs_dir: docs
+theme:
+  name: material
