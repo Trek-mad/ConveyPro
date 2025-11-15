@@ -627,3 +627,21 @@ APIs Required:
 +- Fully dynamic form definitions from database
 +- Analytics dashboard, notifications, client portal
 +*(These are reserved for future phases and remain out of scope for this sprint.)*
+
+---
+
+### ✅ Foundational Infrastructure (added Nov 2025)
+
+To ensure long-term scalability and avoid refactoring later, the following lightweight scaffolding has been added in **Phase 1 (MVP)**:
+
+- **tenant_settings** – per-tenant JSON configuration for branding, email, and domain.
+- **feature_flags** – per-tenant feature toggle table.
+- **Audit fields** – `created_at`, `updated_at`, `deleted_at`, `created_by` on all core tables.
+- **Utility hooks**
+  - `lib/utils/analytics.ts → emitAnalyticsEvent()` (no-op placeholder)
+  - `lib/utils/jobs.ts → enqueueBackgroundJob()` (no-op placeholder)
+
+**Purpose:**  
+Provides a clean, extensible foundation for future modules like cross-selling, analytics, notifications, and background processing.  
+These changes introduce **zero runtime overhead** and ensure smooth progression into Phases 2–5.
+
