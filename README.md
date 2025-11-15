@@ -4,7 +4,7 @@ Multi-tenant SaaS platform for Scottish solicitor firms with intelligent cross-s
 
 ## Tech Stack
 
-Next.js 14 • TypeScript • Supabase • Tailwind CSS • shadcn/ui
+Next.js 14 • TypeScript • Supabase • Tailwind CSS • shadcn/ui • n8n automation
 
 ## Quick Start
 
@@ -19,7 +19,9 @@ npm run dev
 
 ## Documentation
 
-See [docs/ABOUT.md](docs/ABOUT.md) for comprehensive documentation including:
+📚 **Full Documentation Site:** https://trek-mad.github.io/ConveyPro/
+
+For development documentation, see [docs/ABOUT.md](docs/ABOUT.md) including:
 - Full setup instructions
 - Database schema and migrations
 - Architecture decisions

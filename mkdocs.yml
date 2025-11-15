@@ -1,0 +1,23 @@
+site_name: ConveyPro Documentation
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+
+  - Overview:
+      - Start Here: START-HERE.md
+      - Quick Reference: QUICK-REFERENCE.md
+      - Documentation Index: DOCUMENTATION-INDEX.md
+      - Full Summary: DOCUMENTATION-COMPLETE-SUMMARY.md
+
+  - Project:
+      - Roadmap: PROJECT-ROADMAP.md
+      - Next Steps: NEXT-STEPS.md
+
+  - Client:
+      - Client Summary: ConveyPro-CLIENT-SUMMARY.md
+
+  - Misc:
+      - Placeholder: placeholder.md
+      - Readme: ABOUT.md
