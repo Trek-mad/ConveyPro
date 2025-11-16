@@ -7,6 +7,98 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0-phase-2-features] - 2024-11-16
+
+**Phase 2 Features: Analytics, Client Management & Branding** 🎨
+
+### Added
+
+#### Analytics Dashboard
+- ✅ Comprehensive analytics dashboard at `/analytics`
+- ✅ Revenue tracking and conversion funnel visualization
+- ✅ Cross-sell performance metrics (Phase 3 preview)
+- ✅ Staff performance leaderboard
+- ✅ Interactive charts using Recharts library
+- ✅ KPI cards with growth indicators
+- ✅ 6-month revenue trends
+- ✅ Quote status funnel visualization
+- ✅ Service breakdown pie charts
+
+#### Client Management System
+- ✅ Client profiles at `/clients` with comprehensive data
+- ✅ Client detail pages with cross-sell opportunity identification
+- ✅ Life stage classification (first-time-buyer, moving-up, investor, retired, downsizing)
+- ✅ Services tracking (purchase, sale, will, POA, estate planning, remortgage)
+- ✅ Client statistics (total quotes, accepted quotes, total value)
+- ✅ Tags and notes system
+- ✅ Client search and filtering
+- ✅ Database migration for clients table with RLS policies
+
+#### Demo Data Seeder
+- ✅ Comprehensive seed script: `npm run seed`
+- ✅ 15 realistic clients across different life stages
+- ✅ 15 properties (residential, commercial)
+- ✅ 17 quotes with various statuses (8 accepted, 3 sent, 2 draft, 2 declined)
+- ✅ £67,900 demo revenue for impressive analytics
+- ✅ Cross-sell examples (will, POA, estate planning services)
+- ✅ 6 months of historical data for trending charts
+- ✅ Detailed README with usage instructions
+
+#### Firm Branding & White Label
+- ✅ Branding settings page at `/settings/branding`
+- ✅ Logo upload to Supabase Storage
+- ✅ Custom brand colors (primary, secondary, accent)
+- ✅ Color pickers with hex input validation
+- ✅ Firm name and tagline customization
+- ✅ Real-time quote preview with branding
+- ✅ White-label toggle for quotes and emails
+- ✅ Supabase Storage bucket `firm-logos` with RLS policies
+- ✅ Flexible tenant_settings key-value storage
+- ✅ API routes for logo upload and settings management
+
+### Technical Implementation
+
+#### Database
+- Created `clients` table with RLS policies for multi-tenant isolation
+- Created `firm-logos` storage bucket with public access and tenant-scoped policies
+- Flexible `tenant_settings` table for branding configuration
+- Foreign key `client_id` in quotes table
+
+#### Services
+- `client.service.ts` - CRUD operations for clients
+- `branding.service.ts` - Logo upload, branding settings management
+- `team.service.ts` - Team management operations (already existed)
+
+#### Components
+- `analytics-charts.tsx` - Recharts visualizations (line, bar, pie charts)
+- `cross-sell-performance.tsx` - Cross-sell metrics table
+- `staff-performance.tsx` - Staff leaderboard
+- `branding-settings-form.tsx` - Logo upload and color customization
+
+#### API Routes
+- `/api/branding/upload-logo` - Logo file upload handler
+- `/api/branding/settings` - GET/POST branding settings
+
+### Fixed
+- Fixed cross-sell revenue calculation to be `accepted × avgValue` (was percentage-based)
+- Resolved `createClient` naming conflict in client.service.ts (aliased Supabase import)
+
+### Dependencies Added
+- `recharts@^3.4.1` - React charting library for analytics
+- `tsx@^4.7.0` - TypeScript executor for seed scripts
+
+### Security
+- RLS policies for clients table (tenant-scoped access)
+- RLS policies for firm-logos storage (admin-only upload, public read)
+- File validation for logos (5MB limit, image types only)
+- Tenant ID verification in branding API routes
+
+### Documentation
+- Created `scripts/README.md` with seed script usage
+- Added branding settings inline documentation
+
+---
+
 ## [1.0.0-phase-1] - 2024-11-16
 
 **Phase 1 MVP Complete** 🎉
