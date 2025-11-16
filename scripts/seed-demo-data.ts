@@ -324,27 +324,27 @@ async function seedDemoData() {
 
   const properties = [
     // First-Time Buyer Properties
-    { address_line1: '34 Leith Walk', city: 'Edinburgh', postcode: 'EH6 5BR', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 185000, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '12 Woodlands Road', city: 'Glasgow', postcode: 'G3 6UR', country: 'Scotland', property_type: 'flat', bedrooms: 1, price: 145000, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '56 South Bridge', city: 'Edinburgh', postcode: 'EH1 1LL', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 210000, created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '89 Dumbarton Road', city: 'Glasgow', postcode: 'G11 6PW', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 165000, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '23 Nicolson Street', city: 'Edinburgh', postcode: 'EH8 9BH', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 195000, created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '34 Leith Walk', city: 'Edinburgh', postcode: 'EH6 5BR', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 185000, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '12 Woodlands Road', city: 'Glasgow', postcode: 'G3 6UR', country: 'Scotland', property_type: 'residential', bedrooms: 1, purchase_price: 145000, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '56 South Bridge', city: 'Edinburgh', postcode: 'EH1 1LL', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 210000, created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '89 Dumbarton Road', city: 'Glasgow', postcode: 'G11 6PW', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 165000, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '23 Nicolson Street', city: 'Edinburgh', postcode: 'EH8 9BH', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 195000, created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
 
     // Moving Up Properties
-    { address_line1: '45 Ravelston Dykes', city: 'Edinburgh', postcode: 'EH4 3LY', country: 'Scotland', property_type: 'house', bedrooms: 4, price: 475000, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '78 Hyndland Road', city: 'Glasgow', postcode: 'G12 9UZ', country: 'Scotland', property_type: 'house', bedrooms: 4, price: 425000, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '12 Blackford Avenue', city: 'Edinburgh', postcode: 'EH9 2PU', country: 'Scotland', property_type: 'house', bedrooms: 5, price: 550000, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '34 Dowanside Road', city: 'Glasgow', postcode: 'G12 9DQ', country: 'Scotland', property_type: 'house', bedrooms: 3, price: 385000, created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '45 Ravelston Dykes', city: 'Edinburgh', postcode: 'EH4 3LY', country: 'Scotland', property_type: 'residential', bedrooms: 4, purchase_price: 475000, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '78 Hyndland Road', city: 'Glasgow', postcode: 'G12 9UZ', country: 'Scotland', property_type: 'residential', bedrooms: 4, purchase_price: 425000, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '12 Blackford Avenue', city: 'Edinburgh', postcode: 'EH9 2PU', country: 'Scotland', property_type: 'residential', bedrooms: 5, purchase_price: 550000, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '34 Dowanside Road', city: 'Glasgow', postcode: 'G12 9DQ', country: 'Scotland', property_type: 'residential', bedrooms: 3, purchase_price: 385000, created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
 
     // Investor Properties
-    { address_line1: '67 Gorgie Road', city: 'Edinburgh', postcode: 'EH11 2LA', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 175000, created_at: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '45 Maryhill Road', city: 'Glasgow', postcode: 'G20 7XE', country: 'Scotland', property_type: 'flat', bedrooms: 1, price: 125000, created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '89 Commercial Street', city: 'Edinburgh', postcode: 'EH6 6LX', country: 'Scotland', property_type: 'commercial', bedrooms: null, price: 650000, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '67 Gorgie Road', city: 'Edinburgh', postcode: 'EH11 2LA', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 175000, created_at: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '45 Maryhill Road', city: 'Glasgow', postcode: 'G20 7XE', country: 'Scotland', property_type: 'residential', bedrooms: 1, purchase_price: 125000, created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '89 Commercial Street', city: 'Edinburgh', postcode: 'EH6 6LX', country: 'Scotland', property_type: 'commercial', bedrooms: null, purchase_price: 650000, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
 
     // Downsizing Properties
-    { address_line1: '23 Bruntsfield Place', city: 'Edinburgh', postcode: 'EH10 4HN', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 295000, created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '56 Park Circus', city: 'Glasgow', postcode: 'G3 6AP', country: 'Scotland', property_type: 'flat', bedrooms: 3, price: 325000, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
-    { address_line1: '12 Dean Park Crescent', city: 'Edinburgh', postcode: 'EH4 1PH', country: 'Scotland', property_type: 'flat', bedrooms: 2, price: 275000, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '23 Bruntsfield Place', city: 'Edinburgh', postcode: 'EH10 4HN', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 295000, created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '56 Park Circus', city: 'Glasgow', postcode: 'G3 6AP', country: 'Scotland', property_type: 'residential', bedrooms: 3, purchase_price: 325000, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
+    { address_line1: '12 Dean Park Crescent', city: 'Edinburgh', postcode: 'EH4 1PH', country: 'Scotland', property_type: 'residential', bedrooms: 2, purchase_price: 275000, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
   ]
 
   const { data: createdProperties, error: propertyError } = await supabase
