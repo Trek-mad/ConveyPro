@@ -42,7 +42,7 @@ export default async function EditQuotePage({ params }: PageProps) {
   // Check if quote can be edited (only drafts)
   if (quote.status !== 'draft') {
     // Redirect to quote detail page with message
-    redirect(`/quotes/${params.id}`)
+    redirect(`/quotes/${id}`)
   }
 
   // Fetch properties for the property selector
@@ -54,7 +54,7 @@ export default async function EditQuotePage({ params }: PageProps) {
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href={`/quotes/${params.id}`}>
+        <Link href={`/quotes/${id}`}>
           <Button variant="ghost" size="sm">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Quote
