@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0-phase-1] - 2024-11-16
+
+**Phase 1 MVP Complete** 🎉
+
+### Git Tags & Branches
+- **Tag:** `v1.0-phase-1` (main branch)
+- **Tag:** `phase-1-mvp-complete` (feature branch)
+- **Branch:** `claude/phase-1-mvp-0151jSm8PvAf8MqE51ryMAwW` (locked)
+- **Main:** Protected branch (requires PRs)
+
+### Pull Requests Merged
+- **PR #4:** Phase 1 MVP Complete - LBTT Calculator & Email Fixes (12 commits)
+- **PR #5:** Codex Build Fixes - Status Icons & Formatting (1 commit)
+
+### Added
+- ✅ LBTT (Land and Buildings Transaction Tax) calculator
+  - Scottish 2025-26 tax bands (0%, 2%, 5%, 10%, 12%)
+  - First-time buyer relief (£175k nil-rate band)
+  - Additional Dwelling Supplement (8% flat rate)
+  - Mutually exclusive FTB/ADS checkboxes
+  - Real-time calculation and breakdown display
+- ✅ Fee calculator with tiered structure
+- ✅ Email quote sending with PDF attachment
+- ✅ PDF generation for quotes
+- ✅ Auth layout for login/signup flows
+- ✅ Missing quote status icons (pending, expired, cancelled)
+- ✅ RLS recursion fix migration for tenant onboarding
+- ✅ Comprehensive documentation (LBTT-CALCULATOR.md)
+
+### Fixed
+
+#### Next.js 15/16 Compatibility Fixes
+- **Dynamic Routes:** Fixed async params in 7 page routes
+  - `app/(dashboard)/quotes/[id]/page.tsx`
+  - `app/(dashboard)/quotes/[id]/edit/page.tsx`
+  - `app/(dashboard)/properties/[id]/page.tsx`
+  - `app/(dashboard)/properties/[id]/edit/page.tsx`
+  - `app/(dashboard)/quotes/new/page.tsx`
+  - `app/(dashboard)/quotes/page.tsx`
+  - `app/(dashboard)/properties/page.tsx`
+- **API Routes:** Fixed async params in 2 API routes
+  - `app/api/quotes/[id]/send/route.ts`
+  - `app/api/quotes/[id]/pdf/route.ts`
+- **Component Syntax:** Fixed QuotePDF rendering (function call vs JSX)
+
+#### Database & Types
+- **Supabase Types:** Added `Relationships: []` to all 7 tables
+  - Fixed GenericSchema constraint violation
+  - Resolves `profiles.update()` type errors
+  - Tables: tenant_settings, feature_flags, tenants, profiles, tenant_memberships, properties, quotes
+- **RLS Policies:** Fixed infinite recursion in tenant_memberships INSERT policy
+  - Migration: `20241115200000_fix_tenant_memberships_recursion.sql`
+  - Allows first owner membership creation during onboarding
+  - Prevents "infinite recursion detected" error
+
+#### Critical Bug Fixes
+- **Quote Detail 404:** Removed broken `created_by_user:profiles(*)` join (commit 066a8dd)
+- **Email Sending:** Fixed Next.js 16 async params in send/pdf routes (commit e0c87de)
+- **Auth Layout:** Restored missing `app/(auth)/layout.tsx` (commit c770c25)
+- **Settings Page:** Removed unused imports causing build errors (commit 540f24b)
+- **Type Assertions:** Added proper type handling for firm settings role prop
+- **Property Edit:** Fixed params.id usage in JSX links
+
+### Technical Debt Resolved
+- All TypeScript compilation errors fixed
+- Production build passes (`npm run build` ✅)
+- All Supabase type issues resolved
+- No runtime errors in development or production
+
+### Documentation
+- Updated PROJECT-ROADMAP.md (Phase 1 marked complete)
+- Created LBTT-CALCULATOR.md (comprehensive implementation guide)
+- Updated CHANGELOG.md with all fixes and features
+
+### Commits Summary
+- 13 commits total in Phase 1
+- All commits merged to main via PRs
+- Clean git history maintained
+
+---
+
 ## [Unreleased]
 
 ### Added
