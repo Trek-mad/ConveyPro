@@ -14,7 +14,7 @@ import type {
   TenantUpdate,
   TenantMembership,
   TenantMembershipInsert,
-  Profile,
+  TenantMembershipWithUser,
 } from '@/types'
 import { revalidatePath } from 'next/cache'
 
@@ -163,10 +163,7 @@ export async function getTenant(
  */
 export async function getTenantMembers(
   tenantId: string
-): Promise<
-  | { members: Array<TenantMembership & { profile?: Profile }> }
-  | { error: string }
-> {
+): Promise<{ members: TenantMembershipWithUser[] } | { error: string }> {
   try {
     const user = await requireAuth()
     const supabase = await createClient()
@@ -199,7 +196,9 @@ export async function getTenantMembers(
       return { error: error.message }
     }
 
-    return { members: members || [] }
+    return {
+      members: ((members || []) as unknown) as TenantMembershipWithUser[],
+    }
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -354,14 +353,14 @@ export async function removeMember(
 
     // Prevent removing the last owner
     if (targetMembership.role === 'owner') {
-      const { data: ownerCount } = await supabase
+      const { count: ownerCount } = await supabase
         .from('tenant_memberships')
         .select('id', { count: 'exact', head: true })
         .eq('tenant_id', targetMembership.tenant_id)
         .eq('role', 'owner')
         .eq('status', 'active')
 
-      if (ownerCount && ownerCount <= 1) {
+      if ((ownerCount ?? 0) <= 1) {
         return { error: 'Cannot remove the last owner' }
       }
     }

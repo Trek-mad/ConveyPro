@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   badge: {
-    display: 'inline-block',
+    display: 'flex',
     padding: '4px 8px',
     borderRadius: 12,
     fontSize: 9,

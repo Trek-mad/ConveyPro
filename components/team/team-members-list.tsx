@@ -1,11 +1,11 @@
 'use client'
 
-import { TenantMembership, Profile } from '@/types'
+import { TenantMembershipWithUser } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { MemberActions } from './member-actions'
 
 interface TeamMembersListProps {
-  members: Array<TenantMembership & { profile?: Profile }>
+  members: TenantMembershipWithUser[]
   currentUserId: string
   currentUserRole: 'owner' | 'admin' | 'manager' | 'member' | 'viewer'
   tenantId: string
@@ -95,7 +95,11 @@ export function TeamMembersList({
                     )}
                   </p>
                 </div>
-                <p className="text-sm text-gray-500">{profile?.email || '—'}</p>
+                <p className="text-sm text-gray-500">
+                  {profile?.job_title ||
+                    profile?.phone ||
+                    'No additional details'}
+                </p>
                 {member.status === 'invited' && member.invitation_expires_at && (
                   <p className="text-xs text-yellow-600">
                     Invitation expires{' '}
