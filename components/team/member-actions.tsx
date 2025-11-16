@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { TenantMembership } from '@/types'
+import { TenantMembershipWithUser } from '@/types'
 import { updateMemberRole, removeMember } from '@/services/tenant.service'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,7 +15,7 @@ import {
 import { Trash2 } from 'lucide-react'
 
 interface MemberActionsProps {
-  member: TenantMembership
+  member: TenantMembershipWithUser
   currentUserRole: 'owner' | 'admin' | 'manager' | 'member' | 'viewer'
   tenantId: string
 }

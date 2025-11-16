@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Property } from '@/types'
@@ -69,7 +69,7 @@ export function PropertyEditForm({ property }: PropertyEditFormProps) {
       city: property.city,
       postcode: property.postcode,
       country: property.country || 'Scotland',
-      property_type: property.property_type,
+      property_type: property.property_type || 'residential',
       tenure: property.tenure || undefined,
       title_number: property.title_number || '',
       uprn: property.uprn || '',
@@ -77,7 +77,7 @@ export function PropertyEditForm({ property }: PropertyEditFormProps) {
     },
   })
 
-  const onSubmit = async (data: PropertyFormData) => {
+  const onSubmit: SubmitHandler<PropertyFormData> = async (data) => {
     setIsLoading(true)
     setError(null)
 
