@@ -43,7 +43,7 @@ export default async function EditPropertyPage({ params }: PageProps) {
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href={`/properties/${params.id}`}>
+        <Link href={`/properties/${id}`}>
           <Button variant="ghost" size="sm">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Property
