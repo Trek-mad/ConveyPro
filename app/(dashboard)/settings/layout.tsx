@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { getCurrentUser, getActiveTenantMembership } from '@/lib/auth'
-import { usePathname } from 'next/navigation'
 import { SettingsNav } from '@/components/settings/settings-nav'
 
 export default async function SettingsLayout({
