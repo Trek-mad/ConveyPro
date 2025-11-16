@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 
 type Client = Database['public']['Tables']['clients']['Row']
@@ -9,7 +9,7 @@ type ClientUpdate = Database['public']['Tables']['clients']['Update']
  * Get all clients for a tenant
  */
 export async function getClients(tenantId: string) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   const { data: clients, error } = await supabase
     .from('clients')
@@ -30,7 +30,7 @@ export async function getClients(tenantId: string) {
  * Get a single client by ID
  */
 export async function getClient(clientId: string) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   const { data: client, error } = await supabase
     .from('clients')
@@ -54,7 +54,7 @@ export async function getClient(clientId: string) {
  * Create a new client
  */
 export async function createClient(data: ClientInsert) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   const { data: client, error } = await supabase
     .from('clients')
@@ -74,7 +74,7 @@ export async function createClient(data: ClientInsert) {
  * Update a client
  */
 export async function updateClient(clientId: string, data: ClientUpdate) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   const { data: client, error } = await supabase
     .from('clients')
@@ -95,7 +95,7 @@ export async function updateClient(clientId: string, data: ClientUpdate) {
  * Soft delete a client
  */
 export async function deleteClient(clientId: string) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   const { error } = await supabase
     .from('clients')
@@ -114,7 +114,7 @@ export async function deleteClient(clientId: string) {
  * Search clients by name or email
  */
 export async function searchClients(tenantId: string, query: string) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   const { data: clients, error } = await supabase
     .from('clients')
@@ -137,7 +137,7 @@ export async function searchClients(tenantId: string, query: string) {
  * Get client statistics
  */
 export async function getClientStats(clientId: string) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
 
   // Get quotes count and total value
   const { data: quotes, error } = await supabase
