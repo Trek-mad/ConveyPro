@@ -11,14 +11,15 @@ import { SendQuoteButton } from '@/components/quotes/send-quote-button'
 import { formatDistanceToNow, format } from 'date-fns'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
   return {
-    title: `Quote ${params.id} | ConveyPro`,
+    title: `Quote ${id} | ConveyPro`,
     description: 'View and manage quote',
   }
 }
@@ -30,7 +31,8 @@ export default async function QuoteDetailPage({ params }: PageProps) {
     return null
   }
 
-  const result = await getQuote(params.id)
+  const { id } = await params
+  const result = await getQuote(id)
 
   if ('error' in result) {
     notFound()

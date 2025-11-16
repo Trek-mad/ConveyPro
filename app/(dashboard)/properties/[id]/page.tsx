@@ -9,14 +9,15 @@ import { ChevronLeft, Edit, MapPin, FileText, Plus } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
   return {
-    title: `Property ${params.id} | ConveyPro`,
+    title: `Property ${id} | ConveyPro`,
     description: 'View property details',
   }
 }
@@ -28,7 +29,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     return null
   }
 
-  const result = await getProperty(params.id, membership.tenant_id)
+  const { id } = await params
+  const result = await getProperty(id, membership.tenant_id)
 
   if ('error' in result) {
     notFound()
@@ -37,7 +39,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const property = result.property
 
   // Fetch related quotes
-  const quotesResult = await getQuotesByProperty(params.id, membership.tenant_id)
+  const quotesResult = await getQuotesByProperty(id, membership.tenant_id)
   const quotes = 'quotes' in quotesResult ? quotesResult.quotes : []
 
   const getPropertyTypeLabel = (type: typeof property.property_type) => {

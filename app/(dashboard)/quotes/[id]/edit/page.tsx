@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -28,8 +28,10 @@ export default async function EditQuotePage({ params }: PageProps) {
     return null
   }
 
+  const { id } = await params
+
   // Fetch the quote
-  const result = await getQuote(params.id)
+  const result = await getQuote(id)
 
   if ('error' in result) {
     notFound()
