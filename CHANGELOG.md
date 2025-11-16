@@ -115,6 +115,60 @@ export default async function Page({ params }: PageProps) {
 
 ---
 
+#### [2024-11-16] Email Sending & PDF Generation Broken - Critical Bug Fix
+
+**Commit:** `e0c87de`
+
+**Symptoms:**
+- Email sending completely broken - "Send Quote" button failed silently
+- PDF generation also failing
+- These features worked yesterday before Next.js 15 migration
+
+**Root Cause:**
+- API routes also need async params in Next.js 15 (not just page routes)
+- `/app/api/quotes/[id]/send/route.ts` - Email sending endpoint
+- `/app/api/quotes/[id]/pdf/route.ts` - PDF generation endpoint
+- Both were using synchronous `params: { id: string }` instead of async
+
+**Discovery:**
+- User reported emails not sending after today's fixes
+- Realized API routes were missed in the Next.js 15 async params migration
+
+**Fix:**
+Changed API route params from synchronous to async:
+
+```typescript
+// Before
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const quoteResult = await getQuote(params.id)
+}
+
+// After
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+  const quoteResult = await getQuote(id)
+}
+```
+
+**Files Changed:**
+- `app/api/quotes/[id]/send/route.ts` (lines 12, 21, 87)
+- `app/api/quotes/[id]/pdf/route.ts` (lines 10, 19)
+
+**Impact:**
+- ✅ Email sending now works correctly
+- ✅ PDF generation restored
+- ✅ Quote workflow fully functional end-to-end
+
+**Note:** This was the final piece of the Next.js 15 migration. All dynamic routes (pages AND API routes) now properly handle async params.
+
+---
+
 #### [2024-11-16] Settings Layout Unused Imports
 
 **Commit:** `540f24b`
