@@ -392,12 +392,16 @@ async function seedDemoData() {
   // ============================================================================
   console.log('💼 Creating quotes...')
 
+  // Generate unique quote prefix based on tenant to avoid conflicts
+  const quotePrefix = `Q-${tenantId.substring(0, 4)}-`
+  let quoteCounter = 1
+
   const quotes = [
     // ACCEPTED QUOTES (for revenue stats)
     {
       client_id: clientMap.get('sarah.mitchell@email.com'),
       property_id: propertyMap.get('34 Leith Walk'),
-      quote_number: 'Q-2024-001',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 185000,
       client_name: 'Sarah Mitchell',
@@ -415,7 +419,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('emily.chen@email.com'),
       property_id: propertyMap.get('56 South Bridge'),
-      quote_number: 'Q-2024-002',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 210000,
       client_name: 'Emily Chen',
@@ -433,7 +437,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('david.fraser@email.com'),
       property_id: propertyMap.get('45 Ravelston Dykes'),
-      quote_number: 'Q-2024-003',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 475000,
       client_name: 'David Fraser',
@@ -451,7 +455,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('rachel.brown@email.com'),
       property_id: null,
-      quote_number: 'Q-2024-004',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'sale',
       transaction_value: 245000,
       client_name: 'Rachel Brown',
@@ -469,7 +473,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('rob.campbell@email.com'),
       property_id: propertyMap.get('67 Gorgie Road'),
-      quote_number: 'Q-2024-005',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 175000,
       client_name: 'Robert Campbell',
@@ -487,7 +491,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('margaret.r@email.com'),
       property_id: null,
-      quote_number: 'Q-2024-006',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'sale',
       transaction_value: 425000,
       client_name: 'Margaret Robertson',
@@ -505,7 +509,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('andrew.macleod@email.com'),
       property_id: propertyMap.get('12 Blackford Avenue'),
-      quote_number: 'Q-2024-007',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 550000,
       client_name: 'Andrew MacLeod',
@@ -523,7 +527,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('linda.patel@email.com'),
       property_id: propertyMap.get('45 Maryhill Road'),
-      quote_number: 'Q-2024-008',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 125000,
       client_name: 'Linda Patel',
@@ -543,7 +547,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('j.thompson@email.com'),
       property_id: propertyMap.get('12 Woodlands Road'),
-      quote_number: 'Q-2024-011',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 145000,
       client_name: 'James Thompson',
@@ -560,7 +564,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('sophie.w@email.com'),
       property_id: propertyMap.get('23 Nicolson Street'),
-      quote_number: 'Q-2024-012',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 195000,
       client_name: 'Sophie Williams',
@@ -577,7 +581,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('jen.scott@email.com'),
       property_id: propertyMap.get('34 Dowanside Road'),
-      quote_number: 'Q-2024-013',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 385000,
       client_name: 'Jennifer Scott',
@@ -596,7 +600,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('michael.oconnor@email.com'),
       property_id: propertyMap.get('89 Dumbarton Road'),
-      quote_number: 'Q-2024-014',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 165000,
       client_name: "Michael O'Connor",
@@ -613,7 +617,7 @@ async function seedDemoData() {
     {
       client_id: clientMap.get('t.anderson@email.com'),
       property_id: propertyMap.get('89 Commercial Street'),
-      quote_number: 'Q-2024-015',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 650000,
       client_name: 'Thomas Anderson',
@@ -632,7 +636,7 @@ async function seedDemoData() {
     {
       client_id: null,
       property_id: null,
-      quote_number: 'Q-2024-016',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'purchase',
       transaction_value: 175000,
       client_name: 'Anonymous Client',
@@ -649,7 +653,7 @@ async function seedDemoData() {
     {
       client_id: null,
       property_id: null,
-      quote_number: 'Q-2024-017',
+      quote_number: `${quotePrefix}${String(quoteCounter++).padStart(3, '0')}`,
       transaction_type: 'sale',
       transaction_value: 220000,
       client_name: 'Anonymous Client',
