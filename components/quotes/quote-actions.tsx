@@ -6,7 +6,7 @@ import { Quote } from '@/types'
 import { updateQuoteStatus } from '@/services/quote.service'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Mail, Check, X, Clock } from 'lucide-react'
+import { Check, X, Clock } from 'lucide-react'
 
 interface QuoteActionsProps {
   quote: Quote
@@ -34,7 +34,7 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
     setIsLoading(false)
   }
 
-  // Only show actions if quote is in 'sent' status or needs status management
+  // Only show actions if quote is in 'sent' status
   if (quote.status !== 'sent') {
     return null
   }
