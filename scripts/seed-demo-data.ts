@@ -63,6 +63,15 @@ async function seedDemoData() {
   const tenantId = tenant.id
   console.log(`✓ Using tenant: ${tenant.name} (${tenantId})\n`)
 
+  // Clean up existing demo data (optional - run with --clean flag)
+  if (process.argv.includes('--clean')) {
+    console.log('🧹 Cleaning up existing data...')
+    await supabase.from('quotes').delete().eq('tenant_id', tenantId)
+    await supabase.from('properties').delete().eq('tenant_id', tenantId)
+    await supabase.from('clients').delete().eq('tenant_id', tenantId)
+    console.log('✓ Cleaned up existing data\n')
+  }
+
   // ============================================================================
   // CREATE CLIENTS
   // ============================================================================
