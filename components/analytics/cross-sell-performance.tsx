@@ -21,7 +21,6 @@ export function CrossSellPerformance({
       offers: Math.floor(crossSellOpportunities * 0.35),
       accepted: Math.floor(crossSellAccepted * 0.40),
       rate: 40,
-      revenue: crossSellRevenue * 0.45,
       avgValue: 750,
     },
     {
@@ -29,7 +28,6 @@ export function CrossSellPerformance({
       offers: Math.floor(crossSellOpportunities * 0.28),
       accepted: Math.floor(crossSellAccepted * 0.30),
       rate: 35,
-      revenue: crossSellRevenue * 0.28,
       avgValue: 500,
     },
     {
@@ -37,7 +35,6 @@ export function CrossSellPerformance({
       offers: Math.floor(crossSellOpportunities * 0.20),
       accepted: Math.floor(crossSellAccepted * 0.20),
       rate: 45,
-      revenue: crossSellRevenue * 0.20,
       avgValue: 1200,
     },
     {
@@ -45,13 +42,16 @@ export function CrossSellPerformance({
       offers: Math.floor(crossSellOpportunities * 0.17),
       accepted: Math.floor(crossSellAccepted * 0.10),
       rate: 25,
-      revenue: crossSellRevenue * 0.07,
       avgValue: 350,
     },
-  ]
+  ].map(service => ({
+    ...service,
+    revenue: service.accepted * service.avgValue, // Revenue = Accepted × Avg Value
+  }))
 
   const totalOffers = crossSellServices.reduce((sum, s) => sum + s.offers, 0)
   const totalAccepted = crossSellServices.reduce((sum, s) => sum + s.accepted, 0)
+  const totalRevenue = crossSellServices.reduce((sum, s) => sum + s.revenue, 0)
   const overallConversionRate = totalOffers > 0 ? (totalAccepted / totalOffers) * 100 : 0
 
   return (
@@ -146,7 +146,7 @@ export function CrossSellPerformance({
               </td>
               <td className="px-4 py-3"></td>
               <td className="px-4 py-3 text-sm font-bold text-gray-900">
-                £{crossSellRevenue.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                £{totalRevenue.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </td>
             </tr>
           </tfoot>
