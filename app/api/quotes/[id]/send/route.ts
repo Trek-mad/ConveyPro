@@ -46,7 +46,7 @@ export async function POST(
 
     // Generate PDF
     const pdfBuffer = await renderToBuffer(
-      <QuotePDF quote={quote} tenantName={tenantName} />
+      QuotePDF({ quote, tenantName }) as any
     )
 
     // Convert PDF buffer to base64 for email attachment

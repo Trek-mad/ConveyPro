@@ -33,7 +33,7 @@ export async function GET(
 
     // Generate PDF stream
     const stream = await renderToStream(
-      <QuotePDF quote={quote} tenantName={tenantName} />
+      QuotePDF({ quote, tenantName }) as any
     )
 
     // Convert stream to buffer
