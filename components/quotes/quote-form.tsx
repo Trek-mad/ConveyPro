@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createQuote } from '@/services/quote.service'
+import { calculateQuote, type QuoteCalculation } from '@/lib/calculators'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,6 +29,10 @@ const quoteSchema = z.object({
   transaction_type: z.enum(['purchase', 'sale', 'remortgage', 'transfer_of_equity']),
   transaction_value: z.string().min(1, 'Transaction value is required'),
 
+  // LBTT details
+  is_first_time_buyer: z.boolean().optional(),
+  is_additional_property: z.boolean().optional(),
+
   // Financial details
   base_fee: z.string().min(1, 'Base fee is required'),
   disbursements: z.string().optional(),
@@ -47,6 +52,7 @@ export function QuoteForm({ tenantId }: QuoteFormProps) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [calculation, setCalculation] = useState<QuoteCalculation | null>(null)
 
   const {
     register,
@@ -60,13 +66,43 @@ export function QuoteForm({ tenantId }: QuoteFormProps) {
       transaction_type: 'purchase',
       vat_rate: '20',
       disbursements: '0',
+      is_first_time_buyer: false,
+      is_additional_property: false,
     },
   })
 
   // Watch values for auto-calculation
+  const transactionValue = watch('transaction_value') || '0'
+  const transactionType = watch('transaction_type')
+  const isFirstTimeBuyer = watch('is_first_time_buyer') || false
+  const isAdditionalProperty = watch('is_additional_property') || false
   const baseFee = watch('base_fee') || '0'
   const disbursements = watch('disbursements') || '0'
   const vatRate = watch('vat_rate') || '20'
+
+  // Auto-calculate fees when transaction details change
+  useEffect(() => {
+    const value = parseFloat(transactionValue)
+    if (value > 0 && transactionType) {
+      try {
+        const calc = calculateQuote({
+          purchasePrice: value,
+          transactionType,
+          isFirstTimeBuyer,
+          isAdditionalProperty,
+          propertyType: 'residential',
+        })
+        setCalculation(calc)
+
+        // Auto-fill fee fields with calculated values
+        setValue('base_fee', calc.fees.baseFee.toString())
+        setValue('disbursements', calc.fees.disbursements.toString())
+        setValue('vat_rate', '20')
+      } catch (err) {
+        console.error('Calculation error:', err)
+      }
+    }
+  }, [transactionValue, transactionType, isFirstTimeBuyer, isAdditionalProperty, setValue])
 
   // Calculate totals
   const baseFeeNum = parseFloat(baseFee) || 0
@@ -212,7 +248,7 @@ export function QuoteForm({ tenantId }: QuoteFormProps) {
 
           <div>
             <Label htmlFor="transaction_value">
-              Transaction Value (£) <span className="text-red-500">*</span>
+              Property Value (£) <span className="text-red-500">*</span>
             </Label>
             <Input
               id="transaction_value"
@@ -229,13 +265,83 @@ export function QuoteForm({ tenantId }: QuoteFormProps) {
             )}
           </div>
         </div>
+
+        {/* LBTT Options */}
+        {transactionType === 'purchase' && (
+          <div className="mt-4 space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <h3 className="text-sm font-medium text-gray-900">LBTT Options</h3>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="is_first_time_buyer"
+                {...register('is_first_time_buyer')}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="is_first_time_buyer" className="text-sm font-normal cursor-pointer">
+                First-time buyer (no LBTT on properties up to £175,000)
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="is_additional_property"
+                {...register('is_additional_property')}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="is_additional_property" className="text-sm font-normal cursor-pointer">
+                Additional property (6% ADS applies)
+              </Label>
+            </div>
+          </div>
+        )}
+
+        {/* LBTT Calculation Display */}
+        {calculation && transactionType === 'purchase' && (
+          <Card className="bg-blue-50 p-4 border-blue-200">
+            <h3 className="mb-3 font-semibold text-blue-900">LBTT Calculation</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-blue-700">Standard LBTT:</span>
+                <span className="font-medium text-blue-900">
+                  £{calculation.lbtt.standardLBTT.toLocaleString()}
+                </span>
+              </div>
+              {calculation.lbtt.adsLBTT > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-blue-700">ADS (6%):</span>
+                  <span className="font-medium text-blue-900">
+                    £{calculation.lbtt.adsLBTT.toLocaleString()}
+                  </span>
+                </div>
+              )}
+              <div className="border-t border-blue-300 pt-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold text-blue-900">Total LBTT:</span>
+                  <span className="text-lg font-bold text-blue-600">
+                    £{calculation.lbtt.totalLBTT.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-blue-600 mt-2">
+                Effective rate: {calculation.lbtt.effectiveRate.toFixed(2)}%
+              </p>
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* Financial Details */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Financial Details
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Legal Fees
+          </h2>
+          {calculation && (
+            <span className="text-sm text-green-600 font-medium">
+              ✓ Auto-calculated
+            </span>
+          )}
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="base_fee">
