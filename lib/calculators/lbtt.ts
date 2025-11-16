@@ -92,9 +92,21 @@ export function calculateLBTT(params: {
   const { total: standardLBTT, breakdown } = calculateProgressiveTax(purchasePrice, bands)
 
   // Apply first-time buyer relief (residential only)
+  // First-time buyers pay no LBTT on the first £175,000
   let finalStandardLBTT = standardLBTT
-  if (propertyType === 'residential' && isFirstTimeBuyer && purchasePrice <= FIRST_TIME_BUYER_THRESHOLD) {
-    finalStandardLBTT = 0
+  let reliefAmount = 0
+  if (propertyType === 'residential' && isFirstTimeBuyer) {
+    if (purchasePrice <= FIRST_TIME_BUYER_THRESHOLD) {
+      // Property costs £175k or less - no LBTT at all
+      reliefAmount = standardLBTT
+      finalStandardLBTT = 0
+    } else {
+      // Property costs more than £175k - pay LBTT only on the amount above £175k
+      const taxableAmount = purchasePrice - FIRST_TIME_BUYER_THRESHOLD
+      const { total: reducedLBTT } = calculateProgressiveTax(taxableAmount, bands)
+      reliefAmount = standardLBTT - reducedLBTT
+      finalStandardLBTT = reducedLBTT
+    }
   }
 
   // Calculate ADS (residential additional properties only)

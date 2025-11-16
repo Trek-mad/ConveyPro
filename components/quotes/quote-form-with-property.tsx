@@ -171,7 +171,7 @@ export function QuoteFormWithProperty({
       ...(calculation && {
         lbtt: {
           standard: calculation.lbtt.standardLBTT,
-          ads: calculation.lbtt.adsAmount,
+          ads: calculation.lbtt.adsLBTT,
           total: calculation.lbtt.totalLBTT,
           is_first_time_buyer: data.is_first_time_buyer || false,
           is_additional_property: data.is_additional_property || false,
@@ -433,11 +433,11 @@ export function QuoteFormWithProperty({
                   £{calculation.lbtt.standardLBTT.toLocaleString('en-GB')}
                 </span>
               </div>
-              {calculation.lbtt.adsAmount > 0 && (
+              {calculation.lbtt.adsLBTT > 0 && (
                 <div className="flex justify-between">
                   <span className="text-blue-700">ADS (6%):</span>
                   <span className="font-medium text-blue-900">
-                    £{calculation.lbtt.adsAmount.toLocaleString('en-GB')}
+                    £{calculation.lbtt.adsLBTT.toLocaleString('en-GB')}
                   </span>
                 </div>
               )}
