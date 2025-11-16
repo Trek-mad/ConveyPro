@@ -38,11 +38,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `app/(dashboard)/quotes/new/page.tsx` - Await searchParams
 
 #### Critical Bug Fixes
-- **Fixed quote detail page 404 errors**
-  - Removed broken `created_by_user:profiles(*)` join
-  - Actual column name is `created_by`, not `created_by_user`
-  - File: `services/quote.service.ts:327`
-  - This bug was causing ALL quote detail pages to fail silently
+- **Fixed quote detail page 404 errors (getQuote service)**
+  - **Symptoms**: ALL quote detail pages (`/quotes/[id]`) were failing with 404 errors
+  - **Root Cause**: Incorrect Supabase query in `getQuote()` function
+    - Query attempted to join: `.select('*, created_by_user:profiles(*)')`
+    - Problem: Column is named `created_by`, NOT `created_by_user`
+    - This caused the entire query to fail silently, returning no results
+  - **Discovery**: While testing quote viewing functionality, noticed all detail pages returned 404
+  - **Fix**: Removed the broken profiles join entirely
+    - File: `services/quote.service.ts:327`
+    - The created_by reference wasn't being used in the UI anyway
+  - **Impact**: Quote detail pages now load successfully with all quote data
+  - **Commit**: `bf8ae7f` - Fix getQuote query - remove broken profiles join
 
 ### Added - 2025-11-15
 
