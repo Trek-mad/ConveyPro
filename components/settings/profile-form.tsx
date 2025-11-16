@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  scottish_law_society_number: z.string().optional(),
+  law_society_number: z.string().optional(),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
@@ -38,8 +38,8 @@ export function ProfileForm({ user, profile }: ProfileFormProps) {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       full_name: profile?.full_name || user.user_metadata?.full_name || '',
-      scottish_law_society_number:
-        profile?.scottish_law_society_number || '',
+      law_society_number:
+        profile?.law_society_number || '',
     },
   })
 
@@ -50,7 +50,7 @@ export function ProfileForm({ user, profile }: ProfileFormProps) {
 
     const result = await updateProfile({
       full_name: data.full_name,
-      scottish_law_society_number: data.scottish_law_society_number || null,
+      law_society_number: data.law_society_number || null,
     })
 
     if ('error' in result) {
@@ -116,13 +116,13 @@ export function ProfileForm({ user, profile }: ProfileFormProps) {
       </div>
 
       <div>
-        <Label htmlFor="scottish_law_society_number">
+        <Label htmlFor="law_society_number">
           Scottish Law Society Number
         </Label>
         <Input
-          id="scottish_law_society_number"
+          id="law_society_number"
           placeholder="123456"
-          {...register('scottish_law_society_number')}
+          {...register('law_society_number')}
           className="mt-1"
         />
         <p className="mt-1 text-xs text-gray-500">
