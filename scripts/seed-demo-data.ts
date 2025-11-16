@@ -33,19 +33,35 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 async function seedDemoData() {
   console.log('🌱 Starting demo data seed...\n')
 
-  // Get the first tenant (assuming test environment with one tenant)
-  const { data: tenants, error: tenantError } = await supabase
+  // Get tenant from command line arg or use first tenant
+  const tenantNameArg = process.argv[2]
+
+  const { data: allTenants, error: tenantError } = await supabase
     .from('tenants')
     .select('id, name')
-    .limit(1)
 
-  if (tenantError || !tenants || tenants.length === 0) {
+  if (tenantError || !allTenants || allTenants.length === 0) {
     console.error('❌ No tenant found. Please create a tenant first.')
     process.exit(1)
   }
 
-  const tenantId = tenants[0].id
-  console.log(`✓ Using tenant: ${tenants[0].name} (${tenantId})\n`)
+  let tenant
+  if (tenantNameArg) {
+    tenant = allTenants.find(t => t.name.toLowerCase() === tenantNameArg.toLowerCase() || t.id === tenantNameArg)
+    if (!tenant) {
+      console.error(`❌ Tenant "${tenantNameArg}" not found. Available tenants:`)
+      allTenants.forEach(t => console.error(`   - ${t.name} (${t.id})`))
+      process.exit(1)
+    }
+  } else {
+    tenant = allTenants[0]
+    console.log('Available tenants:')
+    allTenants.forEach((t, i) => console.log(`   ${i === 0 ? '→' : ' '} ${t.name} (${t.id})`))
+    console.log()
+  }
+
+  const tenantId = tenant.id
+  console.log(`✓ Using tenant: ${tenant.name} (${tenantId})\n`)
 
   // ============================================================================
   // CREATE CLIENTS
