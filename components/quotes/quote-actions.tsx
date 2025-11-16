@@ -34,8 +34,8 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
     setIsLoading(false)
   }
 
-  // Only show actions if quote is not in a final state
-  if (!['draft', 'sent'].includes(quote.status)) {
+  // Only show actions if quote is in 'sent' status or needs status management
+  if (quote.status !== 'sent') {
     return null
   }
 
@@ -48,52 +48,39 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
       )}
 
       <Card className="p-4">
+        <h3 className="mb-3 text-sm font-semibold text-gray-900">
+          Status Management
+        </h3>
         <div className="flex flex-wrap items-center gap-3">
-          {quote.status === 'draft' && (
-            <>
-              <Button
-                onClick={() => handleStatusChange('sent')}
-                disabled={isLoading}
-              >
-                <Mail className="mr-2 h-4 w-4" />
-                Send to Client
-              </Button>
-              <p className="text-sm text-gray-600">
-                Send this quote to the client for review
-              </p>
-            </>
-          )}
-
-          {quote.status === 'sent' && (
-            <>
-              <Button
-                onClick={() => handleStatusChange('accepted')}
-                disabled={isLoading}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Check className="mr-2 h-4 w-4" />
-                Mark as Accepted
-              </Button>
-              <Button
-                onClick={() => handleStatusChange('rejected')}
-                disabled={isLoading}
-                variant="outline"
-                className="border-red-300 text-red-600 hover:bg-red-50"
-              >
-                <X className="mr-2 h-4 w-4" />
-                Mark as Rejected
-              </Button>
-              <Button
-                onClick={() => handleStatusChange('draft')}
-                disabled={isLoading}
-                variant="outline"
-              >
-                <Clock className="mr-2 h-4 w-4" />
-                Move to Draft
-              </Button>
-            </>
-          )}
+          <Button
+            onClick={() => handleStatusChange('accepted')}
+            disabled={isLoading}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Check className="mr-2 h-4 w-4" />
+            Mark as Accepted
+          </Button>
+          <Button
+            onClick={() => handleStatusChange('rejected')}
+            disabled={isLoading}
+            variant="outline"
+            className="border-red-300 text-red-600 hover:bg-red-50"
+          >
+            <X className="mr-2 h-4 w-4" />
+            Mark as Rejected
+          </Button>
+          <Button
+            onClick={() => handleStatusChange('draft')}
+            disabled={isLoading}
+            variant="outline"
+          >
+            <Clock className="mr-2 h-4 w-4" />
+            Revert to Draft
+          </Button>
         </div>
+        <p className="mt-3 text-xs text-gray-500">
+          Update the quote status based on client response. Use "Send to Client" button above to send the email.
+        </p>
       </Card>
     </>
   )
