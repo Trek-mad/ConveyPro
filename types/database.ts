@@ -37,6 +37,7 @@ export interface Database {
           updated_at?: string
           created_by?: string | null
         }
+        Relationships: []
       }
       feature_flags: {
         Row: {
@@ -69,6 +70,7 @@ export interface Database {
           updated_at?: string
           created_by?: string | null
         }
+        Relationships: []
       }
       tenants: {
         Row: {
@@ -128,6 +130,7 @@ export interface Database {
           created_by?: string | null
           deleted_at?: string | null
         }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -169,6 +172,7 @@ export interface Database {
           updated_at?: string
           deleted_at?: string | null
         }
+        Relationships: []
       }
       tenant_memberships: {
         Row: {
@@ -213,6 +217,7 @@ export interface Database {
           created_by?: string | null
           deleted_at?: string | null
         }
+        Relationships: []
       }
       properties: {
         Row: {
@@ -284,6 +289,7 @@ export interface Database {
           created_by?: string | null
           deleted_at?: string | null
         }
+        Relationships: []
       }
       quotes: {
         Row: {
@@ -376,6 +382,7 @@ export interface Database {
           accepted_at?: string | null
           deleted_at?: string | null
         }
+        Relationships: []
       }
     }
     Views: {
