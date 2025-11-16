@@ -47,6 +47,11 @@ export async function RecentActivity() {
         icon: <FileText className="h-4 w-4 text-gray-600" />,
         iconBg: 'bg-gray-100',
       },
+      pending: {
+        action: 'pending review',
+        icon: <Clock className="h-4 w-4 text-amber-600" />,
+        iconBg: 'bg-amber-100',
+      },
       sent: {
         action: 'sent',
         icon: <Send className="h-4 w-4 text-blue-600" />,
@@ -61,6 +66,16 @@ export async function RecentActivity() {
         action: 'rejected',
         icon: <XCircle className="h-4 w-4 text-red-600" />,
         iconBg: 'bg-red-100',
+      },
+      expired: {
+        action: 'expired',
+        icon: <Clock className="h-4 w-4 text-gray-500" />,
+        iconBg: 'bg-gray-100',
+      },
+      cancelled: {
+        action: 'cancelled',
+        icon: <XCircle className="h-4 w-4 text-rose-600" />,
+        iconBg: 'bg-rose-100',
       },
     }
 

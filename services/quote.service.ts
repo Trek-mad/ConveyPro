@@ -346,7 +346,7 @@ export async function getQuote(
       return { error: 'Unauthorized' }
     }
 
-    return { quote: quote as QuoteWithRelations }
+    return { quote: quote as unknown as QuoteWithRelations }
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -360,8 +360,8 @@ export async function getQuote(
 export async function getQuotes(
   tenantId: string,
   filters?: {
-    status?: string
-    transaction_type?: string
+    status?: Quote['status']
+    transaction_type?: Quote['transaction_type']
   }
 ): Promise<{ quotes: Quote[] } | { error: string }> {
   try {
