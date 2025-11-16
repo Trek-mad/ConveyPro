@@ -62,9 +62,10 @@ export function SignupForm() {
 
     if (authData.user) {
       // Update profile with full name
+      // @ts-expect-error - Supabase type generation issue with profiles table
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ full_name: data.fullName } as any)
+        .update({ full_name: data.fullName })
         .eq('id', authData.user.id)
 
       if (profileError) {
