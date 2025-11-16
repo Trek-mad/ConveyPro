@@ -38,7 +38,7 @@ export default async function FirmSettingsPage() {
         <h2 className="mb-6 text-lg font-semibold text-gray-900">
           Firm Information
         </h2>
-        <FirmSettingsForm tenant={tenant} userRole={membership.role} />
+        <FirmSettingsForm tenant={tenant} userRole={membership.role as 'owner' | 'admin'} />
       </Card>
 
       {/* Subscription Information */}
