@@ -603,7 +603,7 @@ async function seedDemoData() {
       updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     },
 
-    // DECLINED QUOTES (funnel drop-off)
+    // REJECTED QUOTES (funnel drop-off)
     {
       client_id: null,
       property_id: null,
@@ -612,7 +612,7 @@ async function seedDemoData() {
       transaction_value: 175000,
       client_name: 'Anonymous Client',
       client_email: null,
-      status: 'declined',
+      status: 'rejected',
       base_fee: 1200,
       disbursements: 800,
       vat_amount: 400,
@@ -629,7 +629,7 @@ async function seedDemoData() {
       transaction_value: 220000,
       client_name: 'Anonymous Client',
       client_email: null,
-      status: 'declined',
+      status: 'rejected',
       base_fee: 1400,
       disbursements: 0,
       vat_amount: 280,
