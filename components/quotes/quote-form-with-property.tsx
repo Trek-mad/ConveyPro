@@ -402,9 +402,16 @@ export function QuoteFormWithProperty({
                 type="checkbox"
                 id="is_first_time_buyer"
                 {...register('is_first_time_buyer')}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                disabled={isAdditionalProperty}
+                onChange={(e) => {
+                  setValue('is_first_time_buyer', e.target.checked)
+                  if (e.target.checked) {
+                    setValue('is_additional_property', false)
+                  }
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <Label htmlFor="is_first_time_buyer" className="text-sm font-normal cursor-pointer">
+              <Label htmlFor="is_first_time_buyer" className={`text-sm font-normal cursor-pointer ${isAdditionalProperty ? 'opacity-50' : ''}`}>
                 First-time buyer (no LBTT on properties up to £175,000)
               </Label>
             </div>
@@ -413,12 +420,22 @@ export function QuoteFormWithProperty({
                 type="checkbox"
                 id="is_additional_property"
                 {...register('is_additional_property')}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                disabled={isFirstTimeBuyer}
+                onChange={(e) => {
+                  setValue('is_additional_property', e.target.checked)
+                  if (e.target.checked) {
+                    setValue('is_first_time_buyer', false)
+                  }
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <Label htmlFor="is_additional_property" className="text-sm font-normal cursor-pointer">
+              <Label htmlFor="is_additional_property" className={`text-sm font-normal cursor-pointer ${isFirstTimeBuyer ? 'opacity-50' : ''}`}>
                 Additional property (8% ADS applies)
               </Label>
             </div>
+            <p className="text-xs text-gray-600 italic">
+              Note: These options are mutually exclusive. You cannot be a first-time buyer if purchasing an additional property.
+            </p>
           </div>
         )}
 

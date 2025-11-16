@@ -99,8 +99,9 @@ export function calculateLBTT(params: {
 
   // Select appropriate tax bands
   // First-time buyers get extended nil-rate band (£145k → £175k)
+  // IMPORTANT: Cannot be first-time buyer if purchasing additional property
   let bands: LBTTBand[]
-  if (propertyType === 'residential' && isFirstTimeBuyer) {
+  if (propertyType === 'residential' && isFirstTimeBuyer && !isAdditionalProperty) {
     bands = FIRST_TIME_BUYER_BANDS
   } else if (propertyType === 'residential') {
     bands = RESIDENTIAL_BANDS
