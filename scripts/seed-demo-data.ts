@@ -33,8 +33,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 async function seedDemoData() {
   console.log('🌱 Starting demo data seed...\n')
 
-  // Get tenant from command line arg or use first tenant
-  const tenantNameArg = process.argv[2]
+  // Get tenant from command line arg (skip flags like --clean)
+  const args = process.argv.slice(2).filter(arg => !arg.startsWith('--'))
+  const tenantNameArg = args[0]
 
   const { data: allTenants, error: tenantError } = await supabase
     .from('tenants')
