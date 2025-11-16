@@ -64,7 +64,7 @@ export function SignupForm() {
       // Update profile with full name
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ full_name: data.fullName })
+        .update({ full_name: data.fullName } as any)
         .eq('id', authData.user.id)
 
       if (profileError) {
