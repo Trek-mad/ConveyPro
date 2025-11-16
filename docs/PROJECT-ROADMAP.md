@@ -94,8 +94,8 @@ Total to Full Platform: 16 weeks (4 months)
 | Multi-tenant architecture | P0 | L | ⬜ |
 | Authentication & authorization | P0 | M | ⬜ |
 | Quote form (staff dashboard) | P0 | L | ⬜ |
-| LBTT calculator | P0 | M | ⬜ |
-| Fee calculator | P0 | M | ⬜ |
+| LBTT calculator | P0 | M | ✅ |
+| Fee calculator | P0 | M | ✅ |
 | PDF generation | P0 | M | ⬜ |
 | Document attachments | P0 | S | ⬜ |
 | Email delivery | P0 | S | ⬜ |
@@ -561,10 +561,14 @@ APIs Required:
 ---
 
 **Version Control:**
-- Document Version: 1.0
-- Last Review: 2024-11-14
+- Document Version: 1.1
+- Last Review: 2024-11-16
 - Next Review: After MVP launch
 - Owner: Paul @ FunkyFig Automation
+
+**Recent Completions:**
+- ✅ LBTT Calculator (November 16, 2024) - See [LBTT-CALCULATOR.md](./LBTT-CALCULATOR.md)
+- ✅ Fee Calculator (November 16, 2024) - See [LBTT-CALCULATOR.md](./LBTT-CALCULATOR.md)
 
 ---
 
@@ -573,6 +577,7 @@ APIs Required:
 - [Post-MVP Features](./POST-MVP-FEATURES.md)
 - [Development Checklist](./DEVELOPMENT-CHECKLIST.md)
 - [Database Schema](./DATABASE-SCHEMA.md)
+- [LBTT Calculator Implementation](./LBTT-CALCULATOR.md)
 
 
 +---
@@ -742,8 +747,8 @@ Total to Full Platform: 16 weeks (4 months)
 | Multi-tenant architecture | P0 | L | ⬜ |
 | Authentication & authorization | P0 | M | ⬜ |
 | Quote form (staff dashboard) | P0 | L | ⬜ |
-| LBTT calculator | P0 | M | ⬜ |
-| Fee calculator | P0 | M | ⬜ |
+| LBTT calculator | P0 | M | ✅ |
+| Fee calculator | P0 | M | ✅ |
 | PDF generation | P0 | M | ⬜ |
 | Document attachments | P0 | S | ⬜ |
 | Email delivery | P0 | S | ⬜ |
@@ -1209,10 +1214,14 @@ APIs Required:
 ---
 
 **Version Control:**
-- Document Version: 1.0
-- Last Review: 2024-11-14
+- Document Version: 1.1
+- Last Review: 2024-11-16
 - Next Review: After MVP launch
 - Owner: Paul @ FunkyFig Automation
+
+**Recent Completions:**
+- ✅ LBTT Calculator (November 16, 2024) - See [LBTT-CALCULATOR.md](./LBTT-CALCULATOR.md)
+- ✅ Fee Calculator (November 16, 2024) - See [LBTT-CALCULATOR.md](./LBTT-CALCULATOR.md)
 
 ---
 
@@ -1221,6 +1230,7 @@ APIs Required:
 - [Post-MVP Features](./POST-MVP-FEATURES.md)
 - [Development Checklist](./DEVELOPMENT-CHECKLIST.md)
 - [Database Schema](./DATABASE-SCHEMA.md)
+- [LBTT Calculator Implementation](./LBTT-CALCULATOR.md)
 
 
 +---
