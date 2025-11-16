@@ -416,7 +416,7 @@ export function QuoteFormWithProperty({
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <Label htmlFor="is_additional_property" className="text-sm font-normal cursor-pointer">
-                Additional property (6% ADS applies)
+                Additional property (8% ADS applies)
               </Label>
             </div>
           </div>
@@ -435,7 +435,7 @@ export function QuoteFormWithProperty({
               </div>
               {calculation.lbtt.adsLBTT > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-blue-700">ADS (6%):</span>
+                  <span className="text-blue-700">ADS (8%):</span>
                   <span className="font-medium text-blue-900">
                     £{calculation.lbtt.adsLBTT.toLocaleString('en-GB')}
                   </span>

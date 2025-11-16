@@ -33,11 +33,23 @@ export interface LBTTCalculation {
 }
 
 /**
- * Residential LBTT Tax Bands (2024/2025)
+ * Residential LBTT Tax Bands (2025/2026)
  */
 export const RESIDENTIAL_BANDS: LBTTBand[] = [
   { min: 0, max: 145000, rate: 0, label: 'Up to £145,000' },
   { min: 145000, max: 250000, rate: 0.02, label: '£145,001 to £250,000' },
+  { min: 250000, max: 325000, rate: 0.05, label: '£250,001 to £325,000' },
+  { min: 325000, max: 750000, rate: 0.10, label: '£325,001 to £750,000' },
+  { min: 750000, max: null, rate: 0.12, label: 'Above £750,000' },
+]
+
+/**
+ * First-time buyer residential LBTT bands (2025/2026)
+ * The nil-rate band is extended from £145,000 to £175,000
+ */
+export const FIRST_TIME_BUYER_BANDS: LBTTBand[] = [
+  { min: 0, max: 175000, rate: 0, label: 'Up to £175,000 (First-time buyer)' },
+  { min: 175000, max: 250000, rate: 0.02, label: '£175,001 to £250,000' },
   { min: 250000, max: 325000, rate: 0.05, label: '£250,001 to £325,000' },
   { min: 325000, max: 750000, rate: 0.10, label: '£325,001 to £750,000' },
   { min: 750000, max: null, rate: 0.12, label: 'Above £750,000' },
@@ -56,7 +68,7 @@ export const NON_RESIDENTIAL_BANDS: LBTTBand[] = [
  * Additional Dwelling Supplement (ADS) Rate
  * Applied to entire purchase price for additional residential properties
  */
-export const ADS_RATE = 0.06 // 6%
+export const ADS_RATE = 0.08 // 8%
 
 /**
  * First-time buyer relief threshold
@@ -86,28 +98,18 @@ export function calculateLBTT(params: {
   }
 
   // Select appropriate tax bands
-  const bands = propertyType === 'residential' ? RESIDENTIAL_BANDS : NON_RESIDENTIAL_BANDS
+  // First-time buyers get extended nil-rate band (£145k → £175k)
+  let bands: LBTTBand[]
+  if (propertyType === 'residential' && isFirstTimeBuyer) {
+    bands = FIRST_TIME_BUYER_BANDS
+  } else if (propertyType === 'residential') {
+    bands = RESIDENTIAL_BANDS
+  } else {
+    bands = NON_RESIDENTIAL_BANDS
+  }
 
   // Calculate standard LBTT using progressive tax bands
-  const { total: standardLBTT, breakdown } = calculateProgressiveTax(purchasePrice, bands)
-
-  // Apply first-time buyer relief (residential only)
-  // First-time buyers pay no LBTT on the first £175,000
-  let finalStandardLBTT = standardLBTT
-  let reliefAmount = 0
-  if (propertyType === 'residential' && isFirstTimeBuyer) {
-    if (purchasePrice <= FIRST_TIME_BUYER_THRESHOLD) {
-      // Property costs £175k or less - no LBTT at all
-      reliefAmount = standardLBTT
-      finalStandardLBTT = 0
-    } else {
-      // Property costs more than £175k - pay LBTT only on the amount above £175k
-      const taxableAmount = purchasePrice - FIRST_TIME_BUYER_THRESHOLD
-      const { total: reducedLBTT } = calculateProgressiveTax(taxableAmount, bands)
-      reliefAmount = standardLBTT - reducedLBTT
-      finalStandardLBTT = reducedLBTT
-    }
-  }
+  const { total: finalStandardLBTT, breakdown } = calculateProgressiveTax(purchasePrice, bands)
 
   // Calculate ADS (residential additional properties only)
   let adsLBTT = 0
@@ -204,7 +206,7 @@ export function getLBTTSummary(calculation: LBTTCalculation): string {
   }
 
   if (calculation.isAdditionalProperty && calculation.adsLBTT > 0) {
-    lines.push(`Additional Dwelling Supplement (6%): ${formatCurrency(calculation.adsLBTT)}`)
+    lines.push(`Additional Dwelling Supplement (8%): ${formatCurrency(calculation.adsLBTT)}`)
   }
 
   lines.push(`Total LBTT: ${formatCurrency(calculation.totalLBTT)}`)
