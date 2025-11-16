@@ -9,7 +9,7 @@ import { generateQuoteEmail } from '@/lib/email/templates/quote-email'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -18,8 +18,10 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Fetch the quote with relations
-    const quoteResult = await getQuote(params.id)
+    const quoteResult = await getQuote(id)
     if ('error' in quoteResult) {
       return NextResponse.json(
         { error: 'Quote not found' },
@@ -82,7 +84,7 @@ export async function POST(
     }
 
     // Update quote status to 'sent'
-    await updateQuoteStatus(params.id, membership.tenant_id, 'sent')
+    await updateQuoteStatus(id, membership.tenant_id, 'sent')
 
     return NextResponse.json({
       success: true,
