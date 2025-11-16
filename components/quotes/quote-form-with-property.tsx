@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Property } from '@/types'
 import { createQuote } from '@/services/quote.service'
+import { calculateQuote, type QuoteCalculation } from '@/lib/calculators'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,6 +44,10 @@ const quoteSchema = z.object({
   ]),
   transaction_value: z.string().min(1, 'Transaction value is required'),
 
+  // LBTT Options
+  is_first_time_buyer: z.boolean().optional(),
+  is_additional_property: z.boolean().optional(),
+
   // Financial details
   base_fee: z.string().min(1, 'Base fee is required'),
   disbursements: z.string().optional(),
@@ -71,6 +76,7 @@ export function QuoteFormWithProperty({
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null
   )
+  const [calculation, setCalculation] = useState<QuoteCalculation | null>(null)
 
   const {
     register,
@@ -85,6 +91,8 @@ export function QuoteFormWithProperty({
       vat_rate: '20',
       disbursements: '0',
       property_id: defaultPropertyId || undefined,
+      is_first_time_buyer: false,
+      is_additional_property: false,
     },
   })
 
@@ -100,10 +108,35 @@ export function QuoteFormWithProperty({
   }, [defaultPropertyId, properties, setValue])
 
   // Watch values for auto-calculation
+  const transactionValue = watch('transaction_value') || '0'
+  const transactionType = watch('transaction_type')
+  const isFirstTimeBuyer = watch('is_first_time_buyer') || false
+  const isAdditionalProperty = watch('is_additional_property') || false
   const baseFee = watch('base_fee') || '0'
   const disbursements = watch('disbursements') || '0'
   const vatRate = watch('vat_rate') || '20'
   const propertyId = watch('property_id')
+
+  // Auto-calculate LBTT and fees when transaction details change
+  useEffect(() => {
+    const value = parseFloat(transactionValue)
+    if (value > 0 && transactionType === 'purchase') {
+      const calc = calculateQuote({
+        purchasePrice: value,
+        transactionType,
+        isFirstTimeBuyer,
+        isAdditionalProperty,
+        propertyType: 'residential',
+      })
+      setCalculation(calc)
+
+      // Auto-populate fees from calculation
+      setValue('base_fee', calc.fees.baseFee.toString())
+      setValue('disbursements', calc.fees.disbursements.toString())
+    } else {
+      setCalculation(null)
+    }
+  }, [transactionValue, transactionType, isFirstTimeBuyer, isAdditionalProperty, setValue])
 
   // Calculate totals
   const baseFeeNum = parseFloat(baseFee) || 0
@@ -127,7 +160,7 @@ export function QuoteFormWithProperty({
     setIsLoading(true)
     setError(null)
 
-    // Build fee breakdown
+    // Build fee breakdown (include LBTT if calculated)
     const feeBreakdown = {
       base_fee: parseFloat(data.base_fee),
       disbursements: parseFloat(data.disbursements || '0'),
@@ -135,6 +168,15 @@ export function QuoteFormWithProperty({
       vat_amount: vatAmount,
       subtotal: baseFeeNum + disbursementsNum,
       total: totalAmount,
+      ...(calculation && {
+        lbtt: {
+          standard: calculation.lbtt.standardLBTT,
+          ads: calculation.lbtt.adsAmount,
+          total: calculation.lbtt.totalLBTT,
+          is_first_time_buyer: data.is_first_time_buyer || false,
+          is_additional_property: data.is_additional_property || false,
+        },
+      }),
     }
 
     const result = await createQuote({
@@ -350,6 +392,66 @@ export function QuoteFormWithProperty({
             )}
           </div>
         </div>
+
+        {/* LBTT Options */}
+        {transactionType === 'purchase' && (
+          <div className="mt-4 space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <h3 className="text-sm font-medium text-gray-900">LBTT Options</h3>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="is_first_time_buyer"
+                {...register('is_first_time_buyer')}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="is_first_time_buyer" className="text-sm font-normal cursor-pointer">
+                First-time buyer (no LBTT on properties up to £175,000)
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="is_additional_property"
+                {...register('is_additional_property')}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="is_additional_property" className="text-sm font-normal cursor-pointer">
+                Additional property (6% ADS applies)
+              </Label>
+            </div>
+          </div>
+        )}
+
+        {/* LBTT Calculation Display */}
+        {calculation && transactionType === 'purchase' && (
+          <Card className="mt-4 bg-blue-50 p-4 border-blue-200">
+            <h3 className="mb-3 font-semibold text-blue-900">LBTT Calculation</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-blue-700">Standard LBTT:</span>
+                <span className="font-medium text-blue-900">
+                  £{calculation.lbtt.standardLBTT.toLocaleString('en-GB')}
+                </span>
+              </div>
+              {calculation.lbtt.adsAmount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-blue-700">ADS (6%):</span>
+                  <span className="font-medium text-blue-900">
+                    £{calculation.lbtt.adsAmount.toLocaleString('en-GB')}
+                  </span>
+                </div>
+              )}
+              <div className="border-t border-blue-300 pt-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold text-blue-900">Total LBTT:</span>
+                  <span className="text-lg font-bold text-blue-600">
+                    £{calculation.lbtt.totalLBTT.toLocaleString('en-GB')}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* Financial Details */}
