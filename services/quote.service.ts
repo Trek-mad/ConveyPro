@@ -319,10 +319,13 @@ export async function getQuote(
 
     const { data: quote, error } = await supabase
       .from('quotes')
-      .select(`
+      .select(
+        `
         *,
-        property:properties!property_id(*)
-      `)
+        property:properties(*),
+        tenant:tenants(*)
+      `
+      )
       .eq('id', quoteId)
       .single()
 
