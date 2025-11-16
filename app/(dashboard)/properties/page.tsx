@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     type?: string
     search?: string
-  }
+  }>
 }
 
 export default async function PropertiesPage({ searchParams }: PageProps) {
@@ -27,18 +27,21 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
     return null
   }
 
+  // Await searchParams (Next.js 15 requirement)
+  const params = await searchParams
+
   // Fetch all properties
   const propertiesResult = await getProperties(membership.tenant_id)
   let properties =
     'properties' in propertiesResult ? propertiesResult.properties : []
 
   // Apply filters
-  if (searchParams.type && searchParams.type !== 'all') {
-    properties = properties.filter((p) => p.property_type === searchParams.type)
+  if (params.type && params.type !== 'all') {
+    properties = properties.filter((p) => p.property_type === params.type)
   }
 
-  if (searchParams.search) {
-    const search = searchParams.search.toLowerCase()
+  if (params.search) {
+    const search = params.search.toLowerCase()
     properties = properties.filter(
       (p) =>
         p.address_line1.toLowerCase().includes(search) ||
@@ -103,7 +106,7 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
       </div>
 
       {/* Filters */}
-      <PropertiesFilters currentType={searchParams.type} />
+      <PropertiesFilters currentType={params.type} />
 
       {/* Properties table */}
       <Card className="p-6">
@@ -111,11 +114,11 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
           <div className="py-12 text-center">
             <p className="text-gray-600">No properties found</p>
             <p className="mt-2 text-sm text-gray-500">
-              {searchParams.type || searchParams.search
+              {params.type || params.search
                 ? 'Try adjusting your filters'
                 : 'Add your first property to get started'}
             </p>
-            {!searchParams.type && !searchParams.search && (
+            {!params.type && !params.search && (
               <Link href="/properties/new">
                 <Button className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />

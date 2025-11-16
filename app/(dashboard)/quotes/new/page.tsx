@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     property?: string
-  }
+  }>
 }
 
 export default async function NewQuotePage({ searchParams }: PageProps) {
@@ -30,8 +30,9 @@ export default async function NewQuotePage({ searchParams }: PageProps) {
   const properties =
     'properties' in propertiesResult ? propertiesResult.properties : []
 
-  // Get default property ID from query parameter
-  const defaultPropertyId = searchParams.property
+  // Get default property ID from query parameter (Next.js 15: searchParams is now a Promise)
+  const params = await searchParams
+  const defaultPropertyId = params.property
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
