@@ -7,6 +7,201 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0-phase-2] - 2024-11-16/17
+
+**Phase 2 Features: Analytics, Client Management & Branding** 🎨
+
+### Git Tags & Branches
+- **Branch:** `claude/phase-2-form-builder-0151jSm8PvAf8MqE51ryMAwW` (active)
+- **Status:** Phase 2 features complete, ready for production deployment
+
+### Added
+
+#### Analytics Dashboard 📊
+- ✅ Comprehensive analytics page at `/analytics`
+- ✅ Revenue tracking with KPI cards
+  - Total revenue calculation from accepted quotes
+  - Conversion rate (sent → accepted)
+  - Cross-sell revenue metrics (Phase 3 preview)
+  - Average quote value
+- ✅ Interactive charts using Recharts library
+  - Revenue trend line chart (6-month history)
+  - Service breakdown pie chart
+  - Conversion funnel bar chart
+- ✅ Cross-sell performance table
+  - Mock data showing Phase 3 revenue potential
+  - Services: Wills, Power of Attorney, Estate Planning, Remortgage
+  - Conversion rates and revenue projections
+- ✅ Staff performance leaderboard
+  - Top performers by revenue and quote acceptance
+  - Cross-sell tracking per staff member
+
+#### Client Management System 👥
+- ✅ Comprehensive client profiles
+  - Personal information (name, email, phone)
+  - Full address details
+  - Life stage classification (first-time-buyer, moving-up, investor, retired, downsizing)
+  - Client type (individual, couple, business, estate)
+  - Source tracking (website, referral, repeat, marketing)
+- ✅ Client list page at `/clients`
+  - Statistics cards (total clients, active this month, FTBs, investors)
+  - Client badges showing life stage and type
+  - Tags and quick stats per client
+- ✅ Client detail pages
+  - Complete client profile view
+  - All quotes linked to client
+  - Services used tracking
+  - Cross-sell opportunity identification
+  - Priority-based recommendations (high/medium)
+  - Potential revenue calculation
+- ✅ Database schema
+  - Migration: `20241116000000_create_clients_table.sql`
+  - Full RLS policies for multi-tenant security
+  - Indexed for performance
+  - Soft delete support
+  - `client_id` foreign key added to quotes table
+- ✅ Service layer (services/client.service.ts)
+  - Full CRUD operations
+  - Client search functionality
+  - Statistics and analytics
+  - Cross-sell opportunity calculation
+
+#### Firm Branding & White Label 🎨
+- ✅ Branding settings page at `/settings/branding`
+- ✅ Logo upload functionality
+  - Supabase Storage bucket: `firm-logos`
+  - 5MB file size limit
+  - Allowed formats: JPEG, PNG, WebP, SVG
+  - Automatic old logo replacement
+- ✅ Custom brand colors
+  - Primary, secondary, and accent color pickers
+  - Live color preview
+  - Hex input with validation
+- ✅ Firm customization
+  - Firm name and tagline
+  - White-label toggles for quotes and emails
+  - Professional quote mockup preview
+- ✅ Storage bucket migration
+  - Migration: `20241116000001_create_firm_logos_bucket.sql`
+  - Public bucket with RLS policies
+  - Tenant-scoped file paths
+- ✅ API routes
+  - `/api/branding/upload-logo` - Logo upload endpoint
+  - `/api/branding/settings` - Settings CRUD
+- ✅ Service layer (services/branding.service.ts)
+  - Get/update/upload/delete operations
+  - Flexible key-value storage in tenant_settings
+
+#### Demo Data Seeder 🌱
+- ✅ Comprehensive seed script (scripts/seed-demo-data.ts)
+  - Creates 15 realistic clients across life stages
+  - Creates 15 properties (residential and commercial)
+  - Creates 17 quotes with varied statuses
+  - 6 months of historical data for charts
+  - Total demo revenue: £81,420 (8 accepted quotes)
+- ✅ Tenant selection support
+  - Command-line tenant name argument
+  - Automatic first tenant selection fallback
+  - Lists available tenants if not found
+- ✅ Data cleanup flag
+  - `--clean` flag to remove existing demo data
+  - Cleans quotes, properties, and clients before seeding
+- ✅ Environment variable loading
+  - Automatic .env.local loading with dotenv
+  - Validation of required credentials
+- ✅ npm scripts
+  - `npm run seed` - Run seeder
+  - `npm run seed <tenant-name>` - Target specific tenant
+  - `npm run seed -- --clean` - Clean before seeding
+
+#### Utility Scripts 🛠️
+- ✅ Data verification script (scripts/check-data.ts)
+  - Lists all tenants with data counts
+  - Shows clients, properties, and quotes per tenant
+- ✅ Tenant deletion script (scripts/delete-tenant.ts)
+  - Delete unwanted tenants and all their data
+  - Requires `--confirm` flag for safety
+  - Cascading delete (quotes → properties → clients → tenant)
+- ✅ Connection diagnostic script (scripts/check-connection.ts)
+  - Tests Supabase connection
+  - Validates credentials
+  - Helpful for debugging network issues
+
+### Fixed
+
+#### Database Schema Issues
+- ✅ Fixed property price column mismatch
+  - Seed script was using `price` field
+  - Database schema uses `purchase_price`
+  - Updated all property insertions
+- ✅ Fixed property type enum mismatch
+  - Seed script was using `house`/`flat`
+  - Database enum uses `residential`/`commercial`
+  - Updated all property insertions
+- ✅ Fixed quote schema mismatches
+  - Converted `property_value` → `transaction_value`
+  - Converted `legal_fees` → `base_fee`
+  - Combined fees into `disbursements`
+  - Calculated `vat_amount` (20% of base + disbursements)
+  - Calculated `total_amount` correctly
+  - Added `client_name` and `client_email` fields
+  - Added `accepted_at` timestamps for accepted quotes
+
+#### Quote Number Conflicts
+- ✅ Fixed global quote number collisions
+  - Quote numbers were globally unique across all tenants
+  - Multiple tenants caused "duplicate key" errors
+  - Solution: Tenant-specific quote prefixes
+  - Example: Tenant `d9a4...` uses `Q-d9a4-001`, `Q-d9a4-002`, etc.
+
+#### Quote Status Validation
+- ✅ Fixed status check constraint violation
+  - Seed script used `declined` status
+  - Database only accepts: draft, pending, sent, accepted, rejected, expired, cancelled
+  - Changed `declined` → `rejected` throughout
+
+#### Service Naming Conflicts
+- ✅ Fixed createClient function name collision
+  - Seed script function conflicted with Supabase import
+  - Renamed Supabase import to `createSupabaseClient`
+  - Applied across all service files
+
+#### Seed Script Improvements
+- ✅ Fixed --clean flag parsing
+  - Flag was being treated as tenant name
+  - Now filters out flags starting with `--`
+  - Works correctly: `npm run seed -- --clean`
+
+### Documentation
+- ✅ Updated CHANGELOG.md with Phase 2 features
+- ✅ Updated STATUS.md with current state
+- ✅ Created comprehensive script README (scripts/README.md)
+- ✅ Added inline documentation to all new services
+
+### Database Migrations Added
+1. `20241116000000_create_clients_table.sql`
+   - Clients table with full profile fields
+   - Life stage and client type classification
+   - Services tracking (JSONB array)
+   - Tags, notes, and source fields
+   - RLS policies for multi-tenant access
+   - Triggers for updated_at timestamps
+   - Foreign key from quotes → clients
+
+2. `20241116000001_create_firm_logos_bucket.sql`
+   - Supabase Storage bucket creation
+   - RLS policies for logo access
+   - Tenant-scoped upload permissions
+   - Public read access for display
+
+### Commits Summary
+- 20+ commits in Phase 2 session
+- All focused on analytics, client management, and branding
+- Multiple bug fixes for demo data seeder
+- Production-ready code
+
+---
+
 ## [1.0.0-phase-1] - 2024-11-16
 
 **Phase 1 MVP Complete** 🎉
