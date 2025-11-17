@@ -15,7 +15,7 @@ export interface BrandingSettings {
  * Get branding settings for a tenant
  */
 export async function getBrandingSettings(tenantId: string): Promise<BrandingSettings> {
-  const supabase = await createSupabaseClient()
+  const supabase = await createClient()
 
   const { data: settings, error } = await supabase
     .from('tenant_settings')
