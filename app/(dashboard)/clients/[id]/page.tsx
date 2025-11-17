@@ -47,18 +47,30 @@ export default async function ClientDetailPage({ params }: PageProps) {
 
   const { client } = clientResult
 
+  // Type assertion for joined quotes data
+  const clientWithQuotes = client as typeof client & {
+    quotes: Array<{
+      id: string
+      quote_number: string
+      transaction_type: string
+      status: string
+      total_amount: number
+      created_at: string
+    }>
+  }
+
   // Fetch client stats
   const statsResult = await getClientStats(id)
   const stats = 'stats' in statsResult ? statsResult.stats : null
 
   // Identify cross-sell opportunities (Phase 3 feature)
-  const servicesUsed = (client.services_used as string[]) || []
+  const servicesUsed = (clientWithQuotes.services_used as string[]) || []
   const crossSellOpportunities = [
     {
       service: 'Will & Testament',
       used: servicesUsed.includes('will'),
       priority: 'high',
-      reason: client.life_stage === 'first-time-buyer' ? 'New homeowner' : 'Asset protection',
+      reason: clientWithQuotes.life_stage === 'first-time-buyer' ? 'New homeowner' : 'Asset protection',
       estimatedValue: 750,
     },
     {
@@ -71,7 +83,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
     {
       service: 'Estate Planning',
       used: servicesUsed.includes('estate'),
-      priority: client.life_stage === 'retired' ? 'high' : 'medium',
+      priority: clientWithQuotes.life_stage === 'retired' ? 'high' : 'medium',
       reason: 'Wealth management',
       estimatedValue: 1200,
     },
@@ -100,16 +112,16 @@ export default async function ClientDetailPage({ params }: PageProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {client.first_name} {client.last_name}
+              {clientWithQuotes.first_name} {clientWithQuotes.last_name}
             </h1>
-            {client.life_stage && (
+            {clientWithQuotes.life_stage && (
               <p className="mt-1 text-gray-600">
-                {client.life_stage.replace(/-/g, ' ').charAt(0).toUpperCase() + client.life_stage.replace(/-/g, ' ').slice(1)}
+                {clientWithQuotes.life_stage.replace(/-/g, ' ').charAt(0).toUpperCase() + clientWithQuotes.life_stage.replace(/-/g, ' ').slice(1)}
               </p>
             )}
           </div>
         </div>
-        <Link href={`/clients/${client.id}/edit`}>
+        <Link href={`/clients/${clientWithQuotes.id}/edit`}>
           <Button variant="outline">
             <Edit className="mr-2 h-4 w-4" />
             Edit Client
@@ -161,36 +173,36 @@ export default async function ClientDetailPage({ params }: PageProps) {
               Contact Information
             </h2>
             <div className="space-y-3">
-              {client.email && (
+              {clientWithQuotes.email && (
                 <div className="flex items-center gap-3 text-gray-700">
                   <Mail className="h-5 w-5 text-gray-400" />
-                  <a href={`mailto:${client.email}`} className="hover:text-blue-600">
-                    {client.email}
+                  <a href={`mailto:${clientWithQuotes.email}`} className="hover:text-blue-600">
+                    {clientWithQuotes.email}
                   </a>
                 </div>
               )}
-              {client.phone && (
+              {clientWithQuotes.phone && (
                 <div className="flex items-center gap-3 text-gray-700">
                   <Phone className="h-5 w-5 text-gray-400" />
-                  <a href={`tel:${client.phone}`} className="hover:text-blue-600">
-                    {client.phone}
+                  <a href={`tel:${clientWithQuotes.phone}`} className="hover:text-blue-600">
+                    {clientWithQuotes.phone}
                   </a>
                 </div>
               )}
-              {(client.address_line1 || client.city) && (
+              {(clientWithQuotes.address_line1 || clientWithQuotes.city) && (
                 <div className="flex items-start gap-3 text-gray-700">
                   <MapPin className="mt-0.5 h-5 w-5 text-gray-400" />
                   <div>
-                    {client.address_line1 && <p>{client.address_line1}</p>}
-                    {client.address_line2 && <p>{client.address_line2}</p>}
-                    {(client.city || client.postcode) && (
+                    {clientWithQuotes.address_line1 && <p>{clientWithQuotes.address_line1}</p>}
+                    {clientWithQuotes.address_line2 && <p>{clientWithQuotes.address_line2}</p>}
+                    {(clientWithQuotes.city || clientWithQuotes.postcode) && (
                       <p>
-                        {client.city}
-                        {client.city && client.postcode && ', '}
-                        {client.postcode}
+                        {clientWithQuotes.city}
+                        {clientWithQuotes.city && clientWithQuotes.postcode && ', '}
+                        {clientWithQuotes.postcode}
                       </p>
                     )}
-                    {client.country && <p>{client.country}</p>}
+                    {clientWithQuotes.country && <p>{clientWithQuotes.country}</p>}
                   </div>
                 </div>
               )}
@@ -277,9 +289,9 @@ export default async function ClientDetailPage({ params }: PageProps) {
             <h2 className="mb-4 text-lg font-semibold text-gray-900">
               Recent Quotes
             </h2>
-            {client.quotes && client.quotes.length > 0 ? (
+            {clientWithQuotes.quotes && clientWithQuotes.quotes.length > 0 ? (
               <div className="space-y-3">
-                {client.quotes.slice(0, 5).map((quote: any) => (
+                {clientWithQuotes.quotes.slice(0, 5).map((quote: any) => (
                   <Link
                     key={quote.id}
                     href={`/quotes/${quote.id}`}
@@ -329,26 +341,26 @@ export default async function ClientDetailPage({ params }: PageProps) {
               Client Details
             </h2>
             <div className="space-y-3">
-              {client.client_type && (
+              {clientWithQuotes.client_type && (
                 <div>
                   <p className="text-xs text-gray-500">Type</p>
                   <p className="mt-1 font-medium text-gray-900">
-                    {client.client_type.charAt(0).toUpperCase() + client.client_type.slice(1)}
+                    {clientWithQuotes.client_type.charAt(0).toUpperCase() + clientWithQuotes.client_type.slice(1)}
                   </p>
                 </div>
               )}
-              {client.source && (
+              {clientWithQuotes.source && (
                 <div>
                   <p className="text-xs text-gray-500">Source</p>
                   <p className="mt-1 font-medium text-gray-900">
-                    {client.source.charAt(0).toUpperCase() + client.source.slice(1)}
+                    {clientWithQuotes.source.charAt(0).toUpperCase() + clientWithQuotes.source.slice(1)}
                   </p>
                 </div>
               )}
               <div>
                 <p className="text-xs text-gray-500">Client Since</p>
                 <p className="mt-1 font-medium text-gray-900">
-                  {new Date(client.created_at).toLocaleDateString('en-GB', {
+                  {new Date(clientWithQuotes.created_at).toLocaleDateString('en-GB', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
@@ -359,11 +371,11 @@ export default async function ClientDetailPage({ params }: PageProps) {
           </Card>
 
           {/* Tags */}
-          {client.tags && client.tags.length > 0 && (
+          {clientWithQuotes.tags && clientWithQuotes.tags.length > 0 && (
             <Card className="p-6">
               <h2 className="mb-4 text-lg font-semibold text-gray-900">Tags</h2>
               <div className="flex flex-wrap gap-2">
-                {client.tags.map((tag) => (
+                {clientWithQuotes.tags.map((tag) => (
                   <span
                     key={tag}
                     className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800"
