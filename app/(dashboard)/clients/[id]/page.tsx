@@ -5,6 +5,7 @@ import { getActiveTenantMembership } from '@/lib/auth'
 import { getClient, getClientStats } from '@/services/client.service'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Database } from '@/types/database'
 import {
   Mail,
   Phone,
@@ -47,30 +48,22 @@ export default async function ClientDetailPage({ params }: PageProps) {
 
   const { client } = clientResult
 
-  // Type assertion for joined quotes data
-  const clientWithQuotes = client as typeof client & {
-    quotes: Array<{
-      id: string
-      quote_number: string
-      transaction_type: string
-      status: string
-      total_amount: number
-      created_at: string
-    }>
-  }
+  // TypeScript doesn't know about Supabase joins, so we need to properly type the quotes
+  type Quote = Database['public']['Tables']['quotes']['Row']
+  const quotes = (client.quotes as unknown as Quote[]) || []
 
   // Fetch client stats
   const statsResult = await getClientStats(id)
   const stats = 'stats' in statsResult ? statsResult.stats : null
 
   // Identify cross-sell opportunities (Phase 3 feature)
-  const servicesUsed = (clientWithQuotes.services_used as string[]) || []
+  const servicesUsed = (client.services_used as string[]) || []
   const crossSellOpportunities = [
     {
       service: 'Will & Testament',
       used: servicesUsed.includes('will'),
       priority: 'high',
-      reason: clientWithQuotes.life_stage === 'first-time-buyer' ? 'New homeowner' : 'Asset protection',
+      reason: client.life_stage === 'first-time-buyer' ? 'New homeowner' : 'Asset protection',
       estimatedValue: 750,
     },
     {
@@ -83,7 +76,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
     {
       service: 'Estate Planning',
       used: servicesUsed.includes('estate'),
-      priority: clientWithQuotes.life_stage === 'retired' ? 'high' : 'medium',
+      priority: client.life_stage === 'retired' ? 'high' : 'medium',
       reason: 'Wealth management',
       estimatedValue: 1200,
     },
@@ -112,16 +105,16 @@ export default async function ClientDetailPage({ params }: PageProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {clientWithQuotes.first_name} {clientWithQuotes.last_name}
+              {client.first_name} {client.last_name}
             </h1>
-            {clientWithQuotes.life_stage && (
+            {client.life_stage && (
               <p className="mt-1 text-gray-600">
-                {clientWithQuotes.life_stage.replace(/-/g, ' ').charAt(0).toUpperCase() + clientWithQuotes.life_stage.replace(/-/g, ' ').slice(1)}
+                {client.life_stage.replace(/-/g, ' ').charAt(0).toUpperCase() + client.life_stage.replace(/-/g, ' ').slice(1)}
               </p>
             )}
           </div>
         </div>
-        <Link href={`/clients/${clientWithQuotes.id}/edit`}>
+        <Link href={`/clients/${client.id}/edit`}>
           <Button variant="outline">
             <Edit className="mr-2 h-4 w-4" />
             Edit Client
@@ -173,36 +166,36 @@ export default async function ClientDetailPage({ params }: PageProps) {
               Contact Information
             </h2>
             <div className="space-y-3">
-              {clientWithQuotes.email && (
+              {client.email && (
                 <div className="flex items-center gap-3 text-gray-700">
                   <Mail className="h-5 w-5 text-gray-400" />
-                  <a href={`mailto:${clientWithQuotes.email}`} className="hover:text-blue-600">
-                    {clientWithQuotes.email}
+                  <a href={`mailto:${client.email}`} className="hover:text-blue-600">
+                    {client.email}
                   </a>
                 </div>
               )}
-              {clientWithQuotes.phone && (
+              {client.phone && (
                 <div className="flex items-center gap-3 text-gray-700">
                   <Phone className="h-5 w-5 text-gray-400" />
-                  <a href={`tel:${clientWithQuotes.phone}`} className="hover:text-blue-600">
-                    {clientWithQuotes.phone}
+                  <a href={`tel:${client.phone}`} className="hover:text-blue-600">
+                    {client.phone}
                   </a>
                 </div>
               )}
-              {(clientWithQuotes.address_line1 || clientWithQuotes.city) && (
+              {(client.address_line1 || client.city) && (
                 <div className="flex items-start gap-3 text-gray-700">
                   <MapPin className="mt-0.5 h-5 w-5 text-gray-400" />
                   <div>
-                    {clientWithQuotes.address_line1 && <p>{clientWithQuotes.address_line1}</p>}
-                    {clientWithQuotes.address_line2 && <p>{clientWithQuotes.address_line2}</p>}
-                    {(clientWithQuotes.city || clientWithQuotes.postcode) && (
+                    {client.address_line1 && <p>{client.address_line1}</p>}
+                    {client.address_line2 && <p>{client.address_line2}</p>}
+                    {(client.city || client.postcode) && (
                       <p>
-                        {clientWithQuotes.city}
-                        {clientWithQuotes.city && clientWithQuotes.postcode && ', '}
-                        {clientWithQuotes.postcode}
+                        {client.city}
+                        {client.city && client.postcode && ', '}
+                        {client.postcode}
                       </p>
                     )}
-                    {clientWithQuotes.country && <p>{clientWithQuotes.country}</p>}
+                    {client.country && <p>{client.country}</p>}
                   </div>
                 </div>
               )}
@@ -289,9 +282,9 @@ export default async function ClientDetailPage({ params }: PageProps) {
             <h2 className="mb-4 text-lg font-semibold text-gray-900">
               Recent Quotes
             </h2>
-            {clientWithQuotes.quotes && clientWithQuotes.quotes.length > 0 ? (
+            {quotes && quotes.length > 0 ? (
               <div className="space-y-3">
-                {clientWithQuotes.quotes.slice(0, 5).map((quote: any) => (
+                {quotes.slice(0, 5).map((quote) => (
                   <Link
                     key={quote.id}
                     href={`/quotes/${quote.id}`}
@@ -341,26 +334,26 @@ export default async function ClientDetailPage({ params }: PageProps) {
               Client Details
             </h2>
             <div className="space-y-3">
-              {clientWithQuotes.client_type && (
+              {client.client_type && (
                 <div>
                   <p className="text-xs text-gray-500">Type</p>
                   <p className="mt-1 font-medium text-gray-900">
-                    {clientWithQuotes.client_type.charAt(0).toUpperCase() + clientWithQuotes.client_type.slice(1)}
+                    {client.client_type.charAt(0).toUpperCase() + client.client_type.slice(1)}
                   </p>
                 </div>
               )}
-              {clientWithQuotes.source && (
+              {client.source && (
                 <div>
                   <p className="text-xs text-gray-500">Source</p>
                   <p className="mt-1 font-medium text-gray-900">
-                    {clientWithQuotes.source.charAt(0).toUpperCase() + clientWithQuotes.source.slice(1)}
+                    {client.source.charAt(0).toUpperCase() + client.source.slice(1)}
                   </p>
                 </div>
               )}
               <div>
                 <p className="text-xs text-gray-500">Client Since</p>
                 <p className="mt-1 font-medium text-gray-900">
-                  {new Date(clientWithQuotes.created_at).toLocaleDateString('en-GB', {
+                  {new Date(client.created_at).toLocaleDateString('en-GB', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
@@ -371,11 +364,11 @@ export default async function ClientDetailPage({ params }: PageProps) {
           </Card>
 
           {/* Tags */}
-          {clientWithQuotes.tags && clientWithQuotes.tags.length > 0 && (
+          {client.tags && client.tags.length > 0 && (
             <Card className="p-6">
               <h2 className="mb-4 text-lg font-semibold text-gray-900">Tags</h2>
               <div className="flex flex-wrap gap-2">
-                {clientWithQuotes.tags.map((tag) => (
+                {client.tags.map((tag) => (
                   <span
                     key={tag}
                     className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800"
