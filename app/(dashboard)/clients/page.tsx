@@ -20,7 +20,7 @@ export default async function ClientsPage() {
 
   // Fetch clients
   const clientsResult = await getClients(membership.tenant_id)
-  const clients = 'clients' in clientsResult ? clientsResult.clients : []
+  const clients = ('clients' in clientsResult && clientsResult.clients) ? clientsResult.clients : []
 
   return (
     <div className="space-y-6">
