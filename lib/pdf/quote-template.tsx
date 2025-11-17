@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   Font,
+  Image,
 } from '@react-pdf/renderer'
 import { QuoteWithRelations } from '@/types'
 
@@ -224,7 +225,14 @@ export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName, branding 
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={[styles.header, { borderBottomColor: primaryColor }]}>
-          <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+          {branding?.logo_url ? (
+            <Image
+              src={branding.logo_url}
+              style={{ width: 120, height: 'auto', maxHeight: 50, marginBottom: 8, objectFit: 'contain' }}
+            />
+          ) : (
+            <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+          )}
           {branding?.tagline && (
             <Text style={{ fontSize: 9, color: '#6B7280', marginTop: 2 }}>
               {branding.tagline}
