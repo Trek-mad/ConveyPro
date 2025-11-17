@@ -1,4 +1,4 @@
-import { createClient as createSupabaseClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 
 export interface BrandingSettings {
   logo_url?: string
@@ -54,7 +54,7 @@ export async function updateBrandingSettings(
   tenantId: string,
   settings: Partial<BrandingSettings>
 ) {
-  const supabase = await createSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   const updates = Object.entries(settings).map(([key, value]) => ({
     tenant_id: tenantId,
@@ -81,7 +81,7 @@ export async function uploadFirmLogo(
   tenantId: string,
   file: File
 ): Promise<{ url?: string; error?: string }> {
-  const supabase = await createSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   // Generate unique filename
   const fileExt = file.name.split('.').pop()
@@ -119,7 +119,7 @@ export async function uploadFirmLogo(
 export async function deleteFirmLogo(
   tenantId: string
 ): Promise<{ success?: boolean; error?: string }> {
-  const supabase = await createSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   // Get current logo URL to extract filename
   const settings = await getBrandingSettings(tenantId)
