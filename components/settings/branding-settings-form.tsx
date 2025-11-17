@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Upload, X, Loader2, CheckCircle2 } from 'lucide-react'
 import type { BrandingSettings } from '@/services/branding.service'
 
