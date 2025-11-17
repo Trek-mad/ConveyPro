@@ -291,11 +291,84 @@ export interface Database {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          id: string
+          tenant_id: string
+          first_name: string
+          last_name: string
+          email: string | null
+          phone: string | null
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          postcode: string | null
+          country: string | null
+          client_type: string | null
+          life_stage: string | null
+          source: string | null
+          tags: string[] | null
+          notes: string | null
+          services_used: Json
+          created_at: string
+          updated_at: string
+          created_by: string | null
+          deleted_at: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          first_name: string
+          last_name: string
+          email?: string | null
+          phone?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          postcode?: string | null
+          country?: string | null
+          client_type?: string | null
+          life_stage?: string | null
+          source?: string | null
+          tags?: string[] | null
+          notes?: string | null
+          services_used?: Json
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          first_name?: string
+          last_name?: string
+          email?: string | null
+          phone?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          postcode?: string | null
+          country?: string | null
+          client_type?: string | null
+          life_stage?: string | null
+          source?: string | null
+          tags?: string[] | null
+          notes?: string | null
+          services_used?: Json
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+        }
+        Relationships: []
+      }
       quotes: {
         Row: {
           id: string
           tenant_id: string
           property_id: string | null
+          client_id: string | null
           quote_number: string
           status: 'draft' | 'pending' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'
           transaction_type: 'purchase' | 'sale' | 'remortgage' | 'transfer_of_equity'
@@ -326,6 +399,7 @@ export interface Database {
           id?: string
           tenant_id: string
           property_id?: string | null
+          client_id?: string | null
           quote_number?: string
           status?: 'draft' | 'pending' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'
           transaction_type: 'purchase' | 'sale' | 'remortgage' | 'transfer_of_equity'
@@ -356,6 +430,7 @@ export interface Database {
           id?: string
           tenant_id?: string
           property_id?: string | null
+          client_id?: string | null
           quote_number?: string
           status?: 'draft' | 'pending' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'
           transaction_type?: 'purchase' | 'sale' | 'remortgage' | 'transfer_of_equity'
