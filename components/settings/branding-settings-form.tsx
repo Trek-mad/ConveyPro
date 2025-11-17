@@ -22,6 +22,7 @@ export function BrandingSettingsForm({
   const [logoPreview, setLogoPreview] = useState<string | null>(
     currentSettings.logo_url || null
   )
+  const [logoError, setLogoError] = useState(false)
 
   const [settings, setSettings] = useState<BrandingSettings>({
     firm_name: currentSettings.firm_name || firmName,
@@ -62,6 +63,7 @@ export function BrandingSettingsForm({
   const handleRemoveLogo = () => {
     setLogoFile(null)
     setLogoPreview(null)
+    setLogoError(false)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,12 +130,18 @@ export function BrandingSettingsForm({
         </p>
 
         <div className="mt-3">
-          {logoPreview ? (
+          {logoPreview && !logoError ? (
             <div className="relative inline-block">
               <img
                 src={logoPreview}
                 alt="Logo preview"
-                className="h-24 w-auto rounded-lg border-2 border-gray-200 object-contain p-2"
+                className="h-24 w-auto rounded-lg border-2 border-gray-200 object-contain p-2 bg-white"
+                onError={() => {
+                  console.error('Failed to load logo:', logoPreview)
+                  setLogoError(true)
+                }}
+                onLoad={() => setLogoError(false)}
+                crossOrigin="anonymous"
               />
               <button
                 type="button"
@@ -141,6 +149,23 @@ export function BrandingSettingsForm({
                 className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
               >
                 <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : logoError && logoPreview ? (
+            <div className="rounded-lg border-2 border-yellow-300 bg-yellow-50 p-4">
+              <p className="text-sm text-yellow-800">
+                Logo uploaded but preview failed to load. The logo will still appear in PDFs and emails.
+              </p>
+              <p className="mt-2 text-xs text-yellow-700">URL: {logoPreview}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setLogoPreview(null)
+                  setLogoError(false)
+                }}
+                className="mt-2 text-sm text-yellow-900 underline hover:text-yellow-950"
+              >
+                Remove and upload new logo
               </button>
             </div>
           ) : (
