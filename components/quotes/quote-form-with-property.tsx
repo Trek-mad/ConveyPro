@@ -202,6 +202,32 @@ export function QuoteFormWithProperty({
       return
     }
 
+    // If status is 'sent', send the quote email to the client
+    if (status === 'sent' && data.client_email) {
+      try {
+        const sendResponse = await fetch(`/api/quotes/${result.quote.id}/send`, {
+          method: 'POST',
+        })
+
+        if (!sendResponse.ok) {
+          const errorData = await sendResponse.json()
+          setError(`Quote created but failed to send email: ${errorData.error || 'Unknown error'}`)
+          setIsLoading(false)
+          // Still redirect to quote page so user can manually send it
+          router.push(`/quotes/${result.quote.id}`)
+          router.refresh()
+          return
+        }
+      } catch (emailError) {
+        console.error('Error sending quote email:', emailError)
+        setError('Quote created but failed to send email. You can send it from the quote details page.')
+        setIsLoading(false)
+        router.push(`/quotes/${result.quote.id}`)
+        router.refresh()
+        return
+      }
+    }
+
     // Redirect to quote detail page
     router.push(`/quotes/${result.quote.id}`)
     router.refresh()

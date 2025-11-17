@@ -174,9 +174,18 @@ const styles = StyleSheet.create({
 interface QuotePDFProps {
   quote: QuoteWithRelations
   tenantName: string
+  branding?: {
+    primary_color?: string
+    logo_url?: string
+    firm_name?: string
+    tagline?: string
+  }
 }
 
-export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName }) => {
+export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName, branding }) => {
+  // Use branding colors or defaults
+  const primaryColor = branding?.primary_color || '#2563EB'
+  const firmName = branding?.firm_name || tenantName
   // Parse fee breakdown
   const feeBreakdown =
     typeof quote.fee_breakdown === 'string'
@@ -214,8 +223,13 @@ export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.logo}>{tenantName}</Text>
+        <View style={[styles.header, { borderBottomColor: primaryColor }]}>
+          <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+          {branding?.tagline && (
+            <Text style={{ fontSize: 9, color: '#6B7280', marginTop: 2 }}>
+              {branding.tagline}
+            </Text>
+          )}
           <Text style={{ fontSize: 10, color: '#6B7280' }}>
             Conveyancing Quote
           </Text>
@@ -353,9 +367,9 @@ export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName }) => {
             </View>
 
             {/* Total */}
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total Amount</Text>
-              <Text style={styles.totalAmount}>
+            <View style={[styles.totalRow, { borderTopColor: primaryColor }]}>
+              <Text style={[styles.totalLabel, { color: primaryColor }]}>Total Amount</Text>
+              <Text style={[styles.totalAmount, { color: primaryColor }]}>
                 {formatCurrency(Number(quote.total_amount))}
               </Text>
             </View>

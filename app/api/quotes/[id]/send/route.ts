@@ -6,6 +6,7 @@ import { getActiveTenantMembership } from '@/lib/auth'
 import { QuotePDF } from '@/lib/pdf/quote-template'
 import { sendEmail } from '@/lib/email/service'
 import { generateQuoteEmail } from '@/lib/email/templates/quote-email'
+import { getBrandingSettings } from '@/services/branding.service'
 
 export async function POST(
   request: NextRequest,
@@ -44,9 +45,21 @@ export async function POST(
     const tenantName =
       'tenant' in tenantResult ? tenantResult.tenant.name : 'ConveyPro'
 
-    // Generate PDF
+    // Fetch branding settings
+    const brandingSettings = await getBrandingSettings(membership.tenant_id)
+
+    // Generate PDF with branding
     const pdfBuffer = await renderToBuffer(
-      QuotePDF({ quote, tenantName }) as any
+      QuotePDF({
+        quote,
+        tenantName,
+        branding: {
+          primary_color: brandingSettings.primary_color,
+          logo_url: brandingSettings.logo_url,
+          firm_name: brandingSettings.firm_name,
+          tagline: brandingSettings.tagline,
+        }
+      }) as any
     )
 
     // Convert PDF buffer to base64 for email attachment
