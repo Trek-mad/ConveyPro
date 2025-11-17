@@ -31,6 +31,24 @@ export default async function BrandingSettingsPage() {
 
   const brandingSettings = await getBrandingSettings(membership.tenant_id)
 
+  // Convert logo URL to base64 for reliable preview display
+  if (brandingSettings.logo_url) {
+    try {
+      const logoResponse = await fetch(brandingSettings.logo_url)
+      if (logoResponse.ok) {
+        const logoBuffer = await logoResponse.arrayBuffer()
+        const logoBytes = Buffer.from(logoBuffer)
+        const contentType = logoResponse.headers.get('content-type') || 'image/png'
+        brandingSettings.logo_url = `data:${contentType};base64,${logoBytes.toString('base64')}`
+      } else {
+        console.error('Failed to fetch logo for preview:', logoResponse.status)
+      }
+    } catch (logoError) {
+      console.error('Error fetching logo for preview:', logoError)
+      // Keep the original URL as fallback
+    }
+  }
+
   if (!tenant) {
     redirect('/dashboard')
   }

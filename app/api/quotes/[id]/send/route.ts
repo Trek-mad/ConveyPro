@@ -48,6 +48,25 @@ export async function POST(
     // Fetch branding settings
     const brandingSettings = await getBrandingSettings(membership.tenant_id)
 
+    // Convert logo URL to base64 if present
+    let logoBase64: string | undefined
+    if (brandingSettings.logo_url) {
+      try {
+        const logoResponse = await fetch(brandingSettings.logo_url)
+        if (logoResponse.ok) {
+          const logoBuffer = await logoResponse.arrayBuffer()
+          const logoBytes = Buffer.from(logoBuffer)
+          const contentType = logoResponse.headers.get('content-type') || 'image/png'
+          logoBase64 = `data:${contentType};base64,${logoBytes.toString('base64')}`
+        } else {
+          console.error('Failed to fetch logo:', logoResponse.status, logoResponse.statusText)
+        }
+      } catch (logoError) {
+        console.error('Error fetching logo for PDF:', logoError)
+        // Continue without logo rather than failing the entire operation
+      }
+    }
+
     // Generate PDF with branding
     const pdfBuffer = await renderToBuffer(
       QuotePDF({
@@ -55,7 +74,7 @@ export async function POST(
         tenantName,
         branding: {
           primary_color: brandingSettings.primary_color,
-          logo_url: brandingSettings.logo_url,
+          logo_url: logoBase64 || brandingSettings.logo_url,
           firm_name: brandingSettings.firm_name,
           tagline: brandingSettings.tagline,
         }

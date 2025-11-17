@@ -7,6 +7,242 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1-production-deployment] - 2024-11-17
+
+**Production Deployment & Bug Fixes** 🚀
+
+### Deployment
+- ✅ Deployed Phase 2 to Vercel production environment
+- ✅ Branch: `claude/phase-2-demo-complete-01MvsFgXfzypH55ReBQoerMy`
+- ✅ Live URL: Vercel app with all Phase 2 features
+- ✅ Database: Using existing Supabase instance with "Test" tenant
+- ✅ Demo data: 15 clients, 17 quotes, £81,420 revenue
+
+### Fixed - Critical Production Issues
+
+#### Issue 1: TypeScript Build Errors (5 errors fixed)
+**Problem:** Vercel deployment failed due to TypeScript strict mode errors
+
+**Fixes:**
+1. **clients/[id]/page.tsx - Quote array typing**
+   ```typescript
+   // Problem: TypeScript didn't know about Supabase joined quotes
+   const { client } = clientResult
+
+   // Solution: Properly type the joined data
+   type Quote = Database['public']['Tables']['quotes']['Row']
+   const quotes = (client.quotes as unknown as Quote[]) || []
+   ```
+
+2. **clients/page.tsx - Undefined array**
+   ```typescript
+   // Problem: 'clients' is possibly 'undefined'
+   const clients = 'clients' in clientsResult ? clientsResult.clients : []
+
+   // Solution: Add null check
+   const clients = ('clients' in clientsResult && clientsResult.clients)
+     ? clientsResult.clients : []
+   ```
+
+3. **analytics-charts.tsx - Pie chart percent**
+   ```typescript
+   // Problem: Property 'percent' is possibly 'undefined'
+   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+
+   // Solution: Add null check
+   label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : '0'}%`}
+   ```
+
+4. **branding-settings-form.tsx - Wrong import**
+   ```typescript
+   // Problem: Button imported from wrong module
+   import { Button } from '@/components/ui/card'
+
+   // Solution: Import from correct module
+   import { Button } from '@/components/ui/button'
+   ```
+
+5. **branding.service.ts - Undefined function**
+   ```typescript
+   // Problem: createSupabaseClient not defined after refactor
+   const supabase = await createSupabaseClient()
+
+   // Solution: Use renamed import
+   const supabase = await createClient()
+   ```
+
+#### Issue 2: Email Not Sending on Quote Creation
+**Problem:** When creating a quote with "Save and Send to Client", email never sent
+
+**Root Cause:** Form created quote with status='sent' but never called send email API
+
+**Solution:** Added email sending logic in quote-form-with-property.tsx
+```typescript
+// After creating quote successfully
+if (status === 'sent' && data.client_email) {
+  try {
+    const sendResponse = await fetch(`/api/quotes/${result.quote.id}/send`, {
+      method: 'POST',
+    })
+
+    if (!sendResponse.ok) {
+      const errorData = await sendResponse.json()
+      setError(`Quote created but failed to send email: ${errorData.error}`)
+      // Still redirect so user can manually send
+      router.push(`/quotes/${result.quote.id}`)
+      return
+    }
+  } catch (emailError) {
+    console.error('Error sending quote email:', emailError)
+    setError('Quote created but failed to send email. You can send it from the quote details page.')
+  }
+}
+```
+
+**Result:** ✅ Emails now send automatically when creating quote with "sent" status
+
+#### Issue 3: Branding Colors Not in PDF Quotes
+**Problem:** PDF quotes showed hardcoded blue (#2563EB) instead of custom branding
+
+**Root Cause:** QuotePDF component didn't accept or use branding settings
+
+**Solution 1:** Updated QuotePDF to accept branding
+```typescript
+// lib/pdf/quote-template.tsx
+interface QuotePDFProps {
+  quote: QuoteWithRelations
+  tenantName: string
+  branding?: {
+    primary_color?: string
+    logo_url?: string
+    firm_name?: string
+    tagline?: string
+  }
+}
+
+export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName, branding }) => {
+  // Use branding colors or defaults
+  const primaryColor = branding?.primary_color || '#2563EB'
+  const firmName = branding?.firm_name || tenantName
+
+  // Apply to header
+  <View style={[styles.header, { borderBottomColor: primaryColor }]}>
+    <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+
+  // Apply to total section
+  <View style={[styles.totalRow, { borderTopColor: primaryColor }]}>
+    <Text style={[styles.totalLabel, { color: primaryColor }]}>Total Amount</Text>
+```
+
+**Solution 2:** Updated send API to fetch and pass branding
+```typescript
+// app/api/quotes/[id]/send/route.ts
+// Fetch branding settings
+const brandingSettings = await getBrandingSettings(membership.tenant_id)
+
+// Generate PDF with branding
+const pdfBuffer = await renderToBuffer(
+  QuotePDF({
+    quote,
+    tenantName,
+    branding: {
+      primary_color: brandingSettings.primary_color,
+      logo_url: brandingSettings.logo_url,
+      firm_name: brandingSettings.firm_name,
+      tagline: brandingSettings.tagline,
+    }
+  }) as any
+)
+```
+
+**Result:** ✅ PDF quotes now show custom brand colors and firm name
+
+#### Issue 4: Branding Settings Not Saving (RLS Permission Error)
+**Problem:** Uploading logo and clicking Save showed "Failed to save settings"
+
+**Root Cause:** Regular Supabase client has Row Level Security restrictions
+
+**Solution:** Created service role client for admin operations
+```typescript
+// lib/supabase/server.ts
+export function createServiceRoleClient() {
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
+}
+
+// services/branding.service.ts - Use service role for writes
+export async function updateBrandingSettings(
+  tenantId: string,
+  settings: Partial<BrandingSettings>
+) {
+  const supabase = createServiceRoleClient() // Bypasses RLS
+  // ... rest of update logic
+}
+```
+
+**Result:** ✅ Branding settings now save successfully
+
+### Known Issues - Still Need Fixing
+
+#### Logo Not Rendering in PDF or Preview ⚠️
+**Status:** PARTIALLY FIXED - Colors work, logo still broken
+
+**Current State:**
+- ✅ Brand colors working in PDF
+- ✅ Firm name and tagline working in PDF
+- ❌ Logo image not showing in PDF
+- ❌ Logo preview not showing in settings form
+
+**What Was Tried:**
+1. Added Image import to PDF template
+2. Added logo rendering logic with conditional display
+3. Added error handling to form preview with crossOrigin attribute
+4. Verified logo URL is being passed to PDF generator
+
+**Code Added:**
+```typescript
+// lib/pdf/quote-template.tsx
+import { Image } from '@react-pdf/renderer'
+
+{branding?.logo_url ? (
+  <Image
+    src={branding.logo_url}
+    style={{ width: 120, height: 'auto', maxHeight: 50, marginBottom: 8, objectFit: 'contain' }}
+  />
+) : (
+  <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+)}
+```
+
+**Suspected Issues:**
+1. **CORS Problem:** Supabase Storage might not allow cross-origin image access
+2. **Public URL Issue:** Storage bucket might not be properly configured as public
+3. **RLS on Storage:** Row Level Security might be blocking anonymous access to images
+
+**Next Steps to Fix:**
+1. Check Supabase Storage bucket `firm-logos` CORS settings
+2. Verify bucket is set to PUBLIC
+3. Check RLS policies on storage.objects table
+4. Test logo URL directly in browser to confirm it's accessible
+5. May need to add CORS headers to Supabase Storage bucket
+6. Consider using base64 encoded images if CORS can't be fixed
+
+**Workaround:** Logo will still save and can be uploaded. Colors and text branding work perfectly.
+
+### Technical Debt
+- Logo display needs CORS/Storage configuration fix
+- Consider migrating to base64 images for PDFs if storage access remains problematic
+
+---
+
 ## [1.1.0-phase-2] - 2024-11-16/17
 
 **Phase 2 Features: Analytics, Client Management & Branding** 🎨
