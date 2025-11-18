@@ -459,6 +459,453 @@ export interface Database {
         }
         Relationships: []
       }
+      campaigns: {
+        Row: {
+          id: string
+          tenant_id: string
+          name: string
+          description: string | null
+          campaign_type: 'wills' | 'power_of_attorney' | 'estate_planning' | 'remortgage' | 'custom'
+          status: 'draft' | 'active' | 'paused' | 'completed' | 'archived'
+          target_life_stages: string[] | null
+          target_client_types: string[] | null
+          target_services_used: string[] | null
+          send_delay_days: number
+          max_emails_per_campaign: number
+          total_sent: number
+          total_opened: number
+          total_clicked: number
+          total_converted: number
+          estimated_revenue: number
+          created_by: string | null
+          created_at: string
+          updated_at: string
+          started_at: string | null
+          ended_at: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          name: string
+          description?: string | null
+          campaign_type: 'wills' | 'power_of_attorney' | 'estate_planning' | 'remortgage' | 'custom'
+          status?: 'draft' | 'active' | 'paused' | 'completed' | 'archived'
+          target_life_stages?: string[] | null
+          target_client_types?: string[] | null
+          target_services_used?: string[] | null
+          send_delay_days?: number
+          max_emails_per_campaign?: number
+          total_sent?: number
+          total_opened?: number
+          total_clicked?: number
+          total_converted?: number
+          estimated_revenue?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          started_at?: string | null
+          ended_at?: string | null
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          name?: string
+          description?: string | null
+          campaign_type?: 'wills' | 'power_of_attorney' | 'estate_planning' | 'remortgage' | 'custom'
+          status?: 'draft' | 'active' | 'paused' | 'completed' | 'archived'
+          target_life_stages?: string[] | null
+          target_client_types?: string[] | null
+          target_services_used?: string[] | null
+          send_delay_days?: number
+          max_emails_per_campaign?: number
+          total_sent?: number
+          total_opened?: number
+          total_clicked?: number
+          total_converted?: number
+          estimated_revenue?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          started_at?: string | null
+          ended_at?: string | null
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          campaign_id: string | null
+          name: string
+          description: string | null
+          sequence_order: number
+          subject_line: string
+          preview_text: string | null
+          body_html: string
+          body_text: string | null
+          from_name: string | null
+          from_email: string | null
+          reply_to: string | null
+          send_delay_days: number
+          is_active: boolean
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          campaign_id?: string | null
+          name: string
+          description?: string | null
+          sequence_order?: number
+          subject_line: string
+          preview_text?: string | null
+          body_html: string
+          body_text?: string | null
+          from_name?: string | null
+          from_email?: string | null
+          reply_to?: string | null
+          send_delay_days?: number
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          campaign_id?: string | null
+          name?: string
+          description?: string | null
+          sequence_order?: number
+          subject_line?: string
+          preview_text?: string | null
+          body_html?: string
+          body_text?: string | null
+          from_name?: string | null
+          from_email?: string | null
+          reply_to?: string | null
+          send_delay_days?: number
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      campaign_triggers: {
+        Row: {
+          id: string
+          tenant_id: string
+          campaign_id: string
+          trigger_type: 'quote_accepted' | 'quote_sent' | 'client_created' | 'service_completed' | 'date_based' | 'manual'
+          trigger_condition: Json | null
+          is_active: boolean
+          priority: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          campaign_id: string
+          trigger_type: 'quote_accepted' | 'quote_sent' | 'client_created' | 'service_completed' | 'date_based' | 'manual'
+          trigger_condition?: Json | null
+          is_active?: boolean
+          priority?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          campaign_id?: string
+          trigger_type?: 'quote_accepted' | 'quote_sent' | 'client_created' | 'service_completed' | 'date_based' | 'manual'
+          trigger_condition?: Json | null
+          is_active?: boolean
+          priority?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_queue: {
+        Row: {
+          id: string
+          tenant_id: string
+          campaign_id: string | null
+          template_id: string | null
+          client_id: string
+          to_email: string
+          to_name: string | null
+          subject: string
+          body_html: string
+          body_text: string | null
+          personalization_data: Json | null
+          scheduled_for: string
+          sent_at: string | null
+          status: 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled'
+          error_message: string | null
+          retry_count: number
+          max_retries: number
+          sendgrid_message_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          campaign_id?: string | null
+          template_id?: string | null
+          client_id: string
+          to_email: string
+          to_name?: string | null
+          subject: string
+          body_html: string
+          body_text?: string | null
+          personalization_data?: Json | null
+          scheduled_for: string
+          sent_at?: string | null
+          status?: 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled'
+          error_message?: string | null
+          retry_count?: number
+          max_retries?: number
+          sendgrid_message_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          campaign_id?: string | null
+          template_id?: string | null
+          client_id?: string
+          to_email?: string
+          to_name?: string | null
+          subject?: string
+          body_html?: string
+          body_text?: string | null
+          personalization_data?: Json | null
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled'
+          error_message?: string | null
+          retry_count?: number
+          max_retries?: number
+          sendgrid_message_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          campaign_id: string | null
+          template_id: string | null
+          client_id: string
+          queue_id: string | null
+          to_email: string
+          to_name: string | null
+          subject: string
+          sent_at: string
+          opened_at: string | null
+          open_count: number
+          last_opened_at: string | null
+          clicked_at: string | null
+          click_count: number
+          last_clicked_at: string | null
+          converted_at: string | null
+          conversion_value: number | null
+          conversion_type: string | null
+          bounced: boolean
+          bounce_type: string | null
+          unsubscribed: boolean
+          unsubscribed_at: string | null
+          sendgrid_message_id: string | null
+          metadata: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          campaign_id?: string | null
+          template_id?: string | null
+          client_id: string
+          queue_id?: string | null
+          to_email: string
+          to_name?: string | null
+          subject: string
+          sent_at: string
+          opened_at?: string | null
+          open_count?: number
+          last_opened_at?: string | null
+          clicked_at?: string | null
+          click_count?: number
+          last_clicked_at?: string | null
+          converted_at?: string | null
+          conversion_value?: number | null
+          conversion_type?: string | null
+          bounced?: boolean
+          bounce_type?: string | null
+          unsubscribed?: boolean
+          unsubscribed_at?: string | null
+          sendgrid_message_id?: string | null
+          metadata?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          campaign_id?: string | null
+          template_id?: string | null
+          client_id?: string
+          queue_id?: string | null
+          to_email?: string
+          to_name?: string | null
+          subject?: string
+          sent_at?: string
+          opened_at?: string | null
+          open_count?: number
+          last_opened_at?: string | null
+          clicked_at?: string | null
+          click_count?: number
+          last_clicked_at?: string | null
+          converted_at?: string | null
+          conversion_value?: number | null
+          conversion_type?: string | null
+          bounced?: boolean
+          bounce_type?: string | null
+          unsubscribed?: boolean
+          unsubscribed_at?: string | null
+          sendgrid_message_id?: string | null
+          metadata?: Json | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      campaign_subscribers: {
+        Row: {
+          id: string
+          tenant_id: string
+          campaign_id: string
+          client_id: string
+          status: 'active' | 'paused' | 'completed' | 'unsubscribed'
+          current_email_sequence: number
+          emails_sent: number
+          emails_opened: number
+          emails_clicked: number
+          converted: boolean
+          conversion_value: number | null
+          enrolled_at: string
+          completed_at: string | null
+          unsubscribed_at: string | null
+          enrollment_source: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          campaign_id: string
+          client_id: string
+          status?: 'active' | 'paused' | 'completed' | 'unsubscribed'
+          current_email_sequence?: number
+          emails_sent?: number
+          emails_opened?: number
+          emails_clicked?: number
+          converted?: boolean
+          conversion_value?: number | null
+          enrolled_at?: string
+          completed_at?: string | null
+          unsubscribed_at?: string | null
+          enrollment_source?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          campaign_id?: string
+          client_id?: string
+          status?: 'active' | 'paused' | 'completed' | 'unsubscribed'
+          current_email_sequence?: number
+          emails_sent?: number
+          emails_opened?: number
+          emails_clicked?: number
+          converted?: boolean
+          conversion_value?: number | null
+          enrolled_at?: string
+          completed_at?: string | null
+          unsubscribed_at?: string | null
+          enrollment_source?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      campaign_analytics: {
+        Row: {
+          id: string
+          tenant_id: string
+          campaign_id: string
+          analytics_date: string
+          emails_sent: number
+          emails_delivered: number
+          emails_opened: number
+          emails_clicked: number
+          emails_bounced: number
+          conversions: number
+          revenue_generated: number
+          new_subscribers: number
+          unsubscribers: number
+          open_rate: number | null
+          click_rate: number | null
+          conversion_rate: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          campaign_id: string
+          analytics_date: string
+          emails_sent?: number
+          emails_delivered?: number
+          emails_opened?: number
+          emails_clicked?: number
+          emails_bounced?: number
+          conversions?: number
+          revenue_generated?: number
+          new_subscribers?: number
+          unsubscribers?: number
+          open_rate?: number | null
+          click_rate?: number | null
+          conversion_rate?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          campaign_id?: string
+          analytics_date?: string
+          emails_sent?: number
+          emails_delivered?: number
+          emails_opened?: number
+          emails_clicked?: number
+          emails_bounced?: number
+          conversions?: number
+          revenue_generated?: number
+          new_subscribers?: number
+          unsubscribers?: number
+          open_rate?: number | null
+          click_rate?: number | null
+          conversion_rate?: number | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
