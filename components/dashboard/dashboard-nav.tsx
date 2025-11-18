@@ -52,6 +52,7 @@ export function DashboardNav({ tenantId, role }: DashboardNavProps) {
     <nav className="flex w-64 flex-col border-r bg-white">
       <div className="flex h-16 items-center border-b px-6">
         <span className="text-lg font-semibold text-gray-900">ConveyPro</span>
+        <span className="ml-2 text-xs text-green-600">v3</span>
       </div>
 
       <div className="flex-1 space-y-1 p-4">
