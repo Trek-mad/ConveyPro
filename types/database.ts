@@ -711,6 +711,7 @@ export interface Database {
           to_name: string | null
           subject: string
           sent_at: string
+          delivered_at: string | null
           opened_at: string | null
           open_count: number
           last_opened_at: string | null
@@ -721,9 +722,12 @@ export interface Database {
           conversion_value: number | null
           conversion_type: string | null
           bounced: boolean
+          bounced_at: string | null
+          bounce_reason: string | null
           bounce_type: string | null
           unsubscribed: boolean
           unsubscribed_at: string | null
+          spam_reported_at: string | null
           sendgrid_message_id: string | null
           metadata: Json | null
           created_at: string
@@ -739,6 +743,7 @@ export interface Database {
           to_name?: string | null
           subject: string
           sent_at: string
+          delivered_at?: string | null
           opened_at?: string | null
           open_count?: number
           last_opened_at?: string | null
@@ -749,9 +754,12 @@ export interface Database {
           conversion_value?: number | null
           conversion_type?: string | null
           bounced?: boolean
+          bounced_at?: string | null
+          bounce_reason?: string | null
           bounce_type?: string | null
           unsubscribed?: boolean
           unsubscribed_at?: string | null
+          spam_reported_at?: string | null
           sendgrid_message_id?: string | null
           metadata?: Json | null
           created_at?: string
@@ -767,6 +775,7 @@ export interface Database {
           to_name?: string | null
           subject?: string
           sent_at?: string
+          delivered_at?: string | null
           opened_at?: string | null
           open_count?: number
           last_opened_at?: string | null
@@ -777,9 +786,12 @@ export interface Database {
           conversion_value?: number | null
           conversion_type?: string | null
           bounced?: boolean
+          bounced_at?: string | null
+          bounce_reason?: string | null
           bounce_type?: string | null
           unsubscribed?: boolean
           unsubscribed_at?: string | null
+          spam_reported_at?: string | null
           sendgrid_message_id?: string | null
           metadata?: Json | null
           created_at?: string
