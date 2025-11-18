@@ -46,6 +46,8 @@ export function DashboardNav({ tenantId, role }: DashboardNavProps) {
     (item) => !item.roles || item.roles.includes(role)
   )
 
+  // Phase 3: Campaigns feature enabled
+
   return (
     <nav className="flex w-64 flex-col border-r bg-white">
       <div className="flex h-16 items-center border-b px-6">
