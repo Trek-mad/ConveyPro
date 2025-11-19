@@ -79,7 +79,7 @@ export function CampaignActions({
         </button>
       )}
 
-      {status === 'paused' && (
+      {(status === 'draft' || status === 'paused') && (
         <button
           onClick={handleActivate}
           disabled={loading}
