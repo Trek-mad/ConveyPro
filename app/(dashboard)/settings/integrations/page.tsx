@@ -3,6 +3,7 @@ import { getActiveTenantMembership } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { WebhookTestForm } from '@/components/settings/webhook-test-form'
 import { FormSubmissionStats } from '@/components/settings/form-submission-stats'
+import { CopyButton } from '@/components/settings/copy-button'
 
 export const metadata = {
   title: 'Integrations | ConveyPro',
@@ -49,12 +50,7 @@ export default async function IntegrationsPage() {
                 value={webhookUrl}
                 className="block w-full rounded-md border-gray-300 bg-gray-50 px-3 py-2 text-sm font-mono"
               />
-              <button
-                onClick={() => navigator.clipboard.writeText(webhookUrl)}
-                className="ml-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-              >
-                Copy
-              </button>
+              <CopyButton text={webhookUrl} />
             </div>
             <p className="mt-1 text-xs text-gray-500">
               Include your tenant ID in the URL or send it in the request body
