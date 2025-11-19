@@ -7,508 +7,1207 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.0.0-all-phases] - 2025-11-19
+## [1.2.1-phase-3-enrollment-complete] - 2024-11-19
 
-**ALL 7 PHASES COMPLETE** 🎉🚀
+**Phase 3: Client Enrollment System Complete** ✅
 
-### Summary
-ConveyPro is now a complete, production-ready SaaS platform with **~26,000 lines of code** across **7 development phases**. Phase 2 is live in production on Vercel. Phases 3-7 are complete and ready for deployment.
-
-### Statistics
-- **Total Code:** ~25,884 lines of production code
-- **Database:** 17 tables, 12 migrations
-- **Branches:** 13+ feature branches
-- **Commits:** 50+ commits across all phases
-- **TypeScript Errors:** 0 across all phases
-- **Build Status:** ✅ PASSING on all branches
-
-### Deployment Status
-- ✅ **Phase 1:** Merged to main (PR #4, #5)
-- ✅ **Phase 2:** LIVE on Vercel production
-- ✅ **Phase 3-7:** Complete, ready for deployment
-
----
-
-## [1.7.0-phase-7] - 2025-11-19
-
-**Phase 7: Intelligent Automation** 🤖
-
-### Branch
-- **Branch:** `claude/phase-7-intelligent-automation-01MvsFgXfzypH55ReBQoerMy`
-- **Tag:** `phase-7-intelligent-automation-complete`
-- **Status:** ✅ Complete, ready for deployment
-- **Code:** +535 lines
+### Context
+Completed the client enrollment workflow for email campaigns. Built quote acceptance integration, manual enrollment interface, and flexible campaign selection system based on user feedback prioritizing firm control over automated matching.
 
 ### Added
 
-#### AI-Powered Lead Scoring (100-Point System)
-- Lead scoring service with comprehensive algorithm
-  - **Engagement Score (35 points)**
-    - Recent activity: 10 points
-    - Email engagement (opens/clicks): 15 points
-    - Quote interactions: 10 points
-  - **Property Value Score (25 points)**
-    - £0-100k: 5 pts → £1M+: 25 pts (tiered)
-  - **Response Time Score (20 points)**
-    - <24 hours: 20 pts → >7 days: 5 pts
-  - **Service History Score (20 points)**
-    - Previous conversions: +5 pts each (max 15)
-    - Referrals made: +5 pts (max 5)
-- **Lead Classification**
-  - 🔥 Hot Lead: 70-100 points
-  - ⚡ Warm Lead: 40-69 points
-  - ❄️ Cold Lead: 0-39 points
+#### Quote Acceptance Enrollment Flow
+**Files:** `components/campaigns/campaign-enrollment-modal.tsx`, `components/quotes/quote-actions.tsx`
 
-#### Predictive Insights
-- Next purchase timeframe prediction
-- Upsell opportunity identification
-  - Property purchase → Wills service
-  - High-value property → Estate planning
-  - Multiple properties → Power of attorney
-  - Remortgage → Investment property
-- Stale quote detection (14+ days no action)
-- Re-engagement recommendations
+- ✅ **Campaign enrollment modal** on quote acceptance
+  - Shows when accepting quotes with linked clients
+  - Displays ALL active campaigns (not just matching)
+  - Green "Recommended" badge for campaigns matching client's life stage
+  - Firms can select any campaign regardless of matching criteria
+  - Option to skip enrollment and just accept quote
+  - Multiple campaign selection support
 
-#### Hot Leads Dashboard
-- `/dashboard/hot-leads` page
-- Hot leads list (score ≥ 70)
-- Lead score breakdown visualization
-- Recommended actions per lead
-- Quick contact buttons
-- Property value display
-- Next best action suggestions
+- ✅ **Quote action handling**
+  - Handles quotes with and without client_id
+  - Opens modal only when client exists
+  - Gracefully accepts quote when no client linked
+  - Prevents button from breaking on null client_id
 
-#### Recommendation Engine
-- 🔥 "Call within 2 hours" (hot + recent activity)
-- 📧 "Send personalized follow-up" (warm + engaged)
-- 🎯 "Target with wills campaign" (recent property buyer)
-- ⚠️ "Re-engage now" (stale quote alert)
+#### Manual Enrollment System
+**Files:** `app/(dashboard)/campaigns/[id]/subscribers/page.tsx`, `components/campaigns/manual-enrollment-form.tsx`, `components/campaigns/subscribers-list.tsx`
 
-### Files Added
-1. `services/lead-scoring.service.ts` (280 lines) - AI scoring algorithm
-2. `services/predictive-insights.service.ts` (155 lines) - Upsell detection
-3. `app/(dashboard)/dashboard/hot-leads/page.tsx` (100 lines) - Dashboard UI
+- ✅ **Subscribers tab** in campaign detail pages
+  - Server-side data fetching with proper Next.js 15 async params
+  - Client/subscriber count statistics
+  - Enrolled subscribers list with status
+  - Available clients for enrollment
 
-### Impact
-- Prioritize best opportunities automatically
-- Increase conversion rate with targeted actions
-- Identify upsell opportunities before competitors
-- Reduce time wasted on cold leads
+- ✅ **Manual enrollment interface**
+  - Search clients by name or email
+  - Filter by life stage (FTB, moving-up, investor, retired, downsizing)
+  - Real-time filtering with debouncing
+  - Batch enrollment capability
+  - Shows client badges and metadata
 
----
+- ✅ **Subscriber management**
+  - View all enrolled subscribers
+  - Status tracking (active, paused, completed, unsubscribed)
+  - Enrollment date and source tracking
+  - Unenroll button with confirmation
+  - Email count per subscriber
 
-## [1.6.0-phase-6] - 2025-11-19
+#### Campaign Enrollment Service
+**File:** `services/campaign-enrollment.service.ts`
 
-**Phase 6: Advanced Analytics & Reporting** 📈
+- ✅ **Flexible campaign matching**
+  - `findMatchingCampaigns()` - Returns ALL active campaigns
+  - Added `matches_criteria` boolean flag to each campaign
+  - Matches based on client life stage vs campaign target_life_stages
+  - Empty target stages = matches everyone
 
-### Branch
-- **Branch:** `claude/phase-6-advanced-analytics-01MvsFgXfzypH55ReBQoerMy`
-- **Tag:** `phase-6-advanced-analytics-complete`
-- **Status:** ✅ Complete, ready for deployment
-- **Code:** +595 lines
+- ✅ **Multi-campaign enrollment**
+  - `enrollClientInCampaigns()` - Enroll in multiple campaigns at once
+  - Creates campaign_subscribers records
+  - Populates email_queue with all campaign templates
+  - Returns enrollment count and queued email count
 
-### Added
+- ✅ **Email queue population**
+  - Schedules all campaign templates automatically
+  - Calculates `scheduled_for` based on `days_after_enrollment` and `send_time_utc`
+  - Personalizes subject and body with variable replacement
+  - Stores personalization_data for tracking
 
-#### Revenue Attribution
-- Revenue analytics by source
-  - Website, referral, marketing, repeat client
-  - Source performance comparison
-  - Monthly trending per source
-- Revenue analytics by service
-  - Conveyancing, wills, estate planning, remortgage
-  - Service revenue breakdown
-  - Cross-sell revenue tracking
-- `/analytics/revenue` page with visualizations
+- ✅ **Variable replacement**
+  - Supports {{client_name}}, {{firm_name}}, {{property_address}}
+  - Fetches tenant and property data for replacement
+  - Handles missing data gracefully
 
-#### Client Journey Tracking
-- Event tracking system
-  - Client created, quote sent, quote viewed, quote accepted
-  - Campaign enrolled, email opened, email clicked
-  - Service purchased, referral made
-- Timeline visualization per client
-- Journey stage identification
-- Activity stream component
+- ✅ **Unenrollment**
+  - `unenrollClient()` - Remove client from campaign
+  - Updates subscriber status to 'unsubscribed'
+  - Records unenroll timestamp
 
-#### Conversion Funnel Analysis
-- 5-stage funnel tracking
-  1. Lead Created
-  2. Quote Sent
-  3. Quote Viewed
-  4. Quote Accepted
-  5. Service Delivered
-- Dropoff analysis (% lost at each stage)
-- Conversion rate calculation
-- Time-in-stage tracking
-- Stage-specific recommendations
-- `/analytics/conversions` page
+#### API Endpoints
+**Files:** `app/api/campaigns/enroll/route.ts`, `app/api/campaigns/subscribers/[id]/route.ts`
 
-### Files Added
-1. `services/revenue-analytics.service.ts` (135 lines)
-2. `services/client-journey.service.ts` (148 lines)
-3. `services/conversion-funnel.service.ts` (115 lines)
-4. `app/(dashboard)/analytics/revenue/page.tsx` (112 lines)
-5. `app/(dashboard)/analytics/conversions/page.tsx` (85 lines)
+- ✅ **GET /api/campaigns/enroll?clientId=xxx**
+  - Get all active campaigns with match indicators
+  - Returns campaigns with `matches_criteria` field
+  - Used by enrollment modal
 
-### Impact
-- Know which marketing channels drive revenue
-- Visualize complete client lifecycle
-- Identify and fix conversion bottlenecks
-- Optimize funnel for maximum conversions
+- ✅ **POST /api/campaigns/enroll**
+  - Enroll client in multiple campaigns
+  - Body: `{ clientId, campaignIds: string[] }`
+  - Returns enrollment count and queued email count
 
----
-
-## [1.5.0-phase-5] - 2025-11-19
-
-**Phase 5: Email Engagement & Tracking** 📊
-
-### Branch
-- **Branch:** `claude/phase-5-email-engagement-01MvsFgXfzypH55ReBQoerMy`
-- **Tag:** `phase-5-email-engagement-foundation`
-- **Status:** ✅ Complete, ready for deployment
-- **Code:** +284 lines
-
-### Added
-
-#### Email Engagement Metrics
-- Email engagement service
-  - Open rate (unique opens / sent)
-  - Click rate (unique clicks / sent)
-  - Conversion rate (conversions / sent)
-  - Bounce rate (bounces / sent)
-  - Unsubscribe rate (unsubscribes / sent)
-- Campaign-specific metrics
-- Tenant-wide aggregated metrics
-
-#### Campaign Analytics Page
-- `/campaigns/analytics` page
-- Key metrics dashboard
-  - Total emails sent
-  - Average open rate
-  - Average click rate
-  - Total conversions
-- **Engagement Funnel Visualization**
-  - Sent → Delivered → Opened → Clicked → Converted
-  - Dropoff percentages at each stage
-- Campaign comparison table
-- Chart placeholders for iteration
-
-### Files Added
-1. `services/email-engagement.service.ts` (120 lines)
-2. `app/(dashboard)/campaigns/analytics/page.tsx` (164 lines)
-
-### Dependencies
-- Uses Phase 3 `email_history` table
-- Integrates with SendGrid webhooks (Phase 3)
-
-### Impact
-- Measure campaign effectiveness
-- Optimize email content based on data
-- Identify best-performing campaigns
-- Improve overall engagement rates
-
----
-
-## [1.4.0-phase-4] - 2025-11-19
-
-**Phase 4: Form-to-Client Automation** 📝
-
-### Branch
-- **Branch:** `claude/phase-4-form-automation-01MvsFgXfzypH55ReBQoerMy`
-- **Tag:** `phase-4-form-automation-complete` (local)
-- **Status:** ✅ Complete, ready for deployment
-- **Code:** +1,570 lines
-- **Documentation:** `PHASE_4_COMPLETE.md`
-
-### Added
-
-#### Form Submission Service
-- `services/form-submission.service.ts` (400 lines)
-- **Complete Auto-Create Pipeline:**
-  ```
-  External Form → Webhook → Auto-Create Client →
-  Auto-Create Property → Auto-Generate Quote → Auto-Enroll in Campaigns
-  ```
-- Duplicate client prevention (email matching)
-- Life stage detection from form data
-  - First-time buyer (checkbox detection)
-  - Investor (additional property flag)
-  - Moving-up (default purchase)
-  - Remortgage client
-  - Retired (estate planning forms)
-- Source tracking (website/marketing/referral)
-- Client type detection (individual/couple/business/estate)
-
-#### Webhook API
-- `POST /api/webhooks/form-submission`
-- Bearer token authentication (`FORM_WEBHOOK_SECRET`)
-- Comprehensive field mapping (30+ fields)
-- Error handling and validation
-- Returns created IDs (client, property, quote)
-
-#### Integrations UI
-- `/settings/integrations` page (320 lines)
-- Webhook URL display with copy button
-- API documentation
-- **Test Form** - Try webhook without external forms
-- Form submission statistics
-- Integration guides for:
-  - Typeform
-  - Jotform
-  - Google Forms
-  - Custom HTML forms
-
-### Files Added
-1. `services/form-submission.service.ts` (400 lines)
-2. `app/api/webhooks/form-submission/route.ts` (150 lines)
-3. `app/(dashboard)/settings/integrations/page.tsx` (320 lines)
-4. `components/settings/integration-test-form.tsx` (200 lines)
-5. `components/settings/form-submission-stats.tsx` (180 lines)
-6. `components/settings/webhook-docs.tsx` (320 lines)
-
-### Environment Variables
-```bash
-FORM_WEBHOOK_SECRET=your-random-secret
-```
-
-### Impact
-- **Zero manual data entry** for form submissions
-- Automatic campaign enrollment
-- Instant quote generation
-- Seamless integration with marketing funnels
-
----
-
-## [1.3.0-phase-3] - 2025-11-18
-
-**Phase 3: Automated Cross-Selling** 📧
-
-### Branch
-- **Branch:** `claude/phase-3-automation-01MvsFgXfzypH55ReBQoerMy`
-- **Tag:** `phase-3-enrollment-complete`
-- **Status:** ✅ Complete, ready for deployment
-- **Code:** +4,200 lines
-- **Documentation:** `SESSION-SUMMARY-2024-11-18-PHASE-3.md`
-
-### Added
-
-#### Campaign System (7 New Database Tables)
-- **Migration:** `20241118000000_create_campaign_system.sql` (545 lines)
-- **Tables:**
-  1. `campaigns` - Campaign configuration & lifecycle
-  2. `email_templates` - Subject lines, HTML/text body with variables
-  3. `campaign_triggers` - Event-based automation rules
-  4. `email_queue` - Scheduled delivery system
-  5. `email_history` - Sent email tracking (25+ columns)
-  6. `campaign_subscribers` - Client enrollment & status
-  7. `campaign_analytics` - Daily aggregated metrics
-- **Database Function:** `increment_campaign_metric()` for atomic updates
-- **Full RLS Policies** on all tables
-
-#### Service Layer (8 Services, 1,270 Lines)
-1. `campaign.service.ts` (385 lines) - Campaign CRUD
-2. `email-template.service.ts` (228 lines) - Template management
-3. `campaign-trigger.service.ts` (154 lines) - Automation rules
-4. `email-queue.service.ts` (215 lines) - Queue processing
-5. `campaign-enrollment.service.ts` (95 lines) - Client enrollment
-6. `campaign-analytics.service.ts` (183 lines) - Metrics & reporting
-7. `template-variables.service.ts` (10 lines) - Variable rendering
-8. Email history service integration
-
-#### UI Pages
-- `/campaigns` - Campaign list with statistics
-- `/campaigns/new` - Campaign creation wizard
-- `/campaigns/[id]` - Campaign detail with live metrics
-- `/campaigns/[id]/edit` - Campaign editor
-- Email template builder with preview
-- Client enrollment modal
-
-#### Email Automation Features
-- **Event-Triggered Campaigns**
-  - Trigger types: `quote_accepted`, `client_created`, `quote_sent`, `time_based`
-  - Conditional logic with JSONB filters
-  - Priority-based execution
-- **Template Variables**
-  - `{{client_name}}`, `{{property_address}}`, `{{quote_amount}}`, etc.
-  - Variable substitution at send-time
-- **Auto-Enrollment**
-  - Clients automatically enrolled based on life stage
-  - Manual enrollment available
-  - Campaign-specific targeting
-- **Cron Job:** `/api/cron/process-email-queue`
-- **SendGrid Webhook Handler:** Tracks opens, clicks, bounces
-
-#### Campaign Types
-- Wills for property buyers
-- Power of attorney
-- Estate planning
-- Remortgage opportunities
-- Custom campaigns
-
-### Migration 2
-- **File:** `20241118000001_add_email_history_tracking_fields.sql`
-- Added engagement tracking fields to `email_history`
-
-### Environment Variables
-```bash
-CRON_SECRET=your-random-uuid  # For cron job authentication
-```
-
-### Impact
-- **Automated cross-selling** - Clients receive relevant offers automatically
-- **Revenue increase** - Identify and convert upsell opportunities
-- **Time savings** - No manual email campaign management
-- **Data-driven** - Track what works, optimize campaigns
-
----
-
-## [1.2.0-phase-2] - 2025-11-17
-
-**Phase 2: Analytics & Client Management** 📊
-
-### Branch
-- **Branch:** `claude/phase-2-demo-complete-01MvsFgXfzypH55ReBQoerMy`
-- **Status:** ✅ **DEPLOYED TO VERCEL PRODUCTION**
-- **Code:** +7,905 lines
-- **Migrations:** 2 new migrations
-- **Documentation:** `SESSION-SUMMARY-2024-11-17.md`, `DEPLOYMENT.md`
-
-### Added
-
-#### Analytics Dashboard
-- `/analytics` page with comprehensive metrics
-- **Revenue Tracking KPI Cards**
-  - Total revenue from accepted quotes
-  - Conversion rate (sent → accepted)
-  - Average quote value with growth indicators
-  - Cross-sell revenue preview (Phase 3 foundation)
-- **Interactive Recharts Visualizations**
-  - Revenue trend line chart (6-month history)
-  - Service breakdown pie chart
-  - Conversion funnel bar chart
-- **Cross-Sell Performance Table** (mock data showing Phase 3 potential)
-- **Staff Performance Leaderboard**
-  - Top performers by revenue
-  - Acceptance rate tracking
-
-#### Client Management System
-- **Migration:** `20241116000000_create_clients_table.sql` (125 lines)
-- **Table:** `clients` with comprehensive fields
-  - Personal info (name, email, phone, full address)
-  - Life stage classification (7 stages)
-    - first-time-buyer, moving-up, investor, retired, downsizing, remortgage, estate
-  - Client type (individual, couple, business, estate)
-  - Source tracking (website, referral, repeat, marketing)
-  - Created/updated timestamps
-- **Pages:**
-  - `/clients` - Client list with statistics
-  - `/clients/[id]` - Client detail with full history
-- **Features:**
-  - All quotes linked to client
-  - Services used tracking
-  - **Cross-sell opportunity identification**
-    - Priority-based recommendations (high/medium)
-    - Potential revenue calculation
-    - Life stage-based suggestions
-  - Client badges and tags
-
-#### Firm Branding & White Label
-- **Migration:** `20241116000001_create_firm_logos_bucket.sql` (68 lines)
-- **Storage Bucket:** `firm-logos` (Supabase Storage)
-- **Page:** `/settings/branding`
-- **Features:**
-  - Logo upload (5MB limit, multiple formats)
-  - Custom brand colors (primary, secondary, accent)
-  - Firm name and tagline
-  - White-label toggles
-  - Professional quote mockup preview
-  - **PDF Integration**
-    - Custom colors ✅
-    - Firm name & tagline ✅
-    - Logo rendering ❌ **KNOWN BUG** (CORS issue)
-
-#### Demo Data Seeder
-- **Script:** `scripts/seed-demo-data.ts` (718 lines!)
-- **Creates:**
-  - 15 realistic Scottish clients
-  - 15 properties (Edinburgh locations)
-  - 17 quotes (£81,420 total revenue)
-  - 6 months of historical data for charts
-- **Features:**
-  - Tenant selection support (`--tenant "Firm Name"`)
-  - `--clean` flag to refresh data
-  - Comprehensive error handling
-
-#### Database Utility Scripts
-1. `scripts/check-data.ts` (49 lines) - Verify data integrity
-2. `scripts/delete-tenant.ts` (99 lines) - Clean up test data
-3. `scripts/check-connection.ts` (37 lines) - Test DB connection
-4. `scripts/check-schema.ts` (54 lines) - Validate schema
-5. `scripts/README.md` (176 lines) - Documentation
-
-### Files Added
-Total: 36 files, +7,905 lines
-
-Key files:
-- `app/(dashboard)/analytics/page.tsx` (172 lines)
-- `app/(dashboard)/clients/page.tsx` (199 lines)
-- `app/(dashboard)/clients/[id]/page.tsx` (395 lines)
-- `app/(dashboard)/settings/branding/page.tsx` (184 lines)
-- `components/analytics/analytics-charts.tsx` (195 lines)
-- `components/analytics/cross-sell-performance.tsx` (172 lines)
-- `components/analytics/staff-performance.tsx` (150 lines)
-- `components/settings/branding-settings-form.tsx` (384 lines)
-- `services/branding.service.ts` (172 lines)
-- `services/client.service.ts` (163 lines)
-- `services/team.service.ts` (237 lines)
-- `scripts/seed-demo-data.ts` (718 lines)
+- ✅ **DELETE /api/campaigns/subscribers/[id]**
+  - Unenroll client from campaign
+  - Requires subscriber record ID
+  - Updates status to unsubscribed
 
 ### Fixed
 
-#### Production Deployment Bugs (Nov 17, 2025)
-All fixed during production deployment session:
+#### Bug 1: Quote Acceptance Button Not Working
+**File:** `components/quotes/quote-actions.tsx`
 
-1. **TypeScript Build Errors (5 total)** ✅
-   - `clients/[id]/page.tsx` - Supabase join typing
-   - `clients/page.tsx` - Undefined array handling
-   - `analytics-charts.tsx` - Recharts percent undefined
-   - `branding-settings-form.tsx` - Wrong import path
-   - `branding.service.ts` - createClient naming conflict
+**Problem:** When quote had no client_id (null), clicking "Mark as Accepted" did nothing
+**Root Cause:** Modal conditional `{quote.client_id && <CampaignEnrollmentModal />}` prevented modal from rendering, but button handler still tried to show it
+**Fix:** Added null check to `handleAcceptQuote()` - if no client_id, accept quote directly without modal
+```typescript
+const handleAcceptQuote = () => {
+  if (!quote.client_id) {
+    handleStatusChange('accepted')
+    return
+  }
+  setShowEnrollmentModal(true)
+}
+```
+**Result:** ✅ Quote acceptance works for both linked and unlinked quotes
 
-2. **Email Not Sending on Quote Creation** ✅
-   - Added email sending logic to `quote-form-with-property.tsx`
+#### Bug 2: TypeScript Build Failures - Schema Mismatches
+**Files:** Multiple service files and components
 
-3. **Branding Colors Not in PDF Quotes** ✅
-   - Updated `QuotePDF` to accept branding settings
-   - Custom colors now render correctly
+**Problems:**
+- `clients.full_name` doesn't exist (should be `first_name + last_name`)
+- `tenants.firm_name` doesn't exist (should be `name`)
+- `campaign_subscribers` missing `tenant_id` in insert
+- `email_queue` schema mismatch (personalized_subject vs subject)
 
-4. **Branding Settings Not Saving (RLS Error)** ✅
-   - Created service role client to bypass RLS for admin operations
+**Fixes:**
+- Updated `campaign-enrollment.service.ts` to use `first_name` and `last_name`
+- Changed `tenant.firm_name` to `tenant.name` everywhere
+- Added `tenant_id` to all campaign_subscribers inserts
+- Fixed email_queue insert to match actual schema:
+  - `to_email`, `to_name`, `subject`, `body_html`, `body_text`
+  - Removed non-existent `personalized_*` fields
 
-### Known Issues
+**Result:** ✅ Zero TypeScript errors, production build passes
 
-#### Critical
-- ❌ **Logo Rendering Broken**
-  - **Issue:** Logos don't display in PDF quotes or settings preview
-  - **Suspected:** Supabase Storage CORS configuration
-  - **Attempted Fixes:**
-    1. Image component from @react-pdf/renderer ❌
-    2. Error handling with crossOrigin attribute ❌
-    3. Base64 conversion approach (Nov 17 evening) ❌
-  - **Workaround:** Custom colors and text branding work perfectly
-  - **Priority:** HIGH (affects branded PDFs)
+#### Bug 3: No Campaigns Showing in Modal
+**File:** `services/campaign-enrollment.service.ts`
+
+**Problem:** Enrollment modal showed "No matching campaigns" for clients without matching life stages
+**User Feedback:** "firm wants to be able to have the ability to select whatever options they want when enrolling a client for cross selling"
+**Root Cause:** Service filtered campaigns to return only matches
+**Fix:** Changed from `.filter()` to `.map()` to return ALL campaigns with `matches_criteria` flag
+```typescript
+// Before - only returned matching campaigns
+const matchingCampaigns = campaigns.filter(campaign => {
+  // matching logic
+  return matches
+})
+
+// After - return all with match indicator
+const campaignsWithMatching = campaigns.map(campaign => {
+  const matches = /* matching logic */
+  return { ...campaign, matches_criteria: matches }
+})
+```
+**Result:** ✅ All active campaigns shown, recommended ones have green badge
+
+#### Bug 4: Campaign Status Confusion
+**Issue:** User saw "No active campaigns" despite having created campaigns
+**Root Cause:** Campaigns were in "Paused" status
+**Learning:** Only campaigns with `status = 'active'` appear in enrollment flows
+**Solution:** User activated campaigns via dashboard
+**Documentation:** Added to STATUS.md under "Important Learnings"
+
+### Changed
+
+#### Campaign Enrollment Modal UX
+**File:** `components/campaigns/campaign-enrollment-modal.tsx`
+
+- Updated empty state message from "No matching campaigns" to "No active campaigns"
+- Added "Recommended" badge to campaigns with `matches_criteria = true`
+- Updated info text to emphasize firm control: "Recommended campaigns match the client's profile, but you can select any campaign"
+- Removed misleading copy about client not matching campaigns
+- Interface now shows: campaign name, recommended badge, description, email count, duration, campaign type
+
+### Technical Highlights
+
+#### Firm Control Over Cross-Selling
+- User-driven design decision based on explicit feedback
+- Automated matching provides recommendations, not restrictions
+- Firms have full flexibility to enroll any client in any campaign
+- Visual indicators (green "Recommended" badge) guide without limiting
+
+#### Data Flow
+```
+Quote Acceptance → Modal Opens → Fetch All Active Campaigns →
+Mark Matching Campaigns → User Selects → Enroll API Call →
+Create Subscribers → Populate Email Queue → Schedule Emails
+```
+
+#### Email Scheduling Logic
+```
+Template send_time_utc: "09:00:00"
+Template days_after_enrollment: 3
+Enrolled at: 2024-11-19 14:30:00
+
+Scheduled for: 2024-11-22 09:00:00 UTC
+(3 days after enrollment, at 9 AM UTC)
+```
+
+### Database Schema Verified
+- ✅ `clients` table uses `first_name`, `last_name` (not `full_name`)
+- ✅ `tenants` table uses `name` (not `firm_name`)
+- ✅ `campaign_subscribers` requires `tenant_id`
+- ✅ `email_queue` uses `subject`, `body_html`, `to_email`, `to_name`
+- ✅ All foreign key relationships validated
+
+### Commits
+- **Commit:** `1684ee6` - Fix: Handle quote acceptance when client_id is null
+- **Commit:** `e174077` - Fix: Correct database column names in enrollment system
+- **Commit:** `1c85809` - Docs: Add future features documentation
+- **Commit:** `671e1a3` - Feat: Show all campaigns in enrollment modal with recommended badges
+- **Branch:** `claude/phase-2-demo-complete-01MvsFgXfzypH55ReBQoerMy`
+- **Status:** Committed and pushed to remote, auto-deployed to Vercel
+
+### User Testing Results
+✅ Quote acceptance with client enrollment - Working
+✅ Quote acceptance without client (null client_id) - Working
+✅ Manual enrollment in Subscribers tab - Working
+✅ Campaign activation/pause - Working
+✅ All campaigns showing in modal - Working
+✅ Recommended badges displaying - Working
+✅ Email queue population - Working (verified in Supabase)
+
+### What's Next
+- **Phase 4:** Form-to-client/property automation (documented in FUTURE_FEATURES.md)
+- **Email Sending:** Vercel Cron job runs daily at 9 AM UTC
+- **Engagement Tracking:** Open/click tracking via SendGrid webhooks (future)
+- **Analytics:** Campaign ROI and conversion funnels (future)
+
+---
+
+## [1.2.0-phase-3-automation] - 2024-11-18
+
+**Phase 3: Automated Cross-Selling Infrastructure** 🤖
+
+### Context
+Following successful Phase 2 demo with the client, building comprehensive email marketing automation system to maximize credit usage ($138 expiring in 4 hours). Phase 3 foundation implemented with 3,300+ lines of code across database, services, API, and UI layers.
+
+### Added
+
+#### Database Schema (545 lines)
+**Migration:** `20241118000000_create_campaign_system.sql`
+
+- ✅ **campaigns** table
+  - Campaign configuration and lifecycle management
+  - Metrics tracking (sent, opened, clicked, converted)
+  - Revenue attribution and estimation
+  - Target audience segmentation (life stages)
+  - Campaign types: wills, power_of_attorney, estate_planning, remortgage, custom
+  - Statuses: draft, active, paused, completed, archived
+
+- ✅ **email_templates** table
+  - Subject lines and HTML/text body content
+  - Variable support with {{variable}} syntax
+  - Sequence ordering for multi-email campaigns
+  - Template versioning and analytics
+
+- ✅ **campaign_triggers** table
+  - Event-based automation rules
+  - Trigger types: quote_accepted, client_created, quote_sent, time_based
+  - Conditional logic with filter conditions
+  - Priority-based execution
+
+- ✅ **email_queue** table
+  - Scheduled email delivery system
+  - SendGrid integration tracking
+  - Retry logic with configurable max retries
+  - Status tracking: pending, sending, sent, failed
+
+- ✅ **email_history** table
+  - Comprehensive sent email tracking
+  - Engagement metrics (opens, clicks, conversions)
+  - Revenue attribution per email
+  - SendGrid message ID tracking
+
+- ✅ **campaign_subscribers** table
+  - Client enrollment and status management
+  - Per-subscriber metrics and engagement
+  - Enrollment source tracking (manual, automatic, trigger)
+  - Completion and conversion tracking
+
+- ✅ **campaign_analytics** table
+  - Daily aggregated performance metrics
+  - Trend analysis and reporting
+  - Time-series data for charts
+
+- ✅ Database function: `increment_campaign_metric()`
+  - Atomic metric increments to prevent race conditions
+  - Used for campaign performance tracking
+
+- ✅ Comprehensive RLS policies for all tables
+  - Full multi-tenant data isolation
+  - Service role bypass for automation tasks
+
+- ✅ Performance indexes on all tables
+  - Campaign lookups, status filtering
+  - Queue scheduling optimization
+  - History tracking and analytics queries
+
+#### Service Layer (1,300+ lines)
+
+**campaign.service.ts** (600+ lines)
+- ✅ Campaign CRUD operations
+  - `getCampaigns()` - List all campaigns for tenant
+  - `getCampaign()` - Get single campaign with templates, triggers, subscribers
+  - `createCampaign()` - Create new campaign
+  - `updateCampaign()` - Update campaign settings
+  - `deleteCampaign()` - Remove campaign
+  - `activateCampaign()` - Start campaign (set status to active)
+  - `pauseCampaign()` - Pause active campaign
+
+- ✅ Email template management
+  - `getCampaignTemplates()` - Get templates for campaign
+  - `getTemplate()` - Get single template
+  - `createTemplate()` - Create new email template
+  - `updateTemplate()` - Update template content
+  - `deleteTemplate()` - Remove template
+
+- ✅ Campaign trigger operations
+  - `createCampaignTrigger()` - Define automation rules
+  - `getCampaignTriggers()` - List triggers for campaign
+  - `deleteCampaignTrigger()` - Remove trigger
+
+- ✅ Subscriber management
+  - `enrollClient()` - Enroll single client in campaign
+  - `getCampaignSubscribers()` - List subscribers with status filtering
+  - `updateSubscriber()` - Update subscriber status
+  - `unsubscribeClient()` - Remove client from campaign
+
+- ✅ Analytics and metrics
+  - `getCampaignMetrics()` - Performance overview (open rate, click rate, conversion rate)
+  - `getCampaignAnalytics()` - Daily time-series data
+
+- ✅ Email personalization
+  - `replaceEmailVariables()` - {{variable}} replacement engine
+  - Supports client_name, firm_name, service_name, custom variables
+
+**email-automation.service.ts** (700+ lines)
+- ✅ Email queue management
+  - `queueEmail()` - Add email to queue with scheduling
+  - `scheduleCampaignEmail()` - Schedule email for subscriber with personalization
+  - `getPendingEmails()` - Get emails ready to send
+  - `processEmailQueue()` - Batch process pending emails
+
+- ✅ SendGrid integration
+  - `sendQueuedEmail()` - Send individual email via SendGrid
+  - Click and open tracking enabled
+  - Message ID capture for engagement tracking
+  - Error handling with exponential backoff retry
+
+- ✅ Engagement tracking
+  - `trackEmailOpen()` - Record email opens, update metrics
+  - `trackEmailClick()` - Record link clicks, update metrics
+  - `trackEmailConversion()` - Record conversions and revenue
+
+- ✅ Batch operations
+  - `enrollMatchingClients()` - Auto-enroll clients based on targeting criteria
+  - Life stage filtering
+  - Client type filtering
+  - Services used filtering
+
+- ✅ Metric updates
+  - `incrementCampaignMetric()` - Atomic campaign metric updates
+  - `incrementCampaignRevenue()` - Revenue attribution
+  - `incrementSubscriberMetric()` - Per-subscriber tracking
+  - `markSubscriberConverted()` - Conversion tracking
+
+#### API Layer (9 routes)
+
+**Campaign Management**
+- ✅ `GET /api/campaigns` - List all campaigns
+- ✅ `POST /api/campaigns` - Create new campaign
+- ✅ `GET /api/campaigns/[id]` - Get single campaign
+- ✅ `PUT /api/campaigns/[id]` - Update campaign
+- ✅ `DELETE /api/campaigns/[id]` - Delete campaign
+- ✅ `POST /api/campaigns/[id]/activate` - Activate campaign
+- ✅ `POST /api/campaigns/[id]/pause` - Pause campaign
+
+**Subscriber Management**
+- ✅ `GET /api/campaigns/[id]/subscribers` - List subscribers
+- ✅ `POST /api/campaigns/[id]/subscribers` - Enroll client (manual or auto-batch)
+
+**Analytics**
+- ✅ `GET /api/campaigns/[id]/analytics` - Get campaign metrics and daily analytics
+
+**Email Templates**
+- ✅ `GET /api/templates` - List all templates
+- ✅ `POST /api/templates` - Create template
+- ✅ `GET /api/templates/[id]` - Get single template
+- ✅ `PUT /api/templates/[id]` - Update template
+- ✅ `DELETE /api/templates/[id]` - Delete template
+
+**Security**
+- ✅ Authentication required on all routes
+- ✅ Admin-only access for create/update/delete operations
+- ✅ Role-based authorization (owner, admin, member)
+
+#### UI Layer (280+ lines)
+
+**campaigns/page.tsx**
+- ✅ Campaign dashboard with statistics
+  - Total campaigns count
+  - Active campaigns count
+  - Total emails sent
+  - Estimated revenue generated
+
+- ✅ Campaign list view
+  - Campaign name and description
+  - Status badges (active, paused, completed, archived)
+  - Campaign type badges (wills, POA, estate planning, etc.)
+  - Real-time metrics per campaign:
+    - Emails sent
+    - Open rate percentage
+    - Click rate percentage
+    - Conversion count
+    - Revenue generated
+
+- ✅ Empty state with call-to-action
+  - Helpful message for first-time users
+  - "Create Campaign" button
+
+- ✅ Responsive design
+  - Grid layout for stats cards
+  - Mobile-friendly campaign list
+  - Tailwind CSS styling
+
+- ✅ Role-based UI
+  - "New Campaign" button only for admins/owners
+  - Member role has read-only access
+
+#### Type Safety (400+ lines)
+
+**types/database.ts**
+- ✅ Added 7 new table type definitions
+  - `campaigns` - Row, Insert, Update types
+  - `email_templates` - Row, Insert, Update types
+  - `campaign_triggers` - Row, Insert, Update types
+  - `email_queue` - Row, Insert, Update types
+  - `email_history` - Row, Insert, Update types
+  - `campaign_subscribers` - Row, Insert, Update types
+  - `campaign_analytics` - Row, Insert, Update types
+
+- ✅ Full TypeScript coverage
+  - Strict null checks
+  - Union types for status/type enums
+  - JSONB field typing
+  - Array field typing
+  - Timestamp fields
+
+### Fixed
+
+#### TypeScript Compilation Errors
+- ✅ Fixed client table schema mismatch
+  - Issue: Code referenced `full_name` field that doesn't exist
+  - Solution: Changed to `first_name` and `last_name` fields
+  - Files: `email-automation.service.ts` (lines 81, 650)
+
+- ✅ Fixed RPC function type error
+  - Issue: `increment_campaign_metric` function not in types
+  - Solution: Replaced RPC call with direct SQL update
+  - Files: `email-automation.service.ts` (lines 542-562)
+
+- ✅ Fixed union type indexing error
+  - Issue: TypeScript couldn't infer metric field types
+  - Solution: Select all metric fields explicitly
+  - Files: `email-automation.service.ts` (lines 582-604)
+
+- ✅ All TypeScript errors resolved
+  - Ran `npx tsc --noEmit` with zero errors
+  - Production build ready
+
+### Technical Highlights
+
+#### Architecture
+- ✅ Multi-tenant isolation with RLS policies
+- ✅ Service role client for automation (bypasses RLS)
+- ✅ Atomic metric updates to prevent race conditions
+- ✅ Exponential backoff retry logic for failed sends
+- ✅ Queue-based email delivery system
+- ✅ Event-driven trigger system (foundation)
+
+#### Email Personalization
+- ✅ Variable replacement with `{{variable}}` syntax
+- ✅ Client name, firm name, service name support
+- ✅ Custom variable support via personalization_data
+- ✅ Automatic cleanup of unreplaced variables
+
+#### Engagement Tracking
+- ✅ First-open tracking (opened_at timestamp)
+- ✅ Total open count tracking
+- ✅ First-click tracking (clicked_at timestamp)
+- ✅ Total click count tracking
+- ✅ Conversion tracking with revenue attribution
+- ✅ Campaign-level metric aggregation
+- ✅ Subscriber-level metric tracking
+
+#### Performance
+- ✅ Indexed queries for fast lookups
+- ✅ Batch processing with rate limiting
+- ✅ 100ms delay between sends to respect SendGrid limits
+- ✅ Efficient metric updates with select-then-update pattern
+
+### Commits
+- **Commit:** `b100281` - Feat: Phase 3 - Automated Cross-Selling Infrastructure
+- **Branch:** `claude/phase-3-automation-01MvsFgXfzypH55ReBQoerMy`
+- **Status:** Committed and pushed to remote
+- **Lines Changed:** 13 files changed, 3,308 insertions(+)
+
+### What's Next for Phase 3
+
+#### Remaining UI Components
+- ⏳ Campaign detail page (`/campaigns/[id]`)
+  - Campaign overview and edit form
+  - Template management interface
+  - Subscriber list with enrollment controls
+  - Performance charts and analytics
+
+- ⏳ Template editor (`/campaigns/[id]/templates/new`)
+  - Rich text editor for email content
+  - Variable insertion helper
+  - Preview with sample data
+  - A/B testing configuration
+
+- ⏳ Trigger configuration UI
+  - Trigger type selector
+  - Condition builder
+  - Action configuration
+  - Priority management
+
+- ⏳ Analytics dashboard
+  - Revenue trend charts
+  - Engagement funnel visualization
+  - Campaign comparison
+  - Subscriber journey timeline
+
+#### Automation Engine
+- ⏳ Trigger evaluation system
+  - Event listener for quote_accepted, client_created
+  - Condition matching engine
+  - Action execution (enroll client, send email)
+  - Trigger history logging
+
+- ⏳ Email sequence automation
+  - Multi-step drip campaigns
+  - Delay configuration between emails
+  - Conditional branching based on engagement
+  - Automatic progression through sequence
+
+#### Additional Features
+- ⏳ Email tracking pixels for opens
+- ⏳ Link click tracking with redirects
+- ⏳ Unsubscribe handling
+- ⏳ Bounce and complaint processing
+- ⏳ A/B testing framework
+- ⏳ Campaign cloning
+- ⏳ Template library
+- ⏳ SendGrid webhook handlers
+
+### Current State
+- ✅ Database foundation: 100% complete
+- ✅ Service layer: 100% complete
+- ✅ API layer: 100% complete
+- ✅ Basic UI: 30% complete (dashboard only)
+- ⏳ Automation engine: 0% complete
+- ⏳ Advanced UI: 0% complete
+
+**Total Progress:** Phase 3 foundation complete, ready for UI and automation implementation
+
+---
+
+## [1.1.2-logo-fix-attempted] - 2024-11-17 (Evening Session 2)
+
+**Continued from Previous Session - Logo Rendering Issue** 🔧
+
+### Context
+This session continued from earlier deployment session where logo rendering was identified as a problem. User reported that logos still don't display in PDF quotes or settings preview after the initial fix attempts.
+
+### What Was Attempted
+
+#### Logo Rendering Fix - Base64 Conversion Approach
+**Problem:** Logos not displaying in PDF quotes or settings preview despite earlier attempts
+**Hypothesis:** `@react-pdf/renderer` and browser `<img>` tags can't load Supabase Storage public URLs due to CORS
+
+**Solution Attempted:** Convert Supabase Storage URLs to base64 data URLs
+
+**Implementation:**
+1. **app/api/quotes/[id]/send/route.ts** (Lines 51-68)
+   ```typescript
+   // Convert logo URL to base64 if present
+   let logoBase64: string | undefined
+   if (brandingSettings.logo_url) {
+     try {
+       const logoResponse = await fetch(brandingSettings.logo_url)
+       if (logoResponse.ok) {
+         const logoBuffer = await logoResponse.arrayBuffer()
+         const logoBytes = Buffer.from(logoBuffer)
+         const contentType = logoResponse.headers.get('content-type') || 'image/png'
+         logoBase64 = `data:${contentType};base64,${logoBytes.toString('base64')}`
+       }
+     } catch (logoError) {
+       console.error('Error fetching logo for PDF:', logoError)
+     }
+   }
+
+   // Pass base64 logo to PDF generator
+   branding: {
+     logo_url: logoBase64 || brandingSettings.logo_url,
+     // ...
+   }
+   ```
+
+2. **app/(dashboard)/settings/branding/page.tsx** (Lines 34-50)
+   ```typescript
+   // Convert logo URL to base64 for reliable preview display
+   if (brandingSettings.logo_url) {
+     try {
+       const logoResponse = await fetch(brandingSettings.logo_url)
+       if (logoResponse.ok) {
+         const logoBuffer = await logoResponse.arrayBuffer()
+         const logoBytes = Buffer.from(logoBuffer)
+         const contentType = logoResponse.headers.get('content-type') || 'image/png'
+         brandingSettings.logo_url = `data:${contentType};base64,${logoBytes.toString('base64')}`
+       }
+     } catch (logoError) {
+       console.error('Error fetching logo for preview:', logoError)
+     }
+   }
+   ```
+
+**Result:** ❌ **DID NOT WORK** - User confirmed logos still not displaying
+
+### Current Problems That Need Fixing
+
+#### 1. Logo Not Rendering in PDF Quotes ⚠️ HIGH PRIORITY
+**Status:** BROKEN - Multiple fix attempts unsuccessful
+**User Impact:** HIGH - Branded PDFs are a key selling feature
+**What works:**
+- ✅ Custom brand colors in PDF
+- ✅ Firm name and tagline in PDF
+- ✅ Logo uploads successfully to Supabase Storage
+- ✅ Logo URL is saved to database
+
+**What doesn't work:**
+- ❌ Logo image not visible in generated PDF
+- ❌ Logo preview not showing in settings page
+
+**What's been tried:**
+1. Added `Image` component from `@react-pdf/renderer`
+2. Added conditional rendering for logo vs firm name text
+3. Added error handling with crossOrigin attribute
+4. Attempted base64 conversion (tonight's session)
+
+**Possible root causes to investigate:**
+1. **Supabase Storage CORS configuration**
+   - Bucket may not allow requests from @react-pdf/renderer
+   - May need to add specific CORS headers
+   - Check if bucket is truly PUBLIC
+
+2. **@react-pdf/renderer Image limitations**
+   - Library may not support external URLs at all
+   - May require images to be served from same domain
+   - May have issues with Supabase signed URLs
+
+3. **Base64 fetch failing silently**
+   - Server-side fetch might be blocked by firewall/network
+   - Supabase might require authentication even for public buckets
+   - Need to check server logs for fetch errors
+
+4. **Image format incompatibility**
+   - @react-pdf/renderer might not support all image formats
+   - May need specific PNG/JPEG encoding
+   - SVG might not be supported
+
+**Next steps to try:**
+1. Check Vercel deployment logs for fetch errors
+2. Test if base64 string is actually being generated (add console.log)
+3. Verify Supabase Storage bucket is PUBLIC with no RLS restrictions
+4. Try uploading a simple test PNG and see if that renders
+5. Check @react-pdf/renderer documentation for Image component requirements
+6. Consider alternative: Store logos as base64 strings directly in database
+7. Consider alternative: Proxy logo through Next.js API route to avoid CORS
+
+#### 2. Logo Preview Not Showing in Settings ⚠️ MEDIUM PRIORITY
+**Status:** BROKEN - Same underlying issue as PDF
+**User Impact:** MEDIUM - Users can't see their uploaded logo
+**What works:**
+- ✅ Logo upload completes successfully
+- ✅ Logo URL is saved
+- ✅ Error handling shows helpful message
+
+**What doesn't work:**
+- ❌ Preview `<img>` tag fails to load image
+- ❌ Even with crossOrigin="anonymous" attribute
+
+**Root cause likely same as PDF issue** - Supabase Storage CORS or public access configuration
+
+### What Worked Tonight ✅
+
+1. **TypeScript Validation Passed**
+   - Ran `npx tsc --noEmit` with no errors
+   - Code changes are syntactically correct
+
+2. **Documentation Structure**
+   - Previous session created comprehensive docs:
+     - SESSION-SUMMARY-2024-11-17.md
+     - Updated CHANGELOG.md
+     - Updated STATUS.md
+
+3. **Git Workflow**
+   - Successfully committed changes
+   - Pushed to branch: `claude/phase-2-demo-complete-01MvsFgXfzypH55ReBQoerMy`
+   - Vercel will auto-deploy (if configured)
+
+### What Didn't Work Tonight ❌
+
+1. **Logo rendering fix**
+   - Base64 conversion approach didn't solve the problem
+   - User confirmed: "that still didnt fix it"
+
+2. **Local build test**
+   - Build failed due to Google Fonts network restrictions
+   - Error: HTTP 403 from fonts.googleapis.com
+   - Not related to our code - environment issue
+   - TypeScript compilation succeeded (validates our code is correct)
+
+### Files Modified Tonight
+- `app/api/quotes/[id]/send/route.ts` - Added base64 logo conversion
+- `app/(dashboard)/settings/branding/page.tsx` - Added base64 logo conversion
+- `CHANGELOG.md` - This file (documentation)
+- `STATUS.md` - Status update (documentation)
+
+### Commits Tonight
+- Commit: `4e52ea9` - Fix: Logo rendering in PDF quotes and settings preview
+- Status: Pushed to remote branch
+- Deployment: Should trigger Vercel rebuild
+
+### User Feedback
+- "ok that still didnt fix it"
+- User requested: Stop coding, update docs only
+- User wants: List of what worked, what didn't work, current problems
+
+### Meeting Tomorrow
+- User has meeting Tuesday (tomorrow)
+- Current state: Production app works except logos
+- Demo-able features:
+  - ✅ Analytics dashboard with revenue charts
+  - ✅ Client management system
+  - ✅ Branded PDF quotes (colors and text)
+  - ✅ Email sending
+  - ⚠️ Logo rendering (still broken)
+
+### Recommendation for Tomorrow's Session
+
+**Priority 1: Fix Logo Rendering**
+- Investigate Supabase Storage bucket configuration
+- Check deployment logs for base64 fetch errors
+- Try simpler test: Upload small PNG, test if it renders
+- Consider storing logos as base64 in database directly
+
+**Priority 2: Test Current Deployment**
+- Verify Vercel rebuilt with tonight's changes
+- Test if base64 approach works in production (might work despite local testing)
+- Check browser console for any JavaScript errors
+
+**Priority 3: Prepare Demo Fallback**
+- Document workaround: Use firm name text instead of logo
+- Emphasize working features: colors, charts, analytics, emails
+- Logo can be "Phase 2.1" enhancement if needed
+
+---
+
+## [1.1.1-production-deployment] - 2024-11-17
+
+**Production Deployment & Bug Fixes** 🚀
 
 ### Deployment
-- ✅ **Deployed to Vercel:** https://conveypro.vercel.app
-- ✅ **Database:** Supabase Production with Phase 2 schema
-- ✅ **Demo Data:** 15 clients, 17 quotes, £81,420 revenue
-- ✅ **Environment:** All variables configured
-- ✅ **Build Status:** Passing (except logo bug)
+- ✅ Deployed Phase 2 to Vercel production environment
+- ✅ Branch: `claude/phase-2-demo-complete-01MvsFgXfzypH55ReBQoerMy`
+- ✅ Live URL: Vercel app with all Phase 2 features
+- ✅ Database: Using existing Supabase instance with "Test" tenant
+- ✅ Demo data: 15 clients, 17 quotes, £81,420 revenue
 
-### Impact
-- **Complete client visibility** - Full history and cross-sell opportunities
-- **Data-driven decisions** - Revenue analytics and conversion tracking
-- **Professional branding** - White-label PDFs and customization
-- **Demo-ready** - Comprehensive seed data for presentations
+### Fixed - Critical Production Issues
+
+#### Issue 1: TypeScript Build Errors (5 errors fixed)
+**Problem:** Vercel deployment failed due to TypeScript strict mode errors
+
+**Fixes:**
+1. **clients/[id]/page.tsx - Quote array typing**
+   ```typescript
+   // Problem: TypeScript didn't know about Supabase joined quotes
+   const { client } = clientResult
+
+   // Solution: Properly type the joined data
+   type Quote = Database['public']['Tables']['quotes']['Row']
+   const quotes = (client.quotes as unknown as Quote[]) || []
+   ```
+
+2. **clients/page.tsx - Undefined array**
+   ```typescript
+   // Problem: 'clients' is possibly 'undefined'
+   const clients = 'clients' in clientsResult ? clientsResult.clients : []
+
+   // Solution: Add null check
+   const clients = ('clients' in clientsResult && clientsResult.clients)
+     ? clientsResult.clients : []
+   ```
+
+3. **analytics-charts.tsx - Pie chart percent**
+   ```typescript
+   // Problem: Property 'percent' is possibly 'undefined'
+   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+
+   // Solution: Add null check
+   label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : '0'}%`}
+   ```
+
+4. **branding-settings-form.tsx - Wrong import**
+   ```typescript
+   // Problem: Button imported from wrong module
+   import { Button } from '@/components/ui/card'
+
+   // Solution: Import from correct module
+   import { Button } from '@/components/ui/button'
+   ```
+
+5. **branding.service.ts - Undefined function**
+   ```typescript
+   // Problem: createSupabaseClient not defined after refactor
+   const supabase = await createSupabaseClient()
+
+   // Solution: Use renamed import
+   const supabase = await createClient()
+   ```
+
+#### Issue 2: Email Not Sending on Quote Creation
+**Problem:** When creating a quote with "Save and Send to Client", email never sent
+
+**Root Cause:** Form created quote with status='sent' but never called send email API
+
+**Solution:** Added email sending logic in quote-form-with-property.tsx
+```typescript
+// After creating quote successfully
+if (status === 'sent' && data.client_email) {
+  try {
+    const sendResponse = await fetch(`/api/quotes/${result.quote.id}/send`, {
+      method: 'POST',
+    })
+
+    if (!sendResponse.ok) {
+      const errorData = await sendResponse.json()
+      setError(`Quote created but failed to send email: ${errorData.error}`)
+      // Still redirect so user can manually send
+      router.push(`/quotes/${result.quote.id}`)
+      return
+    }
+  } catch (emailError) {
+    console.error('Error sending quote email:', emailError)
+    setError('Quote created but failed to send email. You can send it from the quote details page.')
+  }
+}
+```
+
+**Result:** ✅ Emails now send automatically when creating quote with "sent" status
+
+#### Issue 3: Branding Colors Not in PDF Quotes
+**Problem:** PDF quotes showed hardcoded blue (#2563EB) instead of custom branding
+
+**Root Cause:** QuotePDF component didn't accept or use branding settings
+
+**Solution 1:** Updated QuotePDF to accept branding
+```typescript
+// lib/pdf/quote-template.tsx
+interface QuotePDFProps {
+  quote: QuoteWithRelations
+  tenantName: string
+  branding?: {
+    primary_color?: string
+    logo_url?: string
+    firm_name?: string
+    tagline?: string
+  }
+}
+
+export const QuotePDF: React.FC<QuotePDFProps> = ({ quote, tenantName, branding }) => {
+  // Use branding colors or defaults
+  const primaryColor = branding?.primary_color || '#2563EB'
+  const firmName = branding?.firm_name || tenantName
+
+  // Apply to header
+  <View style={[styles.header, { borderBottomColor: primaryColor }]}>
+    <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+
+  // Apply to total section
+  <View style={[styles.totalRow, { borderTopColor: primaryColor }]}>
+    <Text style={[styles.totalLabel, { color: primaryColor }]}>Total Amount</Text>
+```
+
+**Solution 2:** Updated send API to fetch and pass branding
+```typescript
+// app/api/quotes/[id]/send/route.ts
+// Fetch branding settings
+const brandingSettings = await getBrandingSettings(membership.tenant_id)
+
+// Generate PDF with branding
+const pdfBuffer = await renderToBuffer(
+  QuotePDF({
+    quote,
+    tenantName,
+    branding: {
+      primary_color: brandingSettings.primary_color,
+      logo_url: brandingSettings.logo_url,
+      firm_name: brandingSettings.firm_name,
+      tagline: brandingSettings.tagline,
+    }
+  }) as any
+)
+```
+
+**Result:** ✅ PDF quotes now show custom brand colors and firm name
+
+#### Issue 4: Branding Settings Not Saving (RLS Permission Error)
+**Problem:** Uploading logo and clicking Save showed "Failed to save settings"
+
+**Root Cause:** Regular Supabase client has Row Level Security restrictions
+
+**Solution:** Created service role client for admin operations
+```typescript
+// lib/supabase/server.ts
+export function createServiceRoleClient() {
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
+}
+
+// services/branding.service.ts - Use service role for writes
+export async function updateBrandingSettings(
+  tenantId: string,
+  settings: Partial<BrandingSettings>
+) {
+  const supabase = createServiceRoleClient() // Bypasses RLS
+  // ... rest of update logic
+}
+```
+
+**Result:** ✅ Branding settings now save successfully
+
+### Known Issues - Still Need Fixing
+
+#### Logo Not Rendering in PDF or Preview ⚠️
+**Status:** PARTIALLY FIXED - Colors work, logo still broken
+
+**Current State:**
+- ✅ Brand colors working in PDF
+- ✅ Firm name and tagline working in PDF
+- ❌ Logo image not showing in PDF
+- ❌ Logo preview not showing in settings form
+
+**What Was Tried:**
+1. Added Image import to PDF template
+2. Added logo rendering logic with conditional display
+3. Added error handling to form preview with crossOrigin attribute
+4. Verified logo URL is being passed to PDF generator
+
+**Code Added:**
+```typescript
+// lib/pdf/quote-template.tsx
+import { Image } from '@react-pdf/renderer'
+
+{branding?.logo_url ? (
+  <Image
+    src={branding.logo_url}
+    style={{ width: 120, height: 'auto', maxHeight: 50, marginBottom: 8, objectFit: 'contain' }}
+  />
+) : (
+  <Text style={[styles.logo, { color: primaryColor }]}>{firmName}</Text>
+)}
+```
+
+**Suspected Issues:**
+1. **CORS Problem:** Supabase Storage might not allow cross-origin image access
+2. **Public URL Issue:** Storage bucket might not be properly configured as public
+3. **RLS on Storage:** Row Level Security might be blocking anonymous access to images
+
+**Next Steps to Fix:**
+1. Check Supabase Storage bucket `firm-logos` CORS settings
+2. Verify bucket is set to PUBLIC
+3. Check RLS policies on storage.objects table
+4. Test logo URL directly in browser to confirm it's accessible
+5. May need to add CORS headers to Supabase Storage bucket
+6. Consider using base64 encoded images if CORS can't be fixed
+
+**Workaround:** Logo will still save and can be uploaded. Colors and text branding work perfectly.
+
+### Technical Debt
+- Logo display needs CORS/Storage configuration fix
+- Consider migrating to base64 images for PDFs if storage access remains problematic
+
+---
+
+## [1.1.0-phase-2] - 2024-11-16/17
+
+**Phase 2 Features: Analytics, Client Management & Branding** 🎨
+
+### Git Tags & Branches
+- **Branch:** `claude/phase-2-form-builder-0151jSm8PvAf8MqE51ryMAwW` (active)
+- **Status:** Phase 2 features complete, ready for production deployment
+
+### Added
+
+#### Analytics Dashboard 📊
+- ✅ Comprehensive analytics page at `/analytics`
+- ✅ Revenue tracking with KPI cards
+  - Total revenue calculation from accepted quotes
+  - Conversion rate (sent → accepted)
+  - Cross-sell revenue metrics (Phase 3 preview)
+  - Average quote value
+- ✅ Interactive charts using Recharts library
+  - Revenue trend line chart (6-month history)
+  - Service breakdown pie chart
+  - Conversion funnel bar chart
+- ✅ Cross-sell performance table
+  - Mock data showing Phase 3 revenue potential
+  - Services: Wills, Power of Attorney, Estate Planning, Remortgage
+  - Conversion rates and revenue projections
+- ✅ Staff performance leaderboard
+  - Top performers by revenue and quote acceptance
+  - Cross-sell tracking per staff member
+
+#### Client Management System 👥
+- ✅ Comprehensive client profiles
+  - Personal information (name, email, phone)
+  - Full address details
+  - Life stage classification (first-time-buyer, moving-up, investor, retired, downsizing)
+  - Client type (individual, couple, business, estate)
+  - Source tracking (website, referral, repeat, marketing)
+- ✅ Client list page at `/clients`
+  - Statistics cards (total clients, active this month, FTBs, investors)
+  - Client badges showing life stage and type
+  - Tags and quick stats per client
+- ✅ Client detail pages
+  - Complete client profile view
+  - All quotes linked to client
+  - Services used tracking
+  - Cross-sell opportunity identification
+  - Priority-based recommendations (high/medium)
+  - Potential revenue calculation
+- ✅ Database schema
+  - Migration: `20241116000000_create_clients_table.sql`
+  - Full RLS policies for multi-tenant security
+  - Indexed for performance
+  - Soft delete support
+  - `client_id` foreign key added to quotes table
+- ✅ Service layer (services/client.service.ts)
+  - Full CRUD operations
+  - Client search functionality
+  - Statistics and analytics
+  - Cross-sell opportunity calculation
+
+#### Firm Branding & White Label 🎨
+- ✅ Branding settings page at `/settings/branding`
+- ✅ Logo upload functionality
+  - Supabase Storage bucket: `firm-logos`
+  - 5MB file size limit
+  - Allowed formats: JPEG, PNG, WebP, SVG
+  - Automatic old logo replacement
+- ✅ Custom brand colors
+  - Primary, secondary, and accent color pickers
+  - Live color preview
+  - Hex input with validation
+- ✅ Firm customization
+  - Firm name and tagline
+  - White-label toggles for quotes and emails
+  - Professional quote mockup preview
+- ✅ Storage bucket migration
+  - Migration: `20241116000001_create_firm_logos_bucket.sql`
+  - Public bucket with RLS policies
+  - Tenant-scoped file paths
+- ✅ API routes
+  - `/api/branding/upload-logo` - Logo upload endpoint
+  - `/api/branding/settings` - Settings CRUD
+- ✅ Service layer (services/branding.service.ts)
+  - Get/update/upload/delete operations
+  - Flexible key-value storage in tenant_settings
+
+#### Demo Data Seeder 🌱
+- ✅ Comprehensive seed script (scripts/seed-demo-data.ts)
+  - Creates 15 realistic clients across life stages
+  - Creates 15 properties (residential and commercial)
+  - Creates 17 quotes with varied statuses
+  - 6 months of historical data for charts
+  - Total demo revenue: £81,420 (8 accepted quotes)
+- ✅ Tenant selection support
+  - Command-line tenant name argument
+  - Automatic first tenant selection fallback
+  - Lists available tenants if not found
+- ✅ Data cleanup flag
+  - `--clean` flag to remove existing demo data
+  - Cleans quotes, properties, and clients before seeding
+- ✅ Environment variable loading
+  - Automatic .env.local loading with dotenv
+  - Validation of required credentials
+- ✅ npm scripts
+  - `npm run seed` - Run seeder
+  - `npm run seed <tenant-name>` - Target specific tenant
+  - `npm run seed -- --clean` - Clean before seeding
+
+#### Utility Scripts 🛠️
+- ✅ Data verification script (scripts/check-data.ts)
+  - Lists all tenants with data counts
+  - Shows clients, properties, and quotes per tenant
+- ✅ Tenant deletion script (scripts/delete-tenant.ts)
+  - Delete unwanted tenants and all their data
+  - Requires `--confirm` flag for safety
+  - Cascading delete (quotes → properties → clients → tenant)
+- ✅ Connection diagnostic script (scripts/check-connection.ts)
+  - Tests Supabase connection
+  - Validates credentials
+  - Helpful for debugging network issues
+
+### Fixed
+
+#### Database Schema Issues
+- ✅ Fixed property price column mismatch
+  - Seed script was using `price` field
+  - Database schema uses `purchase_price`
+  - Updated all property insertions
+- ✅ Fixed property type enum mismatch
+  - Seed script was using `house`/`flat`
+  - Database enum uses `residential`/`commercial`
+  - Updated all property insertions
+- ✅ Fixed quote schema mismatches
+  - Converted `property_value` → `transaction_value`
+  - Converted `legal_fees` → `base_fee`
+  - Combined fees into `disbursements`
+  - Calculated `vat_amount` (20% of base + disbursements)
+  - Calculated `total_amount` correctly
+  - Added `client_name` and `client_email` fields
+  - Added `accepted_at` timestamps for accepted quotes
+
+#### Quote Number Conflicts
+- ✅ Fixed global quote number collisions
+  - Quote numbers were globally unique across all tenants
+  - Multiple tenants caused "duplicate key" errors
+  - Solution: Tenant-specific quote prefixes
+  - Example: Tenant `d9a4...` uses `Q-d9a4-001`, `Q-d9a4-002`, etc.
+
+#### Quote Status Validation
+- ✅ Fixed status check constraint violation
+  - Seed script used `declined` status
+  - Database only accepts: draft, pending, sent, accepted, rejected, expired, cancelled
+  - Changed `declined` → `rejected` throughout
+
+#### Service Naming Conflicts
+- ✅ Fixed createClient function name collision
+  - Seed script function conflicted with Supabase import
+  - Renamed Supabase import to `createSupabaseClient`
+  - Applied across all service files
+
+#### Seed Script Improvements
+- ✅ Fixed --clean flag parsing
+  - Flag was being treated as tenant name
+  - Now filters out flags starting with `--`
+  - Works correctly: `npm run seed -- --clean`
+
+### Documentation
+- ✅ Updated CHANGELOG.md with Phase 2 features
+- ✅ Updated STATUS.md with current state
+- ✅ Created comprehensive script README (scripts/README.md)
+- ✅ Added inline documentation to all new services
+
+### Database Migrations Added
+1. `20241116000000_create_clients_table.sql`
+   - Clients table with full profile fields
+   - Life stage and client type classification
+   - Services tracking (JSONB array)
+   - Tags, notes, and source fields
+   - RLS policies for multi-tenant access
+   - Triggers for updated_at timestamps
+   - Foreign key from quotes → clients
+
+2. `20241116000001_create_firm_logos_bucket.sql`
+   - Supabase Storage bucket creation
+   - RLS policies for logo access
+   - Tenant-scoped upload permissions
+   - Public read access for display
+
+### Commits Summary
+- 20+ commits in Phase 2 session
+- All focused on analytics, client management, and branding
+- Multiple bug fixes for demo data seeder
+- Production-ready code
 
 ---
 

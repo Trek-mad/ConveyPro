@@ -7,6 +7,7 @@ import { updateQuoteStatus } from '@/services/quote.service'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Mail, Check, X, Clock } from 'lucide-react'
+import { CampaignEnrollmentModal } from '@/components/campaigns/campaign-enrollment-modal'
 
 interface QuoteActionsProps {
   quote: Quote
@@ -17,6 +18,7 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
 
   const handleStatusChange = async (newStatus: Quote['status']) => {
     setIsLoading(true)
@@ -32,6 +34,57 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
 
     router.refresh()
     setIsLoading(false)
+  }
+
+  const handleAcceptQuote = () => {
+    // If no client_id, just accept the quote directly
+    if (!quote.client_id) {
+      handleStatusChange('accepted')
+      return
+    }
+
+    // Show campaign enrollment modal
+    setShowEnrollmentModal(true)
+  }
+
+  const handleEnrollAndAccept = async (campaignIds: string[]) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Enroll in campaigns if any selected
+      if (campaignIds.length > 0) {
+        const enrollResponse = await fetch('/api/campaigns/enroll', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId: quote.client_id,
+            campaignIds,
+          }),
+        })
+
+        if (!enrollResponse.ok) {
+          throw new Error('Failed to enroll client in campaigns')
+        }
+      }
+
+      // Accept the quote
+      const result = await updateQuoteStatus(quote.id, tenantId, 'accepted')
+
+      if ('error' in result) {
+        setError(result.error)
+        setIsLoading(false)
+        return
+      }
+
+      router.refresh()
+      setShowEnrollmentModal(false)
+      setIsLoading(false)
+    } catch (err: any) {
+      setError(err.message || 'Failed to process request')
+      setIsLoading(false)
+      throw err
+    }
   }
 
   // Only show actions if quote is not in a final state
@@ -67,7 +120,7 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
           {quote.status === 'sent' && (
             <>
               <Button
-                onClick={() => handleStatusChange('accepted')}
+                onClick={handleAcceptQuote}
                 disabled={isLoading}
                 className="bg-green-600 hover:bg-green-700"
               >
@@ -95,6 +148,15 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
           )}
         </div>
       </Card>
+
+      {/* Campaign Enrollment Modal */}
+      <CampaignEnrollmentModal
+        isOpen={showEnrollmentModal && !!quote.client_id}
+        onClose={() => setShowEnrollmentModal(false)}
+        clientId={quote.client_id || ''}
+        clientName="Client"
+        onEnroll={handleEnrollAndAccept}
+      />
     </>
   )
 }
