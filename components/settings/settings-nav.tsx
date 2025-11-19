@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Palette } from 'lucide-react'
+import { User, Building2, Palette, Webhook } from 'lucide-react'
 
 interface SettingsNavProps {
   role: 'owner' | 'admin' | 'manager' | 'member' | 'viewer'
@@ -28,6 +28,12 @@ export function SettingsNav({ role }: SettingsNavProps) {
       name: 'Branding',
       href: '/settings/branding',
       icon: Palette,
+      roles: ['owner', 'admin'],
+    },
+    {
+      name: 'Integrations',
+      href: '/settings/integrations',
+      icon: Webhook,
       roles: ['owner', 'admin'],
     },
   ]
