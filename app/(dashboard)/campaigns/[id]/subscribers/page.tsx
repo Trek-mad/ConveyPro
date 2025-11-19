@@ -49,9 +49,9 @@ export default async function CampaignSubscribersPage({ params }: PageProps) {
   const supabase = await createClient()
   const { data: allClients } = await supabase
     .from('clients')
-    .select('id, full_name, email, life_stage')
+    .select('id, first_name, last_name, email, life_stage')
     .eq('tenant_id', membership.tenant_id)
-    .order('full_name', { ascending: true })
+    .order('first_name', { ascending: true })
 
   const availableClients = allClients || []
 

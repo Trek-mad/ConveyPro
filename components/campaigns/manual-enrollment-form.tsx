@@ -6,8 +6,9 @@ import { Check, Loader2, Search } from 'lucide-react'
 
 interface Client {
   id: string
-  full_name: string
-  email: string
+  first_name: string
+  last_name: string
+  email: string | null
   life_stage: string | null
 }
 
@@ -32,10 +33,11 @@ export function ManualEnrollmentForm({
   // Filter clients based on search and matching criteria
   const filteredClients = availableClients.filter((client) => {
     // Search filter
+    const fullName = `${client.first_name} ${client.last_name}`.toLowerCase()
     const matchesSearch =
       searchQuery === '' ||
-      client.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase())
+      fullName.includes(searchQuery.toLowerCase()) ||
+      (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase()))
 
     if (!matchesSearch) return false
 
@@ -176,7 +178,7 @@ export function ManualEnrollmentForm({
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-gray-900">
-                        {client.full_name}
+                        {client.first_name} {client.last_name}
                       </p>
                       {matches && (
                         <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">

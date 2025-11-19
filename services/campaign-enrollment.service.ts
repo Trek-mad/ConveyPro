@@ -162,13 +162,15 @@ export async function enrollClientInCampaigns(
       }
 
       // Create enrollment record
-      const { data: subscription, error: subError } = await supabase
+      const { data: subscription, error: subError} = await supabase
         .from('campaign_subscribers')
         .insert({
+          tenant_id: tenantId,
           campaign_id: campaignId,
           client_id: clientId,
           status: 'active',
           enrolled_at: new Date().toISOString(),
+          enrollment_source: 'manual',
         })
         .select('id')
         .single()
@@ -183,13 +185,13 @@ export async function enrollClientInCampaigns(
       // Get client and firm details for personalization
       const { data: client } = await supabase
         .from('clients')
-        .select('full_name, email')
+        .select('first_name, last_name, email')
         .eq('id', clientId)
         .single()
 
       const { data: tenant } = await supabase
         .from('tenants')
-        .select('firm_name')
+        .select('name')
         .eq('id', tenantId)
         .single()
 
@@ -207,6 +209,8 @@ export async function enrollClientInCampaigns(
 
       // Queue emails for each template
       const now = new Date()
+      const clientFullName = client ? `${client.first_name} ${client.last_name}` : ''
+      const firmName = tenant?.name || ''
 
       for (const template of templates) {
         const scheduledDate = new Date(now)
@@ -214,25 +218,36 @@ export async function enrollClientInCampaigns(
 
         // Simple variable replacement (basic implementation)
         const personalizedSubject = template.subject_line
-          .replace(/\{\{client_name\}\}/g, client?.full_name || '')
-          .replace(/\{\{firm_name\}\}/g, tenant?.firm_name || '')
+          .replace(/\{\{client_name\}\}/g, clientFullName)
+          .replace(/\{\{firm_name\}\}/g, firmName)
 
         const personalizedBody = template.body_html
-          .replace(/\{\{client_name\}\}/g, client?.full_name || '')
-          .replace(/\{\{firm_name\}\}/g, tenant?.firm_name || '')
+          .replace(/\{\{client_name\}\}/g, clientFullName)
+          .replace(/\{\{firm_name\}\}/g, firmName)
+
+        const personalizedBodyText = (template.body_text || '')
+          .replace(/\{\{client_name\}\}/g, clientFullName)
+          .replace(/\{\{firm_name\}\}/g, firmName)
 
         const { error: queueError } = await supabase
           .from('email_queue')
           .insert({
+            tenant_id: tenantId,
             campaign_id: campaignId,
             template_id: template.id,
-            subscriber_id: subscription.id,
             client_id: clientId,
+            to_email: client?.email || '',
+            to_name: clientFullName,
+            subject: personalizedSubject,
+            body_html: personalizedBody,
+            body_text: personalizedBodyText,
             status: 'pending',
             scheduled_for: scheduledDate.toISOString(),
-            personalized_subject: personalizedSubject,
-            personalized_body_html: personalizedBody,
-            personalized_body_text: template.body_text || '',
+            personalization_data: {
+              client_name: clientFullName,
+              firm_name: firmName,
+              subscriber_id: subscription.id,
+            },
           })
 
         if (!queueError) {

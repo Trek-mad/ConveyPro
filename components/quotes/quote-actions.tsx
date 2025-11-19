@@ -144,13 +144,15 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
       </Card>
 
       {/* Campaign Enrollment Modal */}
-      <CampaignEnrollmentModal
-        isOpen={showEnrollmentModal}
-        onClose={() => setShowEnrollmentModal(false)}
-        clientId={quote.client_id}
-        clientName={quote.client?.full_name || 'Client'}
-        onEnroll={handleEnrollAndAccept}
-      />
+      {quote.client_id && (
+        <CampaignEnrollmentModal
+          isOpen={showEnrollmentModal}
+          onClose={() => setShowEnrollmentModal(false)}
+          clientId={quote.client_id}
+          clientName="Client"
+          onEnroll={handleEnrollAndAccept}
+        />
+      )}
     </>
   )
 }
