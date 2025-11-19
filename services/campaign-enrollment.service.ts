@@ -13,6 +13,7 @@ export interface MatchingCampaign {
   campaign_type: string
   template_count: number
   estimated_duration_days: number
+  matches_criteria: boolean
 }
 
 export interface EnrollmentResult {
@@ -66,25 +67,26 @@ export async function findMatchingCampaigns(
       return { campaigns: [] }
     }
 
-    // Filter campaigns that match client's life stage
-    const matchingCampaigns = campaigns.filter((campaign) => {
+    // Check which campaigns match client's life stage (but return all campaigns)
+    const campaignsWithMatching = campaigns.map((campaign) => {
       const targetStages = campaign.target_life_stages as string[] | null
+
+      let matches = false
 
       // If no target stages specified, campaign matches all clients
       if (!targetStages || targetStages.length === 0) {
-        return true
+        matches = true
       }
-
       // Check if client's life stage matches any target stage
-      if (client.life_stage && targetStages.includes(client.life_stage)) {
-        return true
+      else if (client.life_stage && targetStages.includes(client.life_stage)) {
+        matches = true
       }
 
-      return false
+      return { ...campaign, matches_criteria: matches }
     })
 
     // Get template counts for each campaign
-    const campaignIds = matchingCampaigns.map((c) => c.id)
+    const campaignIds = campaignsWithMatching.map((c) => c.id)
 
     if (campaignIds.length === 0) {
       return { campaigns: [] }
@@ -97,7 +99,7 @@ export async function findMatchingCampaigns(
       .eq('is_active', true)
 
     // Build response with template counts
-    const result: MatchingCampaign[] = matchingCampaigns.map((campaign) => {
+    const result: MatchingCampaign[] = campaignsWithMatching.map((campaign) => {
       const campaignTemplates = templates?.filter(
         (t) => t.campaign_id === campaign.id
       ) || []
@@ -114,6 +116,7 @@ export async function findMatchingCampaigns(
         campaign_type: campaign.campaign_type,
         template_count: campaignTemplates.length,
         estimated_duration_days: maxDelay,
+        matches_criteria: campaign.matches_criteria,
       }
     })
 

@@ -10,6 +10,7 @@ interface MatchingCampaign {
   campaign_type: string
   template_count: number
   estimated_duration_days: number
+  matches_criteria: boolean
 }
 
 interface CampaignEnrollmentModalProps {
@@ -138,11 +139,10 @@ export function CampaignEnrollmentModal({
               <div className="rounded-lg border-2 border-dashed border-gray-200 p-12 text-center">
                 <Mail className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-4 text-sm font-medium text-gray-900">
-                  No matching campaigns
+                  No active campaigns
                 </h3>
                 <p className="mt-2 text-sm text-gray-500">
-                  This client doesn't match any active campaigns based on their
-                  profile.
+                  There are no active campaigns available. Create and activate a campaign first.
                 </p>
               </div>
             ) : (
@@ -172,9 +172,16 @@ export function CampaignEnrollmentModal({
                         </div>
 
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">
-                            {campaign.name}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-900">
+                              {campaign.name}
+                            </h3>
+                            {campaign.matches_criteria && (
+                              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                Recommended
+                              </span>
+                            )}
+                          </div>
                           {campaign.description && (
                             <p className="mt-1 text-sm text-gray-600">
                               {campaign.description}
@@ -218,21 +225,18 @@ export function CampaignEnrollmentModal({
             {campaigns.length > 0 && (
               <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
                 <h4 className="text-sm font-semibold text-blue-900">
-                  What happens when you enroll?
+                  Campaign Selection & Enrollment
                 </h4>
                 <ul className="mt-2 space-y-1 text-sm text-blue-800">
                   <li>
-                    • Client will receive personalized emails based on the
-                    campaign schedule
+                    • <strong>Recommended</strong> campaigns match the client's profile, but you can select any campaign
+                  </li>
+                  <li>
+                    • Client will receive personalized emails based on the campaign schedule
                   </li>
                   <li>• Emails are sent automatically via the daily cron job (9 AM UTC)</li>
                   <li>
-                    • You can unenroll the client anytime from the campaign
-                    Subscribers tab
-                  </li>
-                  <li>
-                    • Client engagement (opens, clicks) will be tracked
-                    automatically
+                    • You can unenroll the client anytime from the campaign Subscribers tab
                   </li>
                 </ul>
               </div>
