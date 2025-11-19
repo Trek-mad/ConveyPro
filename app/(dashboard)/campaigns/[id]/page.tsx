@@ -421,7 +421,7 @@ export default async function CampaignDetailPage({ params }: PageProps) {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
-                          {subscriber.client?.full_name || 'Unknown'}
+                          {subscriber.client ? `${subscriber.client.first_name} ${subscriber.client.last_name}` : 'Unknown'}
                         </p>
                         <p className="text-xs text-gray-500">
                           {subscriber.emails_sent || 0} sent,{' '}

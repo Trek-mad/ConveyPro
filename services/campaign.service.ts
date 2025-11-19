@@ -448,7 +448,8 @@ export async function getCampaignSubscribers(
   subscribers?: (CampaignSubscriber & {
     client?: {
       id: string
-      full_name: string
+      first_name: string
+      last_name: string
       email: string
       life_stage: string
     }
@@ -464,7 +465,8 @@ export async function getCampaignSubscribers(
       *,
       client:clients(
         id,
-        full_name,
+        first_name,
+        last_name,
         email,
         life_stage
       )
