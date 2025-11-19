@@ -37,7 +37,13 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
   }
 
   const handleAcceptQuote = () => {
-    // Show campaign enrollment modal instead of directly accepting
+    // If no client_id, just accept the quote directly
+    if (!quote.client_id) {
+      handleStatusChange('accepted')
+      return
+    }
+
+    // Show campaign enrollment modal
     setShowEnrollmentModal(true)
   }
 
@@ -144,15 +150,13 @@ export function QuoteActions({ quote, tenantId }: QuoteActionsProps) {
       </Card>
 
       {/* Campaign Enrollment Modal */}
-      {quote.client_id && (
-        <CampaignEnrollmentModal
-          isOpen={showEnrollmentModal}
-          onClose={() => setShowEnrollmentModal(false)}
-          clientId={quote.client_id}
-          clientName="Client"
-          onEnroll={handleEnrollAndAccept}
-        />
-      )}
+      <CampaignEnrollmentModal
+        isOpen={showEnrollmentModal && !!quote.client_id}
+        onClose={() => setShowEnrollmentModal(false)}
+        clientId={quote.client_id || ''}
+        clientName="Client"
+        onEnroll={handleEnrollAndAccept}
+      />
     </>
   )
 }
