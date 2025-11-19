@@ -363,7 +363,7 @@ export async function processFormSubmission(
  * Get submission statistics for a tenant
  */
 export async function getFormSubmissionStats(tenantId: string) {
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   // Get clients created in last 30 days from form submissions
   const thirtyDaysAgo = new Date()
@@ -377,6 +377,7 @@ export async function getFormSubmissionStats(tenantId: string) {
     .eq('source', 'website')
 
   if (error) {
+    console.error('Error fetching form submission stats:', error)
     return {
       total_submissions: 0,
       recent_submissions: 0,
