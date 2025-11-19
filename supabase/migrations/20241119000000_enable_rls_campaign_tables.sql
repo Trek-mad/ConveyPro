@@ -18,7 +18,7 @@ FOR SELECT
 USING (
   tenant_id IN (
     SELECT tenant_id
-    FROM tenant_members
+    FROM tenant_membershipships
     WHERE user_id = auth.uid()
   )
 );
@@ -30,7 +30,7 @@ FOR INSERT
 WITH CHECK (
   tenant_id IN (
     SELECT tenant_id
-    FROM tenant_members
+    FROM tenant_membershipships
     WHERE user_id = auth.uid()
     AND role IN ('owner', 'admin')
   )
@@ -43,7 +43,7 @@ FOR UPDATE
 USING (
   tenant_id IN (
     SELECT tenant_id
-    FROM tenant_members
+    FROM tenant_memberships
     WHERE user_id = auth.uid()
     AND role IN ('owner', 'admin')
   )
@@ -56,7 +56,7 @@ FOR DELETE
 USING (
   tenant_id IN (
     SELECT tenant_id
-    FROM tenant_members
+    FROM tenant_memberships
     WHERE user_id = auth.uid()
     AND role = 'owner'
   )
@@ -76,7 +76,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
     )
   )
@@ -92,7 +92,7 @@ WITH CHECK (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
       AND role IN ('owner', 'admin')
     )
@@ -109,7 +109,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
       AND role IN ('owner', 'admin')
     )
@@ -126,7 +126,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
       AND role IN ('owner', 'admin')
     )
@@ -147,7 +147,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
     )
   )
@@ -163,7 +163,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
       AND role IN ('owner', 'admin')
     )
@@ -184,7 +184,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
     )
   )
@@ -212,7 +212,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
       AND role IN ('owner', 'admin')
     )
@@ -233,7 +233,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
     )
   )
@@ -265,7 +265,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
     )
   )
@@ -281,7 +281,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
       AND role IN ('owner', 'admin')
     )
@@ -302,7 +302,7 @@ USING (
     FROM campaigns
     WHERE tenant_id IN (
       SELECT tenant_id
-      FROM tenant_members
+      FROM tenant_memberships
       WHERE user_id = auth.uid()
     )
   )
