@@ -17,30 +17,41 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { clientId, campaignIds } = body
 
-    if (!clientId || !campaignIds || !Array.isArray(campaignIds)) {
+    // Handle both single clientId (string) and multiple clientIds (array)
+    const clientIds = Array.isArray(clientId) ? clientId : [clientId]
+
+    if (!clientIds.length || !campaignIds || !Array.isArray(campaignIds)) {
       return NextResponse.json(
-        { error: 'clientId and campaignIds (array) are required' },
+        { error: 'clientId(s) and campaignIds (array) are required' },
         { status: 400 }
       )
     }
 
-    const result = await enrollClientInCampaigns(
-      clientId,
-      campaignIds,
-      membership.tenant_id
-    )
+    // Enroll each client in the specified campaigns
+    let totalEnrolled = 0
+    let totalQueued = 0
+    const errors: string[] = []
 
-    if (!result.success) {
-      return NextResponse.json(
-        { error: result.error || 'Enrollment failed' },
-        { status: 500 }
+    for (const singleClientId of clientIds) {
+      const result = await enrollClientInCampaigns(
+        singleClientId,
+        campaignIds,
+        membership.tenant_id
       )
+
+      if (result.success) {
+        totalEnrolled += result.enrolled_count
+        totalQueued += result.queued_emails
+      } else {
+        errors.push(result.error || 'Unknown error')
+      }
     }
 
     return NextResponse.json({
-      success: true,
-      enrolled_count: result.enrolled_count,
-      queued_emails: result.queued_emails,
+      success: totalEnrolled > 0,
+      enrolled_count: totalEnrolled,
+      queued_emails: totalQueued,
+      errors: errors.length > 0 ? errors : undefined,
     })
   } catch (error: any) {
     console.error('Error in POST /api/campaigns/enroll:', error)
