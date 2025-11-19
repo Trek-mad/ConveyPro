@@ -231,7 +231,6 @@ async function createQuoteFromForm(
     .from('quotes')
     .insert({
       tenant_id: tenantId,
-      client_id: clientId,
       property_id: propertyId,
       quote_number: quoteNumber,
       client_name: `${formData.first_name} ${formData.last_name}`,
@@ -243,10 +242,7 @@ async function createQuoteFromForm(
       disbursements: calculation.fees.disbursements,
       vat_amount: calculation.fees.vat,
       total_amount: calculation.fees.total,
-      lbtt_amount: calculation.lbtt.totalLBTT,
       status: 'draft', // Start as draft, firm can review and send
-      is_first_time_buyer: formData.is_first_time_buyer || false,
-      is_additional_property: formData.is_additional_property || false,
       notes: formData.notes || null,
     })
     .select()
