@@ -3,7 +3,7 @@ import { getActiveTenantMembership } from '@/lib/auth'
 import { getCampaign, getCampaignSubscribers } from '@/services/campaign.service'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, UserPlus, Mail, Calendar, X } from 'lucide-react'
+import { ArrowLeft, UserPlus, Mail, Calendar, X, Users, BarChart3 } from 'lucide-react'
 import { ManualEnrollmentForm } from '@/components/campaigns/manual-enrollment-form'
 import { SubscribersList } from '@/components/campaigns/subscribers-list'
 
@@ -82,6 +82,32 @@ export default async function CampaignSubscribersPage({ params }: PageProps) {
             <p className="mt-1 text-sm text-gray-500">{campaign.name}</p>
           </div>
         </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <Link
+            href={`/campaigns/${id}`}
+            className="border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          >
+            Overview
+          </Link>
+          <Link
+            href={`/campaigns/${id}/subscribers`}
+            className="border-b-2 border-blue-500 px-1 pb-4 text-sm font-medium text-blue-600"
+          >
+            <Users className="mr-2 inline h-4 w-4" />
+            Subscribers
+          </Link>
+          <Link
+            href={`/campaigns/${id}/analytics`}
+            className="border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          >
+            <BarChart3 className="mr-2 inline h-4 w-4" />
+            Analytics
+          </Link>
+        </nav>
       </div>
 
       {/* Manual Enrollment Form */}

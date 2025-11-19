@@ -128,6 +128,32 @@ export default async function CampaignDetailPage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <Link
+            href={`/campaigns/${id}`}
+            className="border-b-2 border-blue-500 px-1 pb-4 text-sm font-medium text-blue-600"
+          >
+            Overview
+          </Link>
+          <Link
+            href={`/campaigns/${id}/subscribers`}
+            className="border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          >
+            <Users className="mr-2 inline h-4 w-4" />
+            Subscribers
+          </Link>
+          <Link
+            href={`/campaigns/${id}/analytics`}
+            className="border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          >
+            <BarChart3 className="mr-2 inline h-4 w-4" />
+            Analytics
+          </Link>
+        </nav>
+      </div>
+
       {/* Metrics Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-gray-200 bg-white p-6">

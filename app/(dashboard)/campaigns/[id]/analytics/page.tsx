@@ -5,6 +5,9 @@ import { getCampaignEngagementMetrics } from '@/services/email-engagement.servic
 import { EmailEngagementCharts } from '@/components/campaigns/email-engagement-charts'
 import { EmailPerformanceTable } from '@/components/campaigns/email-performance-table'
 import { EngagementFunnel } from '@/components/campaigns/engagement-funnel'
+import Link from 'next/link'
+import { ArrowLeft, Users, BarChart3 } from 'lucide-react'
+import { getCampaign } from '@/services/campaign.service'
 
 export const metadata = {
   title: 'Campaign Analytics | ConveyPro',
@@ -23,17 +26,75 @@ export default async function CampaignAnalyticsPage({ params }: PageProps) {
     redirect('/auth/login')
   }
 
+  // Get campaign details
+  const result = await getCampaign(id)
+
+  if (result.error || !result.campaign) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Campaign not found</h2>
+          <p className="mt-2 text-gray-600">{result.error}</p>
+          <Link
+            href="/campaigns"
+            className="mt-4 inline-flex items-center text-blue-600 hover:text-blue-700"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Campaigns
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const campaign = result.campaign
+
   // Get engagement metrics
   const metrics = await getCampaignEngagementMetrics(id, membership.tenant_id)
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Email Analytics</h2>
-        <p className="mt-2 text-gray-600">
-          Track opens, clicks, and engagement metrics for this campaign
-        </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/campaigns/${id}`}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50"
+          >
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </Link>
+
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Email Analytics</h1>
+            <p className="mt-1 text-sm text-gray-500">{campaign.name}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <Link
+            href={`/campaigns/${id}`}
+            className="border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          >
+            Overview
+          </Link>
+          <Link
+            href={`/campaigns/${id}/subscribers`}
+            className="border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          >
+            <Users className="mr-2 inline h-4 w-4" />
+            Subscribers
+          </Link>
+          <Link
+            href={`/campaigns/${id}/analytics`}
+            className="border-b-2 border-blue-500 px-1 pb-4 text-sm font-medium text-blue-600"
+          >
+            <BarChart3 className="mr-2 inline h-4 w-4" />
+            Analytics
+          </Link>
+        </nav>
       </div>
 
       {/* Key Metrics */}
