@@ -18,7 +18,7 @@ FOR SELECT
 USING (
   tenant_id IN (
     SELECT tenant_id
-    FROM tenant_membershipships
+    FROM tenant_memberships
     WHERE user_id = auth.uid()
   )
 );
