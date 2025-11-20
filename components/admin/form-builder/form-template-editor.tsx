@@ -154,25 +154,38 @@ export function FormTemplateEditor() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      // TODO: Implement save logic
-      console.log('Saving form template...', {
-        formName,
-        formSlug,
-        formDescription,
-        visibility,
-        isMultiStep,
-        enableLBTT,
-        enableFees,
-        fields,
-        pricingRules,
+      const response = await fetch('/api/admin/forms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formName,
+          slug: formSlug,
+          description: formDescription,
+          visibility: visibility,
+          is_multi_step: isMultiStep,
+          enable_lbtt_calculation: enableLBTT,
+          enable_fee_calculation: enableFees,
+          fields: fields,
+          pricing_rules: pricingRules,
+        }),
       })
 
-      // For now, just show success
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to save form template')
+      }
+
+      const data = await response.json()
+      console.log('Form template saved:', data)
+
       alert('Form template saved successfully!')
       router.push('/admin/forms')
+      router.refresh()
     } catch (error) {
       console.error('Error saving form:', error)
-      alert('Error saving form template')
+      alert(`Error saving form template: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setSaving(false)
     }
