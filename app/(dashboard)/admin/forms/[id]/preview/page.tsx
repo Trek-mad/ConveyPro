@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { DynamicFormRenderer } from '@/components/forms/dynamic-form-renderer'
+import { FormPreviewWrapper } from '@/components/admin/form-builder/form-preview-wrapper'
 
 export const metadata: Metadata = {
   title: 'Preview Form | Platform Admin | ConveyPro',
@@ -41,11 +41,6 @@ export default async function FormPreviewPage({ params }: PageProps) {
 
   const { rules, error: rulesError } = await getFormPricingRules(id)
 
-  const handlePreviewSubmit = (data: any) => {
-    console.log('Preview form submitted:', data)
-    alert('This is a preview. Form data would be submitted here.')
-  }
-
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
@@ -78,20 +73,11 @@ export default async function FormPreviewPage({ params }: PageProps) {
       </Card>
 
       {/* Form Preview */}
-      <Card className="p-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{template.name}</h2>
-          {template.description && (
-            <p className="mt-2 text-gray-600">{template.description}</p>
-          )}
-        </div>
-
-        <DynamicFormRenderer
-          fields={fields}
-          onSubmit={handlePreviewSubmit}
-          submitButtonText="Get Quote"
-        />
-      </Card>
+      <FormPreviewWrapper
+        formName={template.name}
+        formDescription={template.description}
+        fields={fields}
+      />
 
       {/* Form Details */}
       <Card className="p-6">
