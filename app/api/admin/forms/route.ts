@@ -4,6 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    console.log('Received form data:', {
+      name: body.name,
+      slug: body.slug,
+      fieldsCount: body.fields?.length || 0,
+      pricingRulesCount: body.pricing_rules?.length || 0,
+    })
     const supabase = await createClient()
 
     // Insert form template
@@ -44,13 +50,18 @@ export async function POST(request: Request) {
         pricing_field_type: field.pricing_field_type || null,
       }))
 
+      console.log('Attempting to insert fields:', fieldsToInsert)
+
       const { error: fieldsError } = await supabase
         .from('form_fields')
         .insert(fieldsToInsert)
 
       if (fieldsError) {
         console.error('Error creating form fields:', fieldsError)
-        // Don't fail completely, just log it
+        return NextResponse.json(
+          { error: `Form created but fields failed to save: ${fieldsError.message}` },
+          { status: 500 }
+        )
       }
     }
 
