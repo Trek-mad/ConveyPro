@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -72,7 +72,16 @@ interface PricingTier {
   display_order: number
 }
 
-export function FormTemplateEditor() {
+interface FormTemplateEditorProps {
+  formId?: string
+  initialData?: {
+    template: any
+    fields: any[]
+    pricingRules: any[]
+  }
+}
+
+export function FormTemplateEditor({ formId, initialData }: FormTemplateEditorProps) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
 
@@ -94,6 +103,53 @@ export function FormTemplateEditor() {
   // Pricing rules
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([])
   const [expandedRule, setExpandedRule] = useState<string | null>(null)
+
+  // Initialize form data when editing
+  useEffect(() => {
+    if (initialData) {
+      const { template, fields: initialFields, pricingRules: initialRules } = initialData
+
+      setFormName(template.name || '')
+      setFormSlug(template.slug || '')
+      setFormDescription(template.description || '')
+      setVisibility(template.visibility || 'global')
+      setIsMultiStep(template.is_multi_step || false)
+      setEnableLBTT(template.enable_lbtt_calculation || false)
+      setEnableFees(template.enable_fee_calculation || false)
+
+      // Map fields to component format
+      const mappedFields = initialFields.map((field: any) => ({
+        id: field.id,
+        field_name: field.field_name,
+        field_label: field.field_label,
+        field_type: field.field_type,
+        placeholder: field.placeholder,
+        help_text: field.help_text,
+        is_required: field.is_required,
+        display_order: field.display_order,
+        width: field.width,
+        affects_pricing: field.affects_pricing,
+        pricing_field_type: field.pricing_field_type,
+        options: field.options || field.form_field_options || [],
+      }))
+      setFields(mappedFields)
+
+      // Map pricing rules to component format
+      const mappedRules = initialRules.map((rule: any) => ({
+        id: rule.id,
+        rule_name: rule.rule_name,
+        rule_code: rule.rule_code,
+        fee_type: rule.fee_type,
+        fixed_amount: rule.fixed_amount,
+        percentage_rate: rule.percentage_rate,
+        per_item_amount: rule.per_item_amount,
+        category: rule.category,
+        display_order: rule.display_order,
+        tiers: rule.tiers || rule.form_pricing_tiers || [],
+      }))
+      setPricingRules(mappedRules)
+    }
+  }, [initialData])
 
   // Auto-generate slug from name
   const handleNameChange = (name: string) => {
@@ -154,8 +210,11 @@ export function FormTemplateEditor() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const response = await fetch('/api/admin/forms', {
-        method: 'POST',
+      const url = formId ? `/api/admin/forms/${formId}` : '/api/admin/forms'
+      const method = formId ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -180,7 +239,7 @@ export function FormTemplateEditor() {
       const data = await response.json()
       console.log('Form template saved:', data)
 
-      alert('Form template saved successfully!')
+      alert(formId ? 'Form template updated successfully!' : 'Form template created successfully!')
       router.push('/admin/forms')
       router.refresh()
     } catch (error) {

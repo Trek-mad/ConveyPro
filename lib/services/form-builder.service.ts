@@ -155,6 +155,73 @@ export async function getFormTemplate(id: string) {
   return { template: data as FormTemplate, error: null }
 }
 
+/**
+ * Get complete form template with all related data (fields, options, pricing rules, tiers)
+ */
+export async function getCompleteFormTemplate(id: string) {
+  const supabase = await createClient()
+
+  // Get form template
+  const { data: template, error: templateError } = await supabase
+    .from('form_templates')
+    .select('*')
+    .eq('id', id)
+    .is('deleted_at', null)
+    .single()
+
+  if (templateError) {
+    console.error('Error fetching form template:', templateError)
+    return { error: templateError.message, data: null }
+  }
+
+  // Get form fields with options
+  const { data: fields, error: fieldsError } = await supabase
+    .from('form_fields')
+    .select(`
+      *,
+      form_field_options (*)
+    `)
+    .eq('form_template_id', id)
+    .is('deleted_at', null)
+    .order('display_order', { ascending: true })
+
+  if (fieldsError) {
+    console.error('Error fetching form fields:', fieldsError)
+    return { error: fieldsError.message, data: null }
+  }
+
+  // Get pricing rules with tiers
+  const { data: pricingRules, error: rulesError } = await supabase
+    .from('form_pricing_rules')
+    .select(`
+      *,
+      form_pricing_tiers (*)
+    `)
+    .eq('form_template_id', id)
+    .is('deleted_at', null)
+    .order('display_order', { ascending: true })
+
+  if (rulesError) {
+    console.error('Error fetching pricing rules:', rulesError)
+    return { error: rulesError.message, data: null }
+  }
+
+  return {
+    data: {
+      template: template as FormTemplate,
+      fields: (fields || []).map((field: any) => ({
+        ...field,
+        options: field.form_field_options || [],
+      })),
+      pricingRules: (pricingRules || []).map((rule: any) => ({
+        ...rule,
+        tiers: rule.form_pricing_tiers || [],
+      })),
+    },
+    error: null,
+  }
+}
+
 export async function createFormTemplate(template: Partial<FormTemplate>) {
   const supabase = await createClient()
 
