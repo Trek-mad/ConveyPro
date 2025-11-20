@@ -109,3 +109,110 @@ export interface TenantMembershipWithUser extends TenantMembership {
 export interface PropertyWithQuotes extends Property {
   quotes?: Quote[]
 }
+
+// ============================================================================
+// PURCHASE CLIENT WORKFLOW (Phase 12)
+// ============================================================================
+
+export * from './purchase-workflow'
+
+// Purchase Workflow Constants
+export const MatterType = {
+  PURCHASE: 'purchase',
+  SALE: 'sale',
+  REMORTGAGE: 'remortgage',
+  TRANSFER_OF_EQUITY: 'transfer_of_equity',
+} as const
+
+export const MatterStatus = {
+  NEW: 'new',
+  ACTIVE: 'active',
+  ON_HOLD: 'on_hold',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+} as const
+
+export const MatterPriority = {
+  LOW: 'low',
+  NORMAL: 'normal',
+  HIGH: 'high',
+  URGENT: 'urgent',
+} as const
+
+export const TaskStatus = {
+  PENDING: 'pending',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed',
+  BLOCKED: 'blocked',
+  CANCELLED: 'cancelled',
+} as const
+
+export const TaskType = {
+  MANUAL: 'manual',
+  AUTOMATED: 'automated',
+  APPROVAL: 'approval',
+} as const
+
+export const DocumentType = {
+  HOME_REPORT: 'home_report',
+  FINANCIAL_QUESTIONNAIRE: 'financial_questionnaire',
+  OFFER_LETTER: 'offer_letter',
+  ID_DOCUMENT: 'id_document',
+  BANK_STATEMENT: 'bank_statement',
+  MORTGAGE_IN_PRINCIPLE: 'mortgage_in_principle',
+  SURVEY: 'survey',
+  CONTRACT: 'contract',
+  SEARCHES: 'searches',
+  TITLE_DEED: 'title_deed',
+  OTHER: 'other',
+} as const
+
+export const DocumentStatus = {
+  UPLOADED: 'uploaded',
+  VERIFIED: 'verified',
+  REJECTED: 'rejected',
+  ARCHIVED: 'archived',
+} as const
+
+export const OfferType = {
+  VERBAL: 'verbal',
+  WRITTEN: 'written',
+} as const
+
+export const OfferStatus = {
+  DRAFT: 'draft',
+  PENDING_SOLICITOR: 'pending_solicitor',
+  PENDING_NEGOTIATOR: 'pending_negotiator',
+  PENDING_CLIENT: 'pending_client',
+  SUBMITTED: 'submitted',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
+  WITHDRAWN: 'withdrawn',
+} as const
+
+export const EmploymentStatus = {
+  EMPLOYED: 'employed',
+  SELF_EMPLOYED: 'self_employed',
+  RETIRED: 'retired',
+  UNEMPLOYED: 'unemployed',
+  STUDENT: 'student',
+  OTHER: 'other',
+} as const
+
+export const DepositSource = {
+  SAVINGS: 'savings',
+  GIFT: 'gift',
+  SALE_PROCEEDS: 'sale_proceeds',
+  INHERITANCE: 'inheritance',
+  INVESTMENT: 'investment',
+  OTHER: 'other',
+} as const
+
+export const AvailabilityType = {
+  AVAILABLE: 'available',
+  HOLIDAY: 'holiday',
+  SICK: 'sick',
+  TRAINING: 'training',
+  BLOCKED: 'blocked',
+  REDUCED_CAPACITY: 'reduced_capacity',
+} as const
