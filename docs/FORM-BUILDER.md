@@ -580,6 +580,280 @@ See: [Workflow Examples](#workflow-examples)
 
 ---
 
+## Issues Resolved During Development
+
+### Issue 1: Row Level Security (RLS) Policy Blocking Field Inserts
+
+**Problem:**
+Form templates were saving successfully, but form fields were failing to insert with the error:
+```
+new row violates row-level security policy for table "form_fields"
+```
+
+**Root Cause:**
+The initial migration (`20241120000001_create_form_builder_schema.sql`) created RLS policies for `form_fields`, `form_pricing_rules`, and related tables that only allowed SELECT operations. There were no policies for INSERT, UPDATE, or DELETE operations.
+
+**Impact:**
+- Platform admins could create form templates
+- Form fields and pricing rules silently failed to save
+- Forms appeared to save successfully but had 0 fields
+
+**Solution:**
+Created migration `20241120000002_fix_form_builder_rls_policies.sql` that added "FOR ALL" policies for:
+- `form_fields`
+- `form_field_options`
+- `form_pricing_rules`
+- `form_pricing_tiers`
+- `form_steps`
+
+**Code:**
+```sql
+CREATE POLICY "Form fields are manageable by platform admins" ON public.form_fields
+    FOR ALL
+    USING (auth.role() = 'authenticated');
+```
+
+**Lesson Learned:**
+When enabling RLS on tables, always create policies for all CRUD operations (SELECT, INSERT, UPDATE, DELETE), not just SELECT.
+
+---
+
+### Issue 2: Next.js 15 Server/Client Component Event Handler Error
+
+**Problem:**
+Form preview page crashed with error:
+```
+Event handlers cannot be passed to Client Component props.
+<... onSubmit={function handlePreviewSubmit} ...>
+If you need interactivity, consider converting part of this to a Client Component.
+```
+
+**Root Cause:**
+In Next.js 15, you cannot pass event handlers (functions) from Server Components to Client Components. The preview page (`page.tsx`) is a Server Component, and it was trying to pass the `handlePreviewSubmit` function directly to the `DynamicFormRenderer` Client Component.
+
+**Impact:**
+- Preview page failed to load
+- Runtime error displayed instead of form preview
+
+**Solution:**
+Created a Client Component wrapper (`FormPreviewWrapper.tsx`) that:
+1. Accepts only serializable data (form name, description, fields)
+2. Defines the event handler internally
+3. Renders the DynamicFormRenderer with the handler
+
+**Files Modified:**
+- Created: `components/admin/form-builder/form-preview-wrapper.tsx`
+- Updated: `app/(dashboard)/admin/forms/[id]/preview/page.tsx`
+
+**Before:**
+```tsx
+// Server Component passing function to Client Component (ERROR)
+<DynamicFormRenderer
+  fields={fields}
+  onSubmit={handlePreviewSubmit}  // ❌ Can't pass functions
+/>
+```
+
+**After:**
+```tsx
+// Server Component passes data to wrapper Client Component
+<FormPreviewWrapper
+  formName={template.name}
+  formDescription={template.description}
+  fields={fields}  // ✅ Only data
+/>
+```
+
+**Lesson Learned:**
+In Next.js 15 App Router, maintain clear separation between Server and Client Components. Only pass serializable data from Server to Client, never functions.
+
+---
+
+### Issue 3: Missing Preview Page (404 Error)
+
+**Problem:**
+Clicking the "Preview" button on a form resulted in a 404 error.
+
+**Root Cause:**
+The form list page (`/admin/forms/page.tsx`) had a Preview button linking to `/admin/forms/[id]/preview`, but that route/page didn't exist yet.
+
+**Impact:**
+- Users couldn't preview forms before publishing
+- Broken navigation UX
+
+**Solution:**
+Created the preview page at `app/(dashboard)/admin/forms/[id]/preview/page.tsx` with:
+- Form template metadata display
+- Preview notice banner
+- Dynamic form rendering using actual form data
+- Form configuration summary
+
+**Features Implemented:**
+- Shows how form will appear to clients
+- Displays "Preview Mode" notice
+- Shows form stats (field count, pricing rules, etc.)
+- Provides navigation back to form list and edit page
+
+---
+
+### Issue 4: Silent Field Save Failures
+
+**Problem:**
+When creating forms, fields appeared to save successfully (showed success alert), but weren't actually being inserted into the database. Users had no indication of failure.
+
+**Root Cause:**
+The API route (`/api/admin/forms/route.ts`) had error handling that logged errors to console but didn't return error responses to the client:
+```typescript
+if (fieldsError) {
+  console.error('Error creating form fields:', fieldsError)
+  // Don't fail completely, just log it  ❌ PROBLEM
+}
+```
+
+**Impact:**
+- Users believed forms were saved correctly
+- No feedback about field insertion failures
+- Debugging required checking database directly
+
+**Solution:**
+Updated API error handling to:
+1. Add console logging at request start (log field count received)
+2. Return proper error responses when field insertion fails
+3. Show detailed error messages to users
+
+**Updated Code:**
+```typescript
+console.log('Received form data:', {
+  name: body.name,
+  fieldsCount: body.fields?.length || 0,
+})
+
+if (fieldsError) {
+  console.error('Error creating form fields:', fieldsError)
+  return NextResponse.json(
+    { error: `Form created but fields failed to save: ${fieldsError.message}` },
+    { status: 500 }
+  )
+}
+```
+
+**Lesson Learned:**
+Always return errors to the client, not just log them. Silent failures create confusion and make debugging difficult.
+
+---
+
+### Issue 5: Delete Functionality Missing
+
+**Problem:**
+No way to delete test forms or forms created with errors.
+
+**Root Cause:**
+Delete functionality wasn't implemented in the initial build.
+
+**Impact:**
+- Test forms accumulated in database
+- No way to clean up forms with errors
+- Duplicate slug errors when trying to recreate forms
+
+**Solution:**
+Implemented complete delete functionality:
+
+**Files Created:**
+1. `app/api/admin/forms/[id]/route.ts` - DELETE endpoint
+2. `components/admin/form-builder/delete-form-button.tsx` - Delete UI component
+
+**Features:**
+- Confirmation dialog before deletion
+- CASCADE deletion (removes fields, pricing rules automatically)
+- Client-side state update after deletion
+- Error handling with user feedback
+
+**API Route:**
+```typescript
+export async function DELETE(request: Request, { params }: RouteParams) {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('form_templates')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true })
+}
+```
+
+---
+
+### Issue 6: Missing Database Migration Application
+
+**Problem:**
+Migration files existed in the repository, but database tables weren't created in Supabase.
+
+**Root Cause:**
+User didn't have Supabase CLI configured locally, and migrations need to be manually run in Supabase Dashboard.
+
+**Impact:**
+- Tables didn't exist when trying to save forms
+- Database errors when querying form_templates
+
+**Solution:**
+Documented process for manual migration:
+1. Open migration file locally
+2. Copy SQL contents
+3. Paste into Supabase SQL Editor
+4. Click "Run"
+
+**Additional Enhancement:**
+Created helper script (`scripts/create-sample-form.sql`) to create a complete sample form with fields and pricing rules for testing.
+
+---
+
+### Issue 7: Missing Radix UI Dependency
+
+**Problem:**
+Application failed to compile with error:
+```
+Module not found: Can't resolve '@radix-ui/react-switch'
+```
+
+**Root Cause:**
+Created `components/ui/switch.tsx` component using Radix UI Switch, but the package wasn't installed.
+
+**Impact:**
+- Development server wouldn't start
+- Build failed
+
+**Solution:**
+Installed missing dependency:
+```bash
+npm install @radix-ui/react-switch
+```
+
+**Lesson Learned:**
+When creating new UI components that depend on external libraries, add them to package.json immediately.
+
+---
+
+## Summary of Fixes Applied
+
+| Issue | Migration/Code Change | Files Affected |
+|-------|----------------------|----------------|
+| RLS Policies | `20241120000002_fix_form_builder_rls_policies.sql` | Database |
+| Event Handler Error | Created `FormPreviewWrapper.tsx` client component | `components/admin/form-builder/` |
+| Preview 404 | Created preview page | `app/(dashboard)/admin/forms/[id]/preview/` |
+| Silent Errors | Enhanced API error handling | `app/api/admin/forms/route.ts` |
+| Delete Missing | Created DELETE endpoint and UI | `app/api/admin/forms/[id]/route.ts` |
+| Missing Dependency | Installed `@radix-ui/react-switch` | `package.json` |
+
+All issues have been resolved and code is pushed to branch `claude/phase-7-form-builder-015jod3AP3UByjRJ2AZbFbpy`.
+
+---
+
 ## Version History
 
 - **v0.6.0** (November 20, 2024) - Initial form builder implementation
