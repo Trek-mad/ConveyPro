@@ -7,6 +7,122 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0-form-builder-complete] - 2024-11-20
+
+**Form Builder System Complete** 📝
+
+### Context
+Built comprehensive form builder system allowing platform admins to create quote forms that firms can activate and customize. Complete two-tier system with form templates, dynamic field configuration, pricing rules, LBTT rate management, and form preview functionality.
+
+### Added
+
+#### Database Schema (10 tables)
+**Migration:** `20241120000001_create_form_builder_schema.sql`
+
+- ✅ **form_templates** - Form definitions with global/firm-specific visibility
+- ✅ **form_fields** - Dynamic field configuration (12 field types)
+- ✅ **form_field_options** - Options for select/radio/checkbox fields
+- ✅ **form_pricing_rules** - Default pricing configuration (5 fee types)
+- ✅ **form_pricing_tiers** - Tiered pricing brackets
+- ✅ **form_instances** - Firm activations of forms
+- ✅ **form_instance_pricing** - Firm pricing customizations
+- ✅ **lbtt_rates** - LBTT rate management with **8% ADS rate**
+- ✅ **form_submissions** - Client form submissions
+- ✅ **form_steps** - Multi-step form configuration
+
+**Migration:** `20241120000002_fix_form_builder_rls_policies.sql`
+- ✅ Fixed RLS policies to allow INSERT/UPDATE/DELETE on all form builder tables
+
+#### Platform Admin UI
+
+**Form Management** (`/admin/forms`)
+- ✅ Form template list with statistics
+- ✅ Create form template page with form builder UI
+- ✅ Form preview page (`/admin/forms/[id]/preview`)
+- ✅ Delete form functionality
+- ✅ Navigation menu integration
+
+**LBTT Rates** (`/admin/lbtt-rates`)
+- ✅ Rate management dashboard with 8% ADS rate
+- ✅ Rate version history
+
+#### Components
+- ✅ `form-template-editor.tsx` - Main form builder UI
+- ✅ `form-preview-wrapper.tsx` - Preview rendering
+- ✅ `delete-form-button.tsx` - Form deletion
+- ✅ `dynamic-form-renderer.tsx` - Client-facing renderer
+
+#### API Routes
+- ✅ `POST /api/admin/forms` - Create form template
+- ✅ `DELETE /api/admin/forms/[id]` - Delete form template
+
+#### Services
+- ✅ Complete CRUD operations in `form-builder.service.ts`
+
+#### Helper Scripts
+- ✅ `scripts/create-sample-form.sql` - Sample form with 8 fields
+
+### Fixed
+
+#### Issue 1: RLS Policy Blocking Field Inserts ⚠️ CRITICAL
+**Problem:** Form templates saved but fields failed to insert with `new row violates row-level security policy`
+
+**Solution:** Created migration adding "FOR ALL" policies to all form builder tables
+
+**Result:** ✅ Fields and pricing rules now save successfully
+
+#### Issue 2: Next.js 15 Server/Client Event Handler Error
+**Problem:** Preview page crashed with "Event handlers cannot be passed to Client Component props"
+
+**Solution:** Created `FormPreviewWrapper.tsx` Client Component
+
+**Result:** ✅ Preview page renders without errors
+
+#### Issue 3: Missing Preview Page (404)
+**Solution:** Created preview page at `/admin/forms/[id]/preview`
+
+**Result:** ✅ Preview functionality working
+
+#### Issue 4: Silent Field Save Failures
+**Solution:** Enhanced error handling in API to return proper errors
+
+**Result:** ✅ Users now see actual errors
+
+#### Issue 5: Missing Delete Functionality
+**Solution:** Created DELETE endpoint and DeleteFormButton component
+
+**Result:** ✅ Forms can be deleted cleanly
+
+#### Issue 6: Missing Radix UI Dependency
+**Solution:** `npm install @radix-ui/react-switch`
+
+**Result:** ✅ Build succeeds
+
+### Documentation
+- ✅ **FORM-BUILDER.md** - Comprehensive documentation with issues and solutions
+
+### Technical Highlights
+
+#### Two-Tier Architecture
+- Platform Admin creates templates → Firms activate and customize
+
+#### 12 Field Types
+Text, Email, Phone, Number, Currency, Textarea, Select, Radio, Checkbox, Yes/No, Date, Address
+
+#### 5 Fee Types
+Fixed, Tiered, Per-Item, Percentage, Conditional
+
+#### LBTT Rates 2025-26
+- Residential: 0%, 2%, 5%, 10%, 12% bands
+- **ADS:** 8%
+- **FTB Relief:** Up to £175,000
+
+### Commits
+- **Branch:** `claude/phase-7-form-builder-015jod3AP3UByjRJ2AZbFbpy`
+- **Files Changed:** 30+ files
+- **Lines Added:** 3,500+ lines
+
+---
 ## [1.3.0-phase-4-testing-complete] - 2024-11-19
 
 **Phase 4: Form Automation Testing Complete + UX Improvements** ✅
