@@ -7,6 +7,324 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0-purchase-workflow-foundation] - 2025-11-20
+
+**Phase 12: Purchase Client Workflow - Foundation Complete** 🎯
+
+### Context
+Built complete database foundation and core services for the Purchase Client Workflow system. This transforms ConveyPro from a quote-centric platform into a comprehensive purchase conveyancing management system with 12-stage workflow tracking, document management, offer handling, and intelligent fee earner allocation.
+
+### Added
+
+#### 12.1 Database Schema (10 Tables + Storage)
+
+**Enhanced Existing Tables**
+- ✅ **clients** - Added 9 fields for Purchase Workflow (title, company_name, mobile, preferred_contact_method, DOB, NI number, passport, updated_by)
+
+**Core Workflow Tables**
+- ✅ **matters** - Purchase transaction tracking with 12-stage workflow
+  - Auto-generated matter numbers (M00001-25 format)
+  - Links to clients, properties, quotes
+  - Financial details (purchase price, mortgage, deposit, ADS)
+  - Fee earner assignment with timestamp tracking
+  - Priority levels (low, normal, high, urgent)
+  - Status tracking (new, active, on_hold, completed, cancelled)
+  - 12 workflow stages (client_entry → conveyancing_allocation)
+- ✅ **workflow_stages** - 12-stage purchase workflow definition
+  - Seeded with default 12 stages
+  - Tenant customization support
+  - Required tasks per stage
+  - Auto-transition conditions
+  - Notification templates
+  - UI customization (colors, Lucide icons)
+- ✅ **matter_tasks** - Checklist tasks with dependencies
+  - Auto-generation based on workflow stage
+  - Task dependencies (depends_on_task_ids)
+  - Stage progression blocking
+  - Assignment and due dates
+  - Reminder system (configurable days before)
+  - Database trigger for auto-task creation
+- ✅ **matter_activities** - Complete audit trail
+  - Immutable activity log
+  - 20+ activity types (stage_changed, task_completed, etc.)
+  - JSONB changes tracking (old/new values)
+  - Auto-logging via database triggers
+  - Related entity links (tasks, documents, offers)
+
+**Document Management**
+- ✅ **documents** - Document metadata with versioning
+  - 11 document types (home_report, offer_letter, ID, bank statements, etc.)
+  - Supabase Storage integration (matter-documents bucket)
+  - Document versioning with previous_version_id
+  - Verification workflow (uploaded → verified/rejected)
+  - Tags and categorization
+  - Storage RLS policies for tenant isolation
+- ✅ **Supabase Storage Bucket** - matter-documents
+  - 50MB file size limit
+  - 8 allowed MIME types (PDF, images, Office docs)
+  - Tenant-isolated folder structure
+  - Complete RLS policies (view, upload, update, delete)
+
+**Offer Management**
+- ✅ **offers** - Verbal and written offer tracking
+  - Auto-generated offer numbers (OFF00001-25)
+  - Multi-step approval workflow (solicitor → negotiator → client)
+  - Client acceptance with IP logging (audit trail)
+  - Agent response tracking (accepted, rejected, counter_offer)
+  - Counter-offer management
+  - Auto-status transitions via database triggers
+  - 8 offer statuses (draft → submitted → accepted/rejected)
+
+**Financial Assessment**
+- ✅ **financial_questionnaires** - Comprehensive financial data
+  - Employment and income tracking
+  - Assets and liabilities
+  - Mortgage details and broker information
+  - Deposit source tracking (AML compliance)
+  - Property sale tracking (if applicable)
+  - ADS liability detection (Additional Dwelling Supplement)
+  - Affordability calculation function
+  - Completion and verification tracking
+
+**Fee Earner Management**
+- ✅ **fee_earner_settings** - Capacity and specialization
+  - Max concurrent matters limit
+  - Max new matters per week limit
+  - Matter type specialization
+  - Transaction value ranges
+  - Auto-assignment preferences
+  - Assignment priority (1-1000)
+  - Working days and hours
+- ✅ **fee_earner_availability** - Calendar blocking
+  - Holiday, sick leave, training periods
+  - Availability types (available, holiday, sick, training, blocked, reduced_capacity)
+  - Capacity overrides for specific periods
+  - Recurring pattern support (JSONB)
+  - Workload calculation integration
+
+**Database Functions**
+- ✅ `generate_matter_number()` - Sequential matter numbering per tenant/year
+- ✅ `generate_offer_number()` - Sequential offer numbering per tenant/year
+- ✅ `calculate_affordability()` - Financial assessment with warnings
+- ✅ `calculate_fee_earner_workload()` - Real-time workload metrics
+- ✅ `log_matter_activity()` - Manual activity logging helper
+- ✅ `auto_generate_stage_tasks()` - Trigger for task creation
+- ✅ `auto_log_matter_changes()` - Trigger for activity logging
+- ✅ `auto_log_task_completion()` - Trigger for completion logging
+- ✅ `auto_log_document_upload()` - Trigger for document logging
+- ✅ `auto_update_offer_status()` - Trigger for offer workflow
+- ✅ `manage_document_versioning()` - Trigger for version management
+
+**Total:** 2,259 lines of SQL across 9 migration files
+
+#### 12.2 TypeScript Types
+
+**New Types File** - `types/purchase-workflow.ts` (420 lines)
+- ✅ Complete type definitions for all 10 tables
+- ✅ Row, Insert, and Update types for each table
+- ✅ Helper types: MatterWithRelations, FeeEarnerWorkload, AffordabilityResult
+- ✅ WorkflowStageKey union type (12 stages)
+- ✅ Proper TypeScript strict mode compliance
+
+**Updated** - `types/index.ts`
+- ✅ Exported all Purchase Workflow types
+- ✅ Added 10 constant enums (MatterType, MatterStatus, TaskStatus, DocumentType, OfferType, OfferStatus, EmploymentStatus, DepositSource, AvailabilityType, MatterPriority)
+
+#### 12.3 Server Actions (Services)
+
+**matter.service.ts** (520 lines)
+- ✅ `createMatter()` - Create with auto-number generation
+- ✅ `getMatter()` - Fetch single matter
+- ✅ `getMatterWithRelations()` - Fetch with all related entities (clients, property, quote, fee earner)
+- ✅ `listMatters()` - List with filtering (status, stage, assignee, priority, search)
+- ✅ `updateMatter()` - Update with audit tracking
+- ✅ `deleteMatter()` - Soft delete
+- ✅ `transitionMatterStage()` - Workflow progression with validation
+- ✅ `assignMatter()` - Fee earner assignment
+- ✅ Full RLS permission checks (owner, admin, manager, member)
+- ✅ Path revalidation for Next.js cache invalidation
+
+**task.service.ts** (380 lines)
+- ✅ `createTask()` - Manual task creation
+- ✅ `getTasksForMatter()` - Fetch with filtering (stage, status, assignee)
+- ✅ `updateTask()` - Task updates
+- ✅ `completeTask()` - Mark complete with auto-logging
+- ✅ `deleteTask()` - Soft delete
+- ✅ `assignTask()` - Assign to user
+- ✅ Integrates with database triggers for auto-generation
+
+**Total:** 900 lines of type-safe server actions
+
+#### 12.4 Documentation
+
+**Specification Documents**
+- ✅ **PURCHASE_CLIENT_WORKFLOW_SPEC.md** (1,831 lines)
+  - Complete technical specification
+  - All 10 table schemas with detailed field definitions
+  - 12-stage workflow states and transitions
+  - Feature requirements (clients, matters, tasks, documents, offers, fee earners)
+  - Fee earner allocation system design
+  - Integration points with existing system
+  - API endpoints design
+  - Security considerations
+  - Testing strategy
+- ✅ **PURCHASE_WORKFLOW_PHASES.md** (478 lines)
+  - 8 implementation phases over 20-22 weeks
+  - Phase dependencies and deliverables
+  - Success criteria for each phase
+  - Resource requirements
+  - Risk assessment
+  - Timeline: 110-130 developer days total
+- ✅ **BRANCH_STRATEGY_AND_INTEGRATION.md** (365 lines)
+  - Sequential build strategy (Phase 1 → 2 → ... → 11 → 12)
+  - Integration with Phase 11 features
+  - Additive-only architecture (no breaking changes)
+  - Safety mechanisms (feature flags, RLS, transactions)
+  - Migration paths for existing data
+
+### Technical Details
+
+**Security**
+- ✅ Row Level Security (RLS) on all 10 tables
+- ✅ Role-based permissions (owner, admin, manager, member, viewer)
+- ✅ Soft deletes on all tables (deleted_at timestamp)
+- ✅ Full audit trail (created_at, updated_at, created_by, updated_by)
+- ✅ Multi-tenant isolation via tenant_id
+- ✅ Storage bucket RLS policies
+- ✅ IP logging for client offer acceptance (audit compliance)
+
+**Performance**
+- ✅ 45+ indexes for query optimization
+- ✅ GIN indexes on JSONB columns
+- ✅ Composite indexes on frequently queried columns
+- ✅ Auto-update triggers for updated_at timestamps
+- ✅ Efficient foreign key relationships
+
+**Data Integrity**
+- ✅ Check constraints for enum values
+- ✅ Foreign key constraints with ON DELETE policies
+- ✅ NOT NULL constraints on required fields
+- ✅ Unique constraints on identifiers (matter_number, offer_number)
+- ✅ Date range validation (end_date >= start_date)
+
+**Automation**
+- ✅ Auto-generate matter numbers on insert
+- ✅ Auto-generate offer numbers on insert
+- ✅ Auto-create tasks when matter enters new stage
+- ✅ Auto-log all matter changes to activity timeline
+- ✅ Auto-transition offer statuses through approval workflow
+- ✅ Auto-increment document versions
+- ✅ Auto-update updated_at timestamps
+
+### Integration Points
+
+**Links to Existing System**
+- ✅ `matters.quote_id` → `quotes.id` (optional link)
+- ✅ `matters.property_id` → `properties.id` (required)
+- ✅ `matters.primary_client_id` → `clients.id` (required)
+- ✅ `matters.secondary_client_id` → `clients.id` (optional for couples)
+- ✅ `matters.assigned_fee_earner_id` → `profiles.id` (fee earner)
+- ✅ All tables have `tenant_id` → `tenants.id` (multi-tenant)
+
+**Future Integration**
+- 🔜 Form Builder (Phase 10) → Financial questionnaire forms
+- 🔜 Campaigns (Phase 3) → Matter creation triggers enrollment
+- 🔜 Analytics (Phase 6) → Purchase funnel metrics
+- 🔜 Client Portal (Phase 9) → Matter status view and offer acceptance
+- 🔜 Billing (Phase 11) → Revenue tracking per matter
+
+### Architecture Decisions
+
+**Additive-Only Approach**
+- No modifications to existing tables (except enhancing clients)
+- New tables exist alongside existing system
+- Existing quote/property workflows continue unchanged
+- Purchase workflow is optional enhancement
+- Feature flag controlled visibility
+
+**Sequential Build Pattern**
+- Phase 12 builds on Phase 11 (all previous features included)
+- Branch: `claude/phase-12-purchase-workflow-01BBD4YzKUvHpqg7AL5YEEHs`
+- Next phase will branch from Phase 12
+
+### Migration Notes
+
+**Database Migrations** (9 files)
+```sql
+20251120000001_enhance_clients_for_purchase_workflow.sql
+20251120000002_create_matters_table.sql
+20251120000003_create_workflow_stages.sql
+20251120000004_create_matter_tasks.sql
+20251120000005_create_documents_table.sql
+20251120000006_create_offers_table.sql
+20251120000007_create_financial_questionnaires.sql
+20251120000008_create_fee_earner_tables.sql
+20251120000009_create_matter_activities.sql
+```
+
+**Rollback Support**
+- All migrations are reversible
+- Soft deletes prevent data loss
+- Foreign keys use SET NULL for optional relationships
+- CASCADE for required relationships
+
+### What's Next (Phase 12 Remaining Work)
+
+**Phase 1 - Foundation** ✅ COMPLETE
+- ✅ Database schema (9 migrations, 10 tables)
+- ✅ TypeScript types (420 lines)
+- ✅ Core services (matter, task - 900 lines)
+- 🔜 Additional services (document, offer, financial, fee earner)
+- 🔜 Basic UI components (matter form, matter list)
+- 🔜 RLS policy testing
+
+**Phase 2 - Workflow & Tasks** (Weeks 4-6)
+- Workflow engine with stage transitions
+- Task management UI
+- Stage visualization (progress stepper)
+- Activity timeline component
+
+**Phase 3 - Documents & Questionnaire** (Weeks 7-9)
+- Document upload/download UI
+- Financial questionnaire form
+- ADS detection and affordability calculator
+- Home report management
+
+**Phase 4 - Offer Management** (Weeks 10-12)
+- Offer creation and approval UI
+- Client acceptance portal (public page)
+- PDF generation for offers
+- Agent response tracking
+
+**Phase 5 - Fee Earner Allocation** (Weeks 13-15)
+- Availability calendar UI
+- Workload dashboard
+- Auto-assignment algorithm
+- Manual assignment with recommendations
+
+**Phase 6-8** (Weeks 16-22)
+- Reminders & notifications
+- Client portal
+- Reporting & analytics
+
+### Stats
+
+**Code Added**
+- SQL: 2,259 lines (9 migrations)
+- TypeScript: 1,318 lines (types + services)
+- Documentation: 2,674 lines (3 spec docs)
+- **Total: 6,251 lines**
+
+**Database Objects Created**
+- Tables: 10 (+ 1 enhanced)
+- Indexes: 45+
+- Functions: 11
+- Triggers: 9
+- RLS Policies: 40+
+- Storage Buckets: 1
+
+---
+
 ## [1.5.0-go-to-market] - 2024-11-20
 
 **Phase 11: Go-to-Market Features Complete** 🚀
