@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus, FileText, Globe, Building2, Archive } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { DeleteFormButton } from '@/components/admin/form-builder/delete-form-button'
 
 export const metadata: Metadata = {
   title: 'Form Templates | Platform Admin | ConveyPro',
@@ -179,6 +180,7 @@ export default async function AdminFormsPage() {
                         Preview
                       </Button>
                     </Link>
+                    <DeleteFormButton formId={form.id} formName={form.name} />
                   </div>
                 </div>
               </Card>
@@ -253,6 +255,7 @@ export default async function AdminFormsPage() {
                         Assign Firms
                       </Button>
                     </Link>
+                    <DeleteFormButton formId={form.id} formName={form.name} />
                   </div>
                 </div>
               </Card>
