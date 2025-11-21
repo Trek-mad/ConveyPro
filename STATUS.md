@@ -1,9 +1,136 @@
 # ConveyPro - Project Status
 
-**Last Updated:** 2025-11-21 (Phase 12: Purchase Workflow - Phase 3 Complete)
-**Current Phase:** Phase 12 - **PURCHASE CLIENT WORKFLOW PHASE 3 COMPLETE** 🚀
-**Latest Branch:** `claude/phase-12-phase-3-documents-questionnaire-01BBD4YzKUvHpqg7AL5YEEHs`
-**Status:** Phase 1, 2 & 3 Complete - Ready for Phase 4
+**Last Updated:** 2025-11-21 (Phase 12: Purchase Workflow - Phase 4 Complete)
+**Current Phase:** Phase 12 - **PURCHASE CLIENT WORKFLOW PHASE 4 COMPLETE** 🎯
+**Latest Branch:** `claude/phase-12-phase-4-offer-management-01BBD4YzKUvHpqg7AL5YEEHs`
+**Status:** Phase 1, 2, 3 & 4 Complete - Ready for Phase 5
+
+---
+
+## 🚀 PHASE 12: PURCHASE CLIENT WORKFLOW - PHASE 4 COMPLETE
+
+### Phase 4: Offer Management - Production Ready!
+
+Built comprehensive offer creation and approval workflow system:
+
+**12.17 Offer Management Service** ✅
+- Offer CRUD operations with full workflow (600 lines)
+- Auto-generated offer numbers (OFF00001-25 format)
+- Multi-step approval workflow (solicitor → negotiator → client)
+- 8 offer statuses (draft, pending_solicitor, pending_negotiator, pending_client, submitted, accepted, rejected, withdrawn)
+- Verbal and written offer types
+- Client acceptance tracking with IP logging
+- Agent response logging (accepted, rejected, counter_offer)
+- Withdraw and soft delete functionality
+
+**12.18 Offer Form Component** ✅
+- Dialog-based offer creation UI (350 lines)
+- Offer type selector (verbal/written)
+- Offer amount input with auto-fill from purchase price
+- Closing and entry date pickers (Scottish specific)
+- Survey required toggle switch
+- Conditions and notes textareas
+- React Hook Form + Zod validation
+- Success/error toasts
+
+**12.19 Offers List Component** ✅
+- Display all offers for a matter (700 lines)
+- Status badges with 8-color system
+- Contextual action buttons based on status and role
+- Approve (Solicitor) button for draft offers
+- Approve (Negotiator) button for pending_negotiator offers
+- Submit to Agent button for client-accepted offers
+- Log Response dialog for submitted offers
+- Withdraw button for active offers
+- Agent response display (type, date, notes, rejection reason, counter offer amount)
+- Client acceptance indicator with timestamp
+- Confirmation dialogs for destructive actions
+- Loading states and per-offer tracking
+- Empty state with CTA
+- Role-based permissions (manager+ for approvals)
+
+**12.20 Client Acceptance Portal** ✅
+- Public offer acceptance page (400 lines)
+- No authentication required (token-based access)
+- Professional gradient background design
+- Offer details display with property address
+- Large, prominent offer amount
+- Closing and entry dates
+- Survey requirements
+- Offer conditions
+- Acceptance status handling (already accepted, not ready, ready)
+- IP address logging via ipify API
+- Large "Accept Offer" CTA button
+- Confirmation dialog before acceptance
+- Success/error feedback
+- Mobile responsive layout
+
+**12.21 Offer PDF Template** ✅
+- @react-pdf/renderer template (500 lines)
+- A4 professional layout
+- Firm branding (name, address, phone, email)
+- Offer type title (WRITTEN OFFER / VERBAL OFFER CONFIRMATION)
+- Offer reference (number, matter, date)
+- Client details section
+- Selling agent section
+- Property address formatting
+- Offer amount (highlighted blue box)
+- Offer terms (closing date, entry date, survey, type)
+- Conditions section (yellow highlighted box)
+- Standard legal terms (property condition, missives, client acceptance)
+- Signature section with line
+- Footer (confidentiality notice, copyright)
+
+**12.22 Public Portal Routes** ✅
+- `/portal/[token]/accept-offer/[offerId]` page (80 lines)
+- No authentication (public access)
+- Server-side data fetching (offer, matter, property)
+- Property address formatting
+- ClientAcceptancePortal integration
+- Minimal public layout
+
+**12.23 Matter Detail Page Integration** ✅
+- Added Offers section to matter detail page
+- OfferForm component integration
+- OffersList component integration
+- Fetch offers on page load
+- Pass user role for permissions
+- Pass purchase price for auto-fill
+- Card layout below documents
+
+### Code Statistics (Phase 4)
+- **Services:** 600 lines (1 service)
+- **Components:** 1,950 lines (4 components)
+- **Pages:** 80 lines (2 pages)
+- **Total Phase 4:** 2,630 lines of TypeScript/TSX
+
+### Cumulative Statistics (Phase 1 + 2 + 3 + 4)
+- **Phase 1:** 7,469 lines (database, types, services)
+- **Phase 2:** 2,850 lines (UI components)
+- **Phase 3:** 2,610 lines (documents & financial)
+- **Phase 4:** 2,630 lines (offer management)
+- **Total:** 15,559 lines across all four phases
+
+### Branch & Tags
+- **Phase 1 Branch:** `claude/phase-12-purchase-workflow-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 1 Tag:** `v2.0.0-phase-12-foundation`
+- **Phase 2 Branch:** `claude/phase-12-phase-2-workflow-ui-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 2 Tag:** `v2.1.0-phase-12-workflow-ui`
+- **Phase 3 Branch:** `claude/phase-12-phase-3-documents-questionnaire-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 3 Tag:** `v2.2.0-phase-12-documents-questionnaire`
+- **Phase 4 Branch:** `claude/phase-12-phase-4-offer-management-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 4 Tag:** `v2.3.0-phase-12-offer-management`
+
+### What's Next (Phase 5: Fee Earner Allocation)
+- Fee earner settings configuration UI
+- Availability calendar management (monthly/weekly views)
+- Block out dates UI (holidays, training, sick leave)
+- Workload calculation engine (real-time)
+- Auto-assignment algorithm (workload-based)
+- Manual assignment with recommendations
+- Team workload dashboard
+- Capacity visualization with charts
+- Assignment notifications
 
 ---
 
