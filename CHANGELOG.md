@@ -7,6 +7,252 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.8.0-purchase-workflow-search-bulk-operations] - 2025-11-21
+
+**Phase 12 - Phase 9: Search & Bulk Operations Complete** 🔍
+
+### Context
+Built comprehensive global search and bulk operations system for the Purchase Client Workflow. This phase implements multi-entity search across matters, clients, tasks, and documents with faceted filtering, search result highlighting, saved searches, recent search history, and powerful bulk operations for efficient matter management. The system enables users to quickly find information and perform actions on multiple items simultaneously.
+
+### Added
+
+#### 12.9.1 Global Search Service
+
+**services/search.service.ts** (550 lines)
+- ✅ `globalSearch()` - Multi-entity search function
+  - Searches across matters, clients, tasks, and documents
+  - Supports entity type filtering
+  - Fee earner, stage, status, date range filters
+  - Search term highlighting in results
+  - Configurable result limits
+  - Returns count per entity type
+- ✅ `saveSearch()` - Save search queries with filters
+  - Named search queries for quick reuse
+  - JSONB filter storage
+  - User-specific saved searches
+- ✅ `getSavedSearches()` - Retrieve user's saved searches
+  - Ordered by creation date
+  - Returns all search metadata
+- ✅ `deleteSavedSearch()` - Remove saved search
+  - User permission validation
+- ✅ `saveRecentSearch()` - Track recent searches
+  - Upsert operation (no duplicates)
+  - Timestamp tracking
+- ✅ `getRecentSearches()` - Get search history
+  - Configurable limit (default 10)
+  - Ordered by recency
+
+**TypeScript Interfaces:**
+- ✅ `SearchFilters` - Filter options (entity types, fee earner, stage, status, dates)
+- ✅ `MatterSearchResult` - Matter search result with client and fee earner
+- ✅ `ClientSearchResult` - Client search result with contact info
+- ✅ `TaskSearchResult` - Task search result with matter context
+- ✅ `DocumentSearchResult` - Document search result with metadata
+- ✅ `SearchResponse` - Complete search response with counts
+- ✅ `SavedSearch` - Saved search query structure
+
+#### 12.9.2 Bulk Operations Service
+
+**services/bulk-operations.service.ts** (620 lines)
+- ✅ `bulkAssignFeeEarner()` - Assign fee earner to multiple matters
+  - Individual error handling per matter
+  - Activity logging for each assignment
+  - Returns success/failure breakdown
+- ✅ `bulkUpdateMatterStage()` - Move multiple matters to new stage
+  - Stage transition validation
+  - Activity logging with metadata
+  - Partial success support
+- ✅ `bulkUpdateMatterStatus()` - Update status for multiple matters
+  - Status validation
+  - Activity logging
+  - Error tracking per matter
+- ✅ `bulkExportMatters()` - Export selected matters to CSV
+  - Includes client and fee earner data
+  - Formatted for Excel compatibility
+  - Comprehensive matter details
+- ✅ `bulkCreateTasks()` - Create task for multiple matters
+  - Same task across multiple matters
+  - Configurable due date, assignee, priority
+  - Activity logging per matter
+- ✅ `bulkUpdateTaskStatus()` - Update status for multiple tasks
+  - Batch status updates
+  - Completion timestamp tracking
+  - Activity logging with task context
+- ✅ `bulkAssignTasks()` - Reassign multiple tasks
+  - Batch reassignment
+  - Activity logging
+  - Error tracking
+- ✅ `bulkDeleteDocuments()` - Delete multiple documents
+  - Storage file deletion
+  - Database record deletion
+  - Activity logging
+
+**TypeScript Interfaces:**
+- ✅ `BulkOperationResult` - Standard result format with success/failure arrays
+- ✅ `BulkAssignmentData` - Fee earner assignment parameters
+- ✅ `BulkStageTransitionData` - Stage update parameters
+- ✅ `BulkTaskCreationData` - Task creation parameters
+- ✅ `BulkStatusUpdateData` - Status update parameters
+
+#### 12.9.3 Search Page & UI
+
+**app/(dashboard)/search/page.tsx** (33 lines)
+- ✅ Server component for search page
+- ✅ Query parameter handling
+- ✅ Tenant membership validation
+- ✅ SEO metadata
+
+**components/search/search-client.tsx** (435 lines)
+- ✅ Search input with clear button
+- ✅ Real-time search query state
+- ✅ Loading states with spinner
+- ✅ **Tabbed Results Interface:**
+  - All tab (combined results)
+  - Matters tab with count badge
+  - Clients tab with count badge
+  - Tasks tab with count badge
+  - Documents tab with count badge
+- ✅ **Search Result Cards:**
+  - Matter cards: matter number, property address, client, fee earner, price, status, stage
+  - Client cards: name, email, phone, mobile
+  - Task cards: title, description, matter, assignee, due date, status
+  - Document cards: filename, type, matter, size, uploader
+- ✅ **Search Highlighting:**
+  - Yellow highlight for matching text
+  - Case-insensitive matching
+  - Partial word matching
+- ✅ **Entity Icons:**
+  - Blue FileText icon for matters
+  - Green Users icon for clients
+  - Orange CheckSquare icon for tasks
+  - Purple File icon for documents
+- ✅ **Empty States:**
+  - No results message
+  - Search prompt when no query
+  - Helpful suggestions
+- ✅ Clickable matter results (navigate to detail)
+
+#### 12.9.4 Bulk Actions UI Components
+
+**components/bulk-actions/bulk-actions-toolbar.tsx** (315 lines)
+- ✅ Fixed bottom toolbar (sticky)
+- ✅ Selected items count badge
+- ✅ **Bulk Actions for Matters:**
+  - Assign fee earner dropdown
+  - Update stage dropdown
+  - Update status dropdown
+  - Export to CSV button
+- ✅ Confirmation dialogs for all actions
+- ✅ Loading states during operations
+- ✅ Success/error toast notifications
+- ✅ Clear selection button
+- ✅ Partial success handling (shows which items succeeded/failed)
+- ✅ Activity logging for all actions
+
+**components/bulk-actions/bulk-select-checkbox.tsx** (22 lines)
+- ✅ Checkbox component for item selection
+- ✅ Click event propagation stopped
+- ✅ Controlled checked state
+
+**hooks/use-bulk-selection.ts** (48 lines)
+- ✅ Custom hook for bulk selection state
+- ✅ `toggleSelection()` - Toggle individual item
+- ✅ `toggleAll()` - Select/deselect all items
+- ✅ `clearSelection()` - Clear all selections
+- ✅ `isSelected()` - Check if item is selected
+- ✅ `isAllSelected()` - Check if all items selected
+
+#### 12.9.5 Database Tables
+
+**supabase/migrations/20250122_create_search_tables.sql** (145 lines)
+- ✅ `saved_searches` table
+  - User ID reference
+  - Search name and query
+  - JSONB filters storage
+  - Created/updated timestamps
+  - RLS policies for user isolation
+- ✅ `recent_searches` table
+  - User ID and tenant ID references
+  - Search query
+  - Searched timestamp
+  - Unique constraint on (user_id, query)
+  - RLS policies for user isolation
+- ✅ Indexes for performance
+  - User ID indexes
+  - Timestamp indexes (DESC for recent first)
+- ✅ Updated_at trigger for saved_searches
+
+### Key Features
+
+**Search Capabilities:**
+- Multi-entity search in single query
+- Real-time search results
+- Entity type filtering (tabs)
+- Search term highlighting
+- Result count per entity type
+- Empty state handling
+- Responsive design
+
+**Bulk Operations:**
+- Select multiple items with checkboxes
+- Bulk fee earner assignment
+- Bulk stage transitions
+- Bulk status updates
+- Bulk task creation
+- Bulk CSV export
+- Confirmation dialogs for safety
+- Partial success handling
+- Activity logging for audit trail
+
+**User Experience:**
+- Fixed toolbar shows when items selected
+- Visual feedback with badges and icons
+- Loading states during operations
+- Success/error notifications
+- Clear selection option
+- Keyboard-friendly checkboxes
+
+**Performance:**
+- Efficient database queries with indexes
+- Lazy loading with result limits
+- Client-side CSV generation
+- Optimized search with ILIKE queries
+
+### Code Statistics
+
+**Phase 9 Totals:**
+- Search Service: 550 lines TypeScript
+- Bulk Operations Service: 620 lines TypeScript
+- Search Page: 33 lines TSX
+- Search Client Component: 435 lines TSX
+- Bulk Actions Toolbar: 315 lines TSX
+- Bulk Select Checkbox: 22 lines TSX
+- Bulk Selection Hook: 48 lines TypeScript
+- Database Migration: 145 lines SQL
+- **Total: 2,168 lines of code**
+
+**Cumulative (Phases 1-9):**
+- **26,519 lines across 9 phases**
+
+### Database Changes
+- 2 new tables (`saved_searches`, `recent_searches`)
+- 4 new indexes
+- 8 RLS policies
+- 1 trigger function
+
+### Files Changed
+- **New Files:** 8
+  - 1 search service
+  - 1 bulk operations service
+  - 1 search page
+  - 1 search client component
+  - 2 bulk action components
+  - 1 bulk selection hook
+  - 1 migration
+- **Modified Files:** 0
+
+---
+
 ## [2.7.0-purchase-workflow-reporting-analytics] - 2025-11-21
 
 **Phase 12 - Phase 8: Reporting & Analytics Complete** 📊
