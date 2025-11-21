@@ -7,6 +7,441 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0-purchase-workflow-documents] - 2025-11-21
+
+**Phase 12 - Phase 3: Documents & Financial Questionnaire Complete** 📄
+
+### Context
+Built complete document management and financial assessment system for the Purchase Client Workflow. This phase implements document upload/download with Supabase Storage, comprehensive financial questionnaire with multi-step form, and affordability calculator with automatic warnings and recommendations.
+
+### Added
+
+#### 12.3.1 Document Management Service
+
+**document.service.ts** (380 lines)
+- ✅ `uploadDocument()` - File upload with metadata
+  - FormData handling for file uploads
+  - Supabase Storage integration (matter-documents bucket)
+  - Unique storage path generation: `tenant_id/matter_id/timestamp_filename`
+  - Metadata record creation in documents table
+  - 50MB file size limit
+  - 11 document types support
+  - Automatic MIME type detection
+- ✅ `getDocumentsForMatter()` - Fetch with filtering
+  - Filter by document type
+  - Filter by status (uploaded, verified, rejected)
+  - Excludes soft-deleted documents
+  - Ordered by creation date (newest first)
+- ✅ `getDocumentDownloadUrl()` - Signed URL generation
+  - 1-hour expiry on signed URLs
+  - Secure download links from Supabase Storage
+  - RLS permission checks
+- ✅ `verifyDocument()` - Solicitor approval workflow
+  - Mark document as verified
+  - Record verification timestamp and user
+  - Audit trail for compliance
+- ✅ `deleteDocument()` - Soft delete with storage cleanup
+  - Soft delete in database (deleted_at timestamp)
+  - Physical file removal from storage
+  - Cascade to document versions
+- ✅ `updateDocument()` - Metadata updates
+  - Update title, description, tags
+  - Change document type
+  - Add notes
+- ✅ Full RLS permission checks on all operations
+- ✅ Path revalidation for cache invalidation
+
+**Document Types Supported:**
+- home_report (Home Report / EPC)
+- financial_questionnaire (Financial Questionnaire)
+- offer_letter (Offer Letter)
+- id_document (ID Document - Passport/Driving License)
+- bank_statement (Bank Statement)
+- mortgage_in_principle (Mortgage in Principle / DIP)
+- survey (Survey Report)
+- contract (Contract / Missives)
+- searches (Property Searches)
+- title_deed (Title Deed)
+- other (Other Documents)
+
+#### 12.3.2 Financial Questionnaire Service
+
+**financial-questionnaire.service.ts** (270 lines)
+- ✅ `createFinancialQuestionnaire()` - Create new questionnaire
+  - Links to matter and client
+  - Comprehensive financial data capture
+  - Validation and RLS checks
+- ✅ `getFinancialQuestionnaire()` - Fetch for matter/client
+  - Retrieve existing questionnaire
+  - Used for editing and review
+- ✅ `updateFinancialQuestionnaire()` - Update questionnaire data
+  - Partial updates supported
+  - Preserves audit trail
+- ✅ `completeFinancialQuestionnaire()` - Mark as complete
+  - Sets completed_at timestamp
+  - Locks questionnaire from further edits
+- ✅ `calculateAffordability()` - Financial assessment algorithm
+  - **Income calculation:**
+    - Annual gross income
+    - Additional income (rental, dividends, etc.)
+    - Total income = annual_income + additional_income_amount
+  - **Assets calculation:**
+    - Savings + Investments + Other assets + Expected sale proceeds
+  - **Liabilities calculation:**
+    - Existing mortgage + Credit cards + Loans + Other debts
+  - **Affordability logic:**
+    - Available deposit vs Total needed (purchase price - mortgage)
+    - Shortfall detection and calculation
+    - Net assets calculation
+  - **Warnings generation:**
+    - Deposit shortfall alerts
+    - High debt-to-income ratio (>50% threshold)
+    - ADS applicability warning (8%)
+    - Missing Mortgage in Principle recommendation
+  - **Results returned:**
+    - `affordable` boolean flag
+    - Total income, assets, liabilities
+    - Available deposit
+    - Total needed
+    - Shortfall amount (positive = need more, negative = surplus)
+    - Array of warning messages
+- ✅ `verifyFinancialQuestionnaire()` - Solicitor verification
+  - Mark questionnaire as verified
+  - Record verifier and timestamp
+  - Required before proceeding to offer stage
+
+**Financial Data Captured:**
+- Personal: Full name, DOB, NI number, address, years at address
+- Employment: Status, employer, job title, years employed
+- Income: Gross annual income, additional income sources
+- Assets: Savings, investments, other assets
+- Liabilities: Mortgage, credit cards, loans, other debts
+- Property Sale: Selling property flag, address, sale status, expected proceeds
+- Mortgage: Required flag, amount, lender, Mortgage in Principle status
+- Deposit: Amount, source (savings, gift, sale proceeds, etc.)
+- ADS: Additional Dwelling Supplement applicability
+
+#### 12.3.3 Document Library UI
+
+**document-library.tsx** (420 lines)
+- ✅ **View mode toggle**
+  - List view (detailed information)
+  - Grid view (card layout)
+  - User preference persisted in component state
+- ✅ **Document filtering**
+  - Search by document title
+  - Filter by document type (11 types)
+  - Real-time filtering with debouncing
+- ✅ **Document display**
+  - Document title and type labels
+  - Status badges (uploaded, verified, rejected, pending_review)
+  - File size display (MB format)
+  - Upload timestamp (relative: "2 hours ago")
+  - Description preview
+  - MIME type icons (PDF red, images purple, other gray)
+- ✅ **Document actions**
+  - Download button with signed URL generation
+  - Verify button (solicitors only, if not verified)
+  - Delete button with confirmation
+  - Loading states for all actions
+- ✅ **Empty states**
+  - No documents uploaded state
+  - No documents matching filters state
+  - Call-to-action for first upload
+- ✅ **Upload integration**
+  - Opens DocumentUploadModal
+  - Refresh on upload completion
+- ✅ **Role-based permissions**
+  - `canManage` prop controls upload/verify/delete visibility
+  - Read-only mode for viewer role
+- ✅ **Responsive design**
+  - Grid layout adapts to screen size
+  - Mobile-friendly controls
+
+#### 12.3.4 Document Upload Modal
+
+**document-upload-modal.tsx** (280 lines)
+- ✅ **Drag & drop file upload**
+  - Visual drop zone with hover state
+  - File preview after selection
+  - Fallback to file browser
+- ✅ **File validation**
+  - 50MB file size limit
+  - Error messages for oversized files
+  - MIME type validation
+- ✅ **Upload form**
+  - Document type selector (11 options)
+  - Title field (auto-filled from filename)
+  - Description textarea (optional)
+  - Tags input (optional)
+- ✅ **Auto-title extraction**
+  - Removes file extension
+  - Populates title field automatically
+  - User can override
+- ✅ **Upload progress**
+  - Loading state during upload
+  - Disabled submit while uploading
+  - Success/error feedback
+- ✅ **FormData submission**
+  - Client-side FormData construction
+  - Server action integration
+  - Router refresh on success
+
+#### 12.3.5 Financial Questionnaire Multi-Step Form
+
+**financial-questionnaire-form.tsx** (850 lines)
+- ✅ **8-step wizard interface**
+  - **Step 1: Personal Info** - Name, DOB, NI number, address
+  - **Step 2: Employment** - Status, employer, job title, years employed
+  - **Step 3: Income** - Annual income, additional income sources
+  - **Step 4: Assets** - Savings, investments, other assets
+  - **Step 5: Liabilities** - Mortgage, credit cards, loans, debts
+  - **Step 6: Property Sale** - Selling property details, sale proceeds
+  - **Step 7: Mortgage & Deposit** - Mortgage details, deposit source, ADS
+  - **Step 8: Review** - Summary and warnings
+- ✅ **Progress tracking**
+  - Progress bar (0-100%)
+  - Step indicators (completed, current, pending)
+  - Current step counter
+- ✅ **Step navigation**
+  - Click step indicators to jump
+  - Next/Previous buttons
+  - Disabled states on first/last step
+- ✅ **Smart form fields**
+  - Conditional fields based on selections
+  - Employment fields only show for employed/self-employed
+  - Property sale fields only show if selling property
+  - Mortgage fields only show if mortgage required
+  - Additional income fields only show if checkbox checked
+  - Other assets/liabilities fields only show if checkbox checked
+- ✅ **Financial summary (Step 8)**
+  - Total annual income calculation
+  - Total assets calculation
+  - Total liabilities calculation
+  - Deposit amount highlight
+  - Mortgage required display
+- ✅ **Automatic warnings (Step 8)**
+  - High debt-to-income ratio (>50%)
+  - Mortgage in Principle recommendation
+  - ADS applicability warning
+  - Color-coded alert boxes (yellow, blue, orange)
+- ✅ **Form submission**
+  - Create new or update existing questionnaire
+  - Validation before submission
+  - Error handling with user feedback
+  - Router refresh on success
+- ✅ **Accessibility**
+  - Proper label associations
+  - Keyboard navigation
+  - Screen reader friendly
+  - Icon indicators for each step
+
+#### 12.3.6 Affordability Calculator UI
+
+**affordability-calculator.tsx** (380 lines)
+- ✅ **Auto-calculation on load**
+  - useEffect triggers calculation when component mounts
+  - Recalculate button for manual refresh
+- ✅ **Overall status display**
+  - Green "Purchase Appears Affordable" with checkmark
+  - Red "Deposit Shortfall Identified" with alert icon
+  - Shortfall amount prominently displayed
+- ✅ **Financial summary cards**
+  - Total Annual Income (blue, trending up icon)
+  - Total Assets (green, dollar icon)
+  - Total Liabilities (red, trending down icon)
+  - Net Assets (calculated, color-coded positive/negative)
+- ✅ **Deposit analysis section**
+  - Total Needed calculation
+  - Available Deposit display
+  - Shortfall/Surplus calculation with large font
+  - Color-coded (red for shortfall, green for surplus)
+  - Detailed breakdown of deposit gap
+- ✅ **Shortfall alert**
+  - Red alert box if shortfall detected
+  - Specific amount needed
+  - Suggestions for bridging the gap
+- ✅ **Debt-to-income ratio visualization**
+  - Percentage calculation
+  - Visual progress bar
+  - Color-coded thresholds:
+    - Green: <30% (healthy)
+    - Yellow: 30-50% (moderate)
+    - Red: >50% (high risk)
+  - Interpretation text below bar
+- ✅ **Warnings display**
+  - Amber "Considerations & Warnings" section
+  - Bulleted list of all warnings
+  - Generated from financial calculation
+- ✅ **Solicitor recommendation**
+  - Blue info box with professional guidance
+  - Conditional messaging based on affordability
+  - If affordable: "Proceed with verification"
+  - If shortfall: "Advise client to secure additional funds"
+  - Warning count reminder
+- ✅ **Loading states**
+  - Calculating skeleton screen
+  - Recalculate button with spinner
+- ✅ **Error handling**
+  - Error state display
+  - Retry button on failure
+
+#### 12.3.7 Progress UI Component
+
+**components/ui/progress.tsx** (30 lines)
+- ✅ Radix UI Progress component wrapper
+- ✅ Horizontal progress bar
+- ✅ Smooth transitions
+- ✅ Tailwind CSS styling
+- ✅ Percentage-based value prop
+
+#### 12.3.8 Matter Detail Page Integration
+
+**app/(dashboard)/matters/[id]/page.tsx** (Updated)
+- ✅ Added DocumentLibrary component integration
+- ✅ Fetch documents via getDocumentsForMatter service
+- ✅ Role-based document management permissions
+- ✅ Positioned below TaskChecklist in left column
+- ✅ Proper data passing (documents, matterId, tenantId, canManage)
+
+### Files Added
+
+#### Services (2 files)
+- `services/document.service.ts` - Document upload/download/verify/delete (380 lines)
+- `services/financial-questionnaire.service.ts` - CRUD and affordability calculation (270 lines)
+
+#### Components (5 files)
+- `components/documents/document-library.tsx` - Document list with view modes (420 lines)
+- `components/documents/document-upload-modal.tsx` - Drag & drop upload (280 lines)
+- `components/matters/financial-questionnaire-form.tsx` - 8-step form wizard (850 lines)
+- `components/matters/affordability-calculator.tsx` - Financial assessment UI (380 lines)
+- `components/ui/progress.tsx` - Progress bar component (30 lines)
+
+### Code Statistics
+
+**TypeScript/TSX:** ~2,610 lines
+- Services: 650 lines
+  - document.service.ts: 380 lines
+  - financial-questionnaire.service.ts: 270 lines
+- Components: 1,960 lines
+  - DocumentLibrary: 420 lines
+  - DocumentUploadModal: 280 lines
+  - FinancialQuestionnaireForm: 850 lines
+  - AffordabilityCalculator: 380 lines
+  - Progress: 30 lines
+
+**Total Phase 3:** 2,610 lines of service and UI code
+
+### Technical Details
+
+**Document Storage**
+- Supabase Storage bucket: `matter-documents`
+- Storage path pattern: `{tenant_id}/{matter_id}/{timestamp}_{filename}`
+- Signed URLs with 1-hour expiry
+- 50MB file size limit
+- RLS policies for tenant isolation
+- Soft delete preserves audit trail
+
+**Affordability Algorithm**
+```typescript
+Total Income = Annual Income + Additional Income
+Total Assets = Savings + Investments + Other Assets + Sale Proceeds
+Total Liabilities = Mortgage + Credit Cards + Loans + Other Debts
+Available Deposit = deposit_amount
+Total Needed = Purchase Price - Mortgage Required
+Shortfall = Total Needed - Available Deposit
+Debt-to-Income Ratio = (Total Liabilities / Total Income) * 100
+
+Affordable = Shortfall <= 0
+```
+
+**Warnings Triggered:**
+- Shortfall > 0: "Deposit shortfall of £X"
+- Debt-to-Income > 50%: "High debt-to-income ratio (>50%)"
+- ADS Applicable: "Additional Dwelling Supplement (8%) will apply"
+- Mortgage Required && !Mortgage in Principle: "Mortgage in Principle recommended"
+
+**Form Data Flow**
+```
+1. User fills 8-step form
+2. Submit → createFinancialQuestionnaire()
+3. Save to database
+4. Navigate to calculator
+5. calculateAffordability() runs
+6. Display results and warnings
+7. Solicitor reviews and verifies
+```
+
+**Document Workflow**
+```
+1. User drags file to upload modal
+2. File validation (size, type)
+3. FormData sent to uploadDocument()
+4. File → Supabase Storage
+5. Metadata → documents table
+6. Document appears in library
+7. Solicitor can download/verify/delete
+8. Signed URL for secure downloads
+```
+
+### Integration Points
+
+**Links to Phase 1 & 2**
+- ✅ Documents linked to matters table (matter_id)
+- ✅ Financial questionnaires linked to matters and clients
+- ✅ Integrated into matter detail page workflow
+- ✅ Uses existing task service for checklist
+- ✅ Uses existing matter service for data
+
+**Supabase Storage Integration**
+- ✅ matter-documents bucket from Phase 1 migration
+- ✅ RLS policies for document access
+- ✅ Public read for verified documents
+- ✅ Tenant-scoped uploads and deletes
+
+### Features Working
+
+- ✅ Upload documents with drag & drop
+- ✅ 11 document type classification
+- ✅ Download documents via signed URLs
+- ✅ Verify documents (solicitor approval)
+- ✅ Delete documents (soft delete + storage cleanup)
+- ✅ List/grid view toggle
+- ✅ Search and filter documents
+- ✅ 8-step financial questionnaire form
+- ✅ Conditional form fields
+- ✅ Automatic affordability calculation
+- ✅ Debt-to-income ratio visualization
+- ✅ Shortfall detection and warnings
+- ✅ Solicitor recommendations
+- ✅ Financial summary display
+- ✅ ADS detection (8% warning)
+- ✅ Mortgage in Principle recommendation
+- ✅ Responsive design across devices
+
+### What's Next (Phase 4)
+
+Phase 4 will add:
+- Offer creation and submission UI
+- Client offer acceptance portal (public page)
+- PDF offer letter generation
+- Agent response tracking
+- Multi-step offer approval workflow
+- Counter-offer management
+
+### Breaking Changes
+None - Phase 3 is additive only
+
+### Security
+- All document operations use RLS policies
+- Signed URLs expire after 1 hour
+- Service actions validate tenant membership
+- Document uploads restricted to authorized users
+- Storage bucket enforces tenant isolation
+- Soft deletes preserve audit trail
+
+---
+
 ## [2.1.0-purchase-workflow-ui] - 2025-11-20
 
 **Phase 12 - Phase 2: Workflow & Tasks UI Complete** 🚀

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getActiveTenantMembership } from '@/lib/auth'
 import { getMatterWithRelations } from '@/services/matter.service'
 import { getTasksForMatter } from '@/services/task.service'
+import { getDocumentsForMatter } from '@/services/document.service'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +13,7 @@ import { WorkflowStages } from '@/components/matters/workflow-stages'
 import { TaskChecklist } from '@/components/matters/task-checklist'
 import { ActivityTimeline } from '@/components/matters/activity-timeline'
 import { MatterStageTransition } from '@/components/matters/matter-stage-transition'
+import { DocumentLibrary } from '@/components/documents/document-library'
 import { formatDistanceToNow } from 'date-fns'
 
 export const metadata: Metadata = {
@@ -46,8 +48,17 @@ export default async function MatterDetailPage({ params }: PageProps) {
   const tasksResult = await getTasksForMatter(id)
   const tasks = 'tasks' in tasksResult ? tasksResult.tasks : []
 
+  // Fetch documents
+  const documentsResult = await getDocumentsForMatter(id)
+  const documents = 'documents' in documentsResult ? documentsResult.documents : []
+
   // Get activities (empty for now - will be populated by database triggers)
   const activities = matter.activities || []
+
+  // Check if user can manage documents (owner, admin, manager, member)
+  const canManageDocuments = ['owner', 'admin', 'manager', 'member'].includes(
+    membership.role
+  )
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -185,6 +196,14 @@ export default async function MatterDetailPage({ params }: PageProps) {
           <TaskChecklist
             tasks={tasks}
             currentStage={matter.current_stage}
+          />
+
+          {/* Document Library */}
+          <DocumentLibrary
+            documents={documents}
+            matterId={matter.id}
+            tenantId={matter.tenant_id}
+            canManage={canManageDocuments}
           />
         </div>
 
