@@ -7,6 +7,246 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.9.0-purchase-workflow-activity-log-viewer] - 2025-11-21
+
+**Phase 12 - Phase 10: Activity Log Viewer Complete** 📋
+
+### Context
+Built comprehensive activity log viewing and audit trail system for the Purchase Client Workflow. This phase implements activity log viewer with advanced filtering, timeline visualization, user activity summaries, CSV export, and dashboard widget. The system provides complete transparency and compliance with audit requirements, enabling users to track all actions across matters and understand who did what and when.
+
+### Added
+
+#### 12.10.1 Activity Log Service
+
+**services/activity-log.service.ts** (495 lines)
+- ✅ `logActivity()` - Core logging function used throughout the system
+  - Logs activities to matter_activities table
+  - Supports metadata storage (JSONB)
+  - Tenant-isolated logging
+- ✅ `getActivities()` - Get activities with advanced filtering
+  - Filter by matter, user, activity type, date range, search query
+  - Pagination support (limit, offset)
+  - Returns total count and has_more flag
+  - Includes user and matter information via joins
+  - Ordered by created_at descending
+- ✅ `getMatterActivities()` - Get all activities for a specific matter
+  - Simplified wrapper around getActivities()
+  - Default limit of 100 activities
+- ✅ `getUserActivities()` - Get all activities for a specific user
+  - Tracks user actions across all matters
+  - Default limit of 50 activities
+- ✅ `getActivityTypes()` - Get unique activity types for filtering
+  - Returns sorted array of all activity types
+  - Used for filter dropdowns
+- ✅ `getUserActivitySummary()` - Generate user activity statistics
+  - Groups activities by user
+  - Counts total activities per user
+  - Breaks down activity types per user
+  - Tracks last activity timestamp
+  - Optional date range filtering
+- ✅ `exportActivitiesToCSV()` - Export activities with filters
+  - Supports up to 10,000 activities
+  - Applies same filters as getActivities()
+  - Returns data ready for CSV export
+- ✅ `getRecentActivityFeed()` - Get recent activities for dashboard
+  - Default limit of 10 activities
+  - Used by dashboard widget
+
+**TypeScript Interfaces:**
+- ✅ `ActivityLog` - Complete activity record with user/matter info
+- ✅ `ActivityLogFilters` - Filter options for queries
+- ✅ `ActivityLogResponse` - Paginated response structure
+- ✅ `UserActivitySummary` - User statistics and breakdown
+
+#### 12.10.2 Matter Activity Log Page
+
+**app/(dashboard)/purchase-matters/[id]/activity-log/page.tsx** (52 lines)
+- ✅ Server component for matter-specific activity log
+- ✅ Matter validation (404 if not found)
+- ✅ Tenant membership validation
+- ✅ SEO metadata
+- ✅ Suspense for loading state
+
+**components/activity-log/activity-log-viewer.tsx** (265 lines)
+- ✅ Complete activity log viewer for single matter
+- ✅ **Advanced Filtering:**
+  - Search query filter (description, user, type)
+  - Activity type dropdown filter
+  - Date from/to range filters
+  - Clear filters button
+  - Active filter count badge
+- ✅ **Filter Panel:**
+  - Collapsible filter section
+  - 4-column responsive grid
+  - Real-time filtering (no submit button)
+  - Filter persistence during session
+- ✅ **Export Functionality:**
+  - Export to CSV button
+  - Timestamped filenames
+  - Includes matter context
+  - Client-side download
+- ✅ **Statistics Display:**
+  - Shows X of Y activities count
+  - Updates dynamically with filters
+- ✅ Loading states and empty states
+- ✅ Error handling with toasts
+
+#### 12.10.3 Global Activity Log Page
+
+**app/(dashboard)/activity-log/page.tsx** (25 lines)
+- ✅ Server component for tenant-wide activity log
+- ✅ Tenant membership validation
+- ✅ SEO metadata
+- ✅ Suspense for loading state
+
+**components/activity-log/global-activity-log-viewer.tsx** (350 lines)
+- ✅ Complete activity log viewer for entire tenant
+- ✅ **Advanced Filtering:**
+  - Search query filter
+  - User dropdown filter (all users in tenant)
+  - Activity type dropdown filter
+  - Date from/to range filters
+  - Clear filters button
+  - Active filter count badge (5 possible filters)
+- ✅ **Tabbed Interface:**
+  - Activity Timeline tab - chronological view
+  - User Summary tab - statistics per user
+- ✅ **User Summary Tab:**
+  - User activity count cards
+  - Top 5 activity types per user
+  - Last activity timestamp
+  - Email display
+  - Total activities badge
+- ✅ **Export Functionality:**
+  - Export all activities to CSV
+  - Respects active filters
+  - Up to 10,000 activities
+- ✅ Pagination info (showing first 100)
+- ✅ Loading states and empty states
+
+#### 12.10.4 Activity Timeline Component
+
+**components/activity-log/activity-timeline.tsx** (185 lines)
+- ✅ Beautiful timeline visualization
+- ✅ **Grouped by Date:**
+  - Activities grouped by day
+  - Date separator headers
+  - Visual divider lines
+- ✅ **Timeline Styling:**
+  - Vertical timeline line connecting activities
+  - Color-coded activity icons (17 icon types)
+  - Color-coded activity cards (5 color schemes)
+  - Icon categories: create (blue), complete (green), cancel (red), assign (orange), update (gray)
+- ✅ **Activity Icons:**
+  - FileText for matter/task/offer created
+  - CheckCircle for completed/accepted/verified
+  - XCircle for cancelled/rejected
+  - Upload/Download for document operations
+  - Mail for email sent
+  - GitBranch for stage changes
+  - Users for assignments
+  - Edit for updates
+  - Trash2 for deletions
+- ✅ **Activity Details:**
+  - Activity type badge
+  - Relative time display (e.g., "2 hours ago", "3 days ago")
+  - User name and email
+  - Activity description
+  - Expandable metadata (JSON view)
+- ✅ **Metadata Display:**
+  - Collapsible details section
+  - Formatted JSON view
+  - Only shown when metadata exists
+- ✅ Responsive design (mobile-friendly)
+
+#### 12.10.5 Dashboard Widget
+
+**components/dashboard/recent-activity-feed.tsx** (145 lines)
+- ✅ Recent activity feed widget for dashboard
+- ✅ Shows last 10 activities across all matters
+- ✅ **Activity Cards:**
+  - Description with line clamping (2 lines max)
+  - Relative time display
+  - Activity type badge with color coding
+  - Matter number link (navigates to matter)
+  - User attribution ("by John Doe")
+- ✅ **Features:**
+  - "View All" button linking to global log
+  - Clock icon for each activity
+  - Color-coded badges matching timeline
+  - Loading state with spinner
+  - Empty state with icon
+- ✅ Responsive layout
+- ✅ Auto-refresh on mount
+
+### Key Features
+
+**Audit Trail & Compliance:**
+- Complete activity history for all matters
+- Who did what, when, and where (IP tracking available via metadata)
+- Immutable log records (no deletion, only viewing)
+- Export capability for regulatory compliance
+- Date range filtering for audit periods
+
+**Advanced Filtering:**
+- Multi-dimensional filtering (user, type, date, search)
+- Real-time filter application (no page reload)
+- Filter count indicators
+- One-click filter clearing
+- Persistent during session
+
+**Visualization:**
+- Beautiful timeline design with date grouping
+- Color-coded activities by type
+- Icon-based visual language (17 icon types)
+- Relative time display for recency
+- Expandable metadata for technical details
+
+**User Experience:**
+- Fast client-side filtering
+- Loading states for async operations
+- Empty states with helpful messages
+- Responsive design (mobile-friendly)
+- Toast notifications for actions
+- CSV export with timestamped filenames
+
+**Integration:**
+- Activity logging used throughout all 9 previous phases
+- Dashboard widget for at-a-glance activity view
+- Matter-specific log accessible from matter detail
+- Global log for admin/compliance users
+- Links between activities and matters
+
+### Code Statistics
+
+**Phase 10 Totals:**
+- Activity Log Service: 495 lines TypeScript
+- Matter Activity Log Page: 52 lines TSX
+- Activity Log Viewer: 265 lines TSX
+- Global Activity Log Page: 25 lines TSX
+- Global Activity Log Viewer: 350 lines TSX
+- Activity Timeline Component: 185 lines TSX
+- Recent Activity Feed Widget: 145 lines TSX
+- **Total: 1,517 lines of code**
+
+**Cumulative (Phases 1-10):**
+- **28,036 lines across 10 phases**
+
+### Database Changes
+- No new tables (uses existing matter_activities table)
+- Leverages existing indexes
+- All queries tenant-isolated
+
+### Files Changed
+- **New Files:** 7
+  - 1 activity log service
+  - 2 activity log pages
+  - 3 activity log components
+  - 1 dashboard widget
+- **Modified Files:** 0
+
+---
+
 ## [2.8.0-purchase-workflow-search-bulk-operations] - 2025-11-21
 
 **Phase 12 - Phase 9: Search & Bulk Operations Complete** 🔍
