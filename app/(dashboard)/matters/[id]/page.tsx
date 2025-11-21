@@ -5,6 +5,7 @@ import { getActiveTenantMembership } from '@/lib/auth'
 import { getMatterWithRelations } from '@/services/matter.service'
 import { getTasksForMatter } from '@/services/task.service'
 import { getDocumentsForMatter } from '@/services/document.service'
+import { getOffersForMatter } from '@/services/offer.service'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +15,8 @@ import { TaskChecklist } from '@/components/matters/task-checklist'
 import { ActivityTimeline } from '@/components/matters/activity-timeline'
 import { MatterStageTransition } from '@/components/matters/matter-stage-transition'
 import { DocumentLibrary } from '@/components/documents/document-library'
+import { OfferForm } from '@/components/offers/offer-form'
+import { OffersList } from '@/components/offers/offers-list'
 import { formatDistanceToNow } from 'date-fns'
 
 export const metadata: Metadata = {
@@ -51,6 +54,10 @@ export default async function MatterDetailPage({ params }: PageProps) {
   // Fetch documents
   const documentsResult = await getDocumentsForMatter(id)
   const documents = 'documents' in documentsResult ? documentsResult.documents : []
+
+  // Fetch offers
+  const offersResult = await getOffersForMatter(id)
+  const offers = 'offers' in offersResult ? offersResult.offers : []
 
   // Get activities (empty for now - will be populated by database triggers)
   const activities = matter.activities || []
@@ -205,6 +212,19 @@ export default async function MatterDetailPage({ params }: PageProps) {
             tenantId={matter.tenant_id}
             canManage={canManageDocuments}
           />
+
+          {/* Offers Section */}
+          <Card className="p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Offers</h3>
+              <OfferForm
+                matterId={matter.id}
+                tenantId={matter.tenant_id}
+                purchasePrice={matter.purchase_price ? Number(matter.purchase_price) : undefined}
+              />
+            </div>
+            <OffersList offers={offers} userRole={membership.role} />
+          </Card>
         </div>
 
         {/* Right Column - Details & Activity */}

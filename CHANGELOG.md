@@ -7,6 +7,318 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0-purchase-workflow-offers] - 2025-11-21
+
+**Phase 12 - Phase 4: Offer Management Complete** 🎯
+
+### Context
+Built comprehensive offer creation and approval workflow system for the Purchase Client Workflow. This phase implements verbal and written offer tracking, multi-step approval workflow (solicitor → negotiator → client), public client acceptance portal, agent response logging, and PDF offer letter generation.
+
+### Added
+
+#### 12.4.1 Offer Management Service
+
+**offer.service.ts** (600 lines)
+- ✅ `createOffer()` - Create verbal or written offers
+  - Auto-generate offer numbers (OFF00001-25 format)
+  - Support for verbal and written offer types
+  - Multi-step approval workflow initialization
+  - Draft status with solicitor assignment
+  - Metadata tracking and audit fields
+- ✅ `getOffersForMatter()` - Fetch all offers for a matter
+  - Ordered by creation date (newest first)
+  - Excludes soft-deleted offers
+  - Full offer details with approval status
+- ✅ `getOffer()` - Fetch single offer by ID
+  - Permission checks via RLS
+  - Complete offer details
+- ✅ `updateOffer()` - Update offer details
+  - Modify amount, dates, conditions
+  - Update survey requirements
+  - Add internal notes
+- ✅ `approveBySolicitor()` - Solicitor approval step
+  - Validates offer in correct status
+  - Records solicitor approval timestamp
+  - Auto-transitions to pending_negotiator (via trigger)
+  - Role-based authorization (manager+)
+- ✅ `approveByNegotiator()` - Negotiator approval step
+  - Validates solicitor approval completed
+  - Records negotiator approval timestamp
+  - Auto-transitions to pending_client (via trigger)
+  - Role-based authorization (manager+)
+- ✅ `acceptOfferByClient()` - Client acceptance (public endpoint)
+  - NO authentication required (token-based access)
+  - Records client acceptance timestamp
+  - Logs client IP address for audit trail
+  - Validates offer in pending_client status
+- ✅ `submitOfferToAgent()` - Submit to selling agent
+  - Validates client acceptance completed
+  - Transitions to submitted status
+  - Records submission timestamp and user
+- ✅ `logAgentResponse()` - Record agent response
+  - Three response types: accepted, rejected, counter_offer
+  - Optional agent notes and rejection reason
+  - Counter offer amount tracking
+  - Auto-update offer status based on response
+- ✅ `withdrawOffer()` - Withdraw offer
+  - Mark offer as withdrawn
+  - Audit trail preservation
+- ✅ `deleteOffer()` - Soft delete offer
+  - Soft delete with deleted_at timestamp
+  - Preserves data for compliance
+
+#### 12.4.2 Offer Form Component
+
+**offer-form.tsx** (350 lines)
+- ✅ Dialog-based offer creation form
+  - Offer type selector (verbal/written)
+  - Offer amount input with currency formatting
+  - Closing date picker (Scottish specific)
+  - Entry date picker
+  - Survey required toggle switch
+  - Conditions textarea (multi-line)
+  - Internal notes textarea
+- ✅ React Hook Form integration
+  - Zod schema validation
+  - Error handling and display
+  - Form state management
+- ✅ Auto-population from matter
+  - Pre-fill offer amount from purchase price
+  - Tenant and matter ID binding
+- ✅ Success/error toasts
+  - User feedback on submission
+  - Error message display
+- ✅ Responsive design
+  - Mobile-friendly modal
+  - Scrollable content for long forms
+
+#### 12.4.3 Offers List Component
+
+**offers-list.tsx** (700 lines)
+- ✅ Display all offers for a matter
+  - Offer number and type badges
+  - Status badges with color coding
+  - Offer amount with currency formatting
+  - Key dates display (closing, entry)
+  - Survey requirements
+  - Creation timestamp
+  - Conditions display
+- ✅ Status badge color system
+  - Draft: Gray
+  - Pending Solicitor: Yellow
+  - Pending Negotiator: Orange
+  - Pending Client: Blue
+  - Submitted: Purple
+  - Accepted: Green
+  - Rejected: Red
+  - Withdrawn: Gray
+- ✅ Contextual action buttons
+  - Approve (Solicitor) - for draft/pending_solicitor
+  - Approve (Negotiator) - for pending_negotiator
+  - Submit to Agent - for pending_client (after client acceptance)
+  - Log Response - for submitted offers
+  - Withdraw - for active offers
+  - Role-based button visibility (manager+)
+- ✅ Agent response logging dialog
+  - Response type selector (accepted/rejected/counter)
+  - Rejection reason textarea
+  - Counter offer amount input
+  - Agent notes textarea
+  - Save response action
+- ✅ Client acceptance indicator
+  - Green checkmark for accepted offers
+  - Acceptance timestamp display
+  - IP address logging
+- ✅ Agent response display
+  - Response type badge
+  - Response date
+  - Agent notes
+  - Rejection reason
+  - Counter offer amount
+- ✅ Confirmation dialogs
+  - AlertDialog for destructive actions
+  - User confirmation before approval
+  - Withdrawal confirmation
+- ✅ Loading states
+  - Spinner during async operations
+  - Disabled buttons during loading
+  - Per-offer loading tracking
+- ✅ Empty state
+  - Friendly message when no offers
+  - Call-to-action to create first offer
+
+#### 12.4.4 Client Acceptance Portal
+
+**client-acceptance-portal.tsx** (400 lines)
+- ✅ Public page for client offer acceptance
+  - No authentication required
+  - Token-based secure access
+  - Gradient background design
+  - Professional layout
+- ✅ Offer details display
+  - Property address
+  - Offer amount (large, prominent)
+  - Closing and entry dates
+  - Survey requirements
+  - Offer number
+  - Conditions and requirements
+- ✅ Acceptance status handling
+  - Already accepted state with timestamp
+  - Not ready for acceptance message
+  - Ready for acceptance with call-to-action
+- ✅ Acceptance workflow
+  - Informative acceptance section
+  - Checklist of what happens next
+  - Large "Accept Offer" button
+  - Confirmation dialog before acceptance
+- ✅ IP address logging
+  - Fetch client IP via ipify API
+  - Log with acceptance for audit trail
+- ✅ User feedback
+  - Success toast on acceptance
+  - Error handling with user-friendly messages
+  - Solicitor notification confirmation
+- ✅ Responsive design
+  - Mobile-optimized layout
+  - Touch-friendly buttons
+  - Readable on all screen sizes
+- ✅ Professional styling
+  - Color-coded sections
+  - Icon usage for visual clarity
+  - Card-based layout
+  - Border highlighting
+
+#### 12.4.5 Offer PDF Template
+
+**offer-pdf-template.tsx** (500 lines)
+- ✅ @react-pdf/renderer template
+  - A4 page size
+  - Professional formatting
+  - Helvetica font family
+- ✅ Header section
+  - Firm name (large, blue)
+  - Firm address, phone, email
+  - Blue bottom border
+- ✅ Title section
+  - "WRITTEN OFFER" or "VERBAL OFFER CONFIRMATION"
+  - Centered, bold, 18pt
+- ✅ Offer reference details
+  - Offer number
+  - Matter number
+  - Current date
+- ✅ Client details section
+  - "On Behalf Of" heading
+  - Client full name
+- ✅ Selling agent section
+  - Agent name
+  - "Selling Agent" subtitle
+- ✅ Property details section
+  - Full property address
+  - Multi-line formatting
+- ✅ Offer amount box
+  - Highlighted blue background
+  - Large, bold amount (20pt)
+  - Currency formatting
+- ✅ Offer terms section
+  - Closing date
+  - Entry date
+  - Survey required (Yes/No)
+  - Offer type (Written/Verbal)
+- ✅ Conditions section
+  - Yellow highlighted box
+  - Pre-wrapped text display
+  - Optional section
+- ✅ Standard terms section
+  - Property condition clause
+  - Missives conclusion clause
+  - Client acceptance clause
+  - Legal boilerplate text
+- ✅ Signature section
+  - "Yours faithfully" closing
+  - Signature line
+  - Solicitor signature label
+  - Firm name
+- ✅ Footer section
+  - Confidentiality notice
+  - Copyright statement
+  - Fixed at bottom of page
+- ✅ Styling system
+  - StyleSheet with consistent colors
+  - Responsive spacing
+  - Professional color scheme (#0066cc blue)
+  - Gray tones for secondary text
+
+#### 12.4.6 Matter Detail Page Integration
+
+**app/(dashboard)/matters/[id]/page.tsx** (Updated)
+- ✅ Import offer components
+  - OfferForm, OffersList
+  - getOffersForMatter service
+- ✅ Fetch offers on page load
+  - Parallel fetch with tasks and documents
+  - Error handling
+- ✅ Offers section in UI
+  - Card layout below documents
+  - Header with "Create Offer" button
+  - OffersList component integration
+  - Pass user role for permissions
+  - Pass purchase price for auto-fill
+- ✅ Responsive layout
+  - Fits in left column grid
+  - Mobile-friendly
+
+#### 12.4.7 Public Portal Route
+
+**app/(public)/portal/[token]/accept-offer/[offerId]/page.tsx** (New)
+- ✅ Public page route
+  - No authentication required
+  - Token validation (simplified)
+  - Offer ID parameter
+- ✅ Server-side data fetching
+  - Fetch offer by ID
+  - Fetch matter details
+  - Fetch property address
+- ✅ Property address formatting
+  - Multi-line to single line
+  - Comma-separated parts
+- ✅ ClientAcceptancePortal integration
+  - Pass offer, matter number, property address
+  - Full page layout
+
+**app/(public)/layout.tsx** (New)
+- ✅ Minimal public layout
+  - No dashboard UI
+  - No authentication checks
+  - Clean container
+
+### Code Statistics (Phase 4)
+- **Services:** 600 lines (1 service)
+- **Components:** 1,950 lines (3 main components + 1 PDF template)
+- **Pages:** 80 lines (2 pages)
+- **Total Phase 4:** 2,630 lines of TypeScript/TSX
+
+### Cumulative Statistics (Phase 1 + 2 + 3 + 4)
+- **Phase 1:** 7,469 lines (database, types, services)
+- **Phase 2:** 2,850 lines (UI components)
+- **Phase 3:** 2,610 lines (documents & financial)
+- **Phase 4:** 2,630 lines (offer management)
+- **Total:** 15,559 lines across all four phases
+
+### Branch & Tags
+- **Phase 4 Branch:** `claude/phase-12-phase-4-offer-management-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 4 Tag:** `v2.3.0-phase-12-offer-management` (to be created by user)
+
+### What's Next (Phase 5: Fee Earner Allocation)
+- Fee earner settings configuration
+- Availability calendar management
+- Workload calculation engine
+- Auto-assignment algorithm
+- Manual assignment with recommendations
+- Team workload dashboard
+- Capacity visualization
+
+---
+
 ## [2.2.0-purchase-workflow-documents] - 2025-11-21
 
 **Phase 12 - Phase 3: Documents & Financial Questionnaire Complete** 📄
