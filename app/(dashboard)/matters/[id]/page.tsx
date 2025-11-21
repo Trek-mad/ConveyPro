@@ -17,6 +17,7 @@ import { MatterStageTransition } from '@/components/matters/matter-stage-transit
 import { DocumentLibrary } from '@/components/documents/document-library'
 import { OfferForm } from '@/components/offers/offer-form'
 import { OffersList } from '@/components/offers/offers-list'
+import { FeeEarnerAssignmentCard } from '@/components/fee-earners/fee-earner-assignment-card'
 import { formatDistanceToNow } from 'date-fns'
 
 export const metadata: Metadata = {
@@ -158,19 +159,14 @@ export default async function MatterDetailPage({ params }: PageProps) {
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-purple-100 p-2">
-              <User className="h-5 w-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Fee Earner</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {matter.assigned_fee_earner?.full_name || 'Unassigned'}
-              </p>
-            </div>
-          </div>
-        </Card>
+        <FeeEarnerAssignmentCard
+          matterId={matter.id}
+          matterType={matter.matter_type}
+          transactionValue={matter.purchase_price ? Number(matter.purchase_price) : 0}
+          tenantId={matter.tenant_id}
+          currentFeeEarner={matter.assigned_fee_earner}
+          userRole={membership.role}
+        />
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
