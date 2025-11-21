@@ -7,6 +7,244 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.0-purchase-workflow-client-portal] - 2025-11-21
+
+**Phase 12 - Phase 7: Client Portal Complete** 🌐
+
+### Context
+Built secure client-facing portal for the Purchase Client Workflow. This phase implements tokenized access for clients to view their matter details, accept offers, and communicate with their solicitor without requiring authentication. The portal includes mobile-responsive design, secure token generation with HMAC validation, offer acceptance workflow, document viewing, contact form, and professional email templates.
+
+### Added
+
+#### 12.7.1 Portal Token System
+
+**Database Migration: 20250121_create_client_portal_tokens.sql** (220 lines)
+- ✅ `client_portal_tokens` table
+  - Unique token field (UUID v4)
+  - HMAC token hash for validation
+  - Expiry date tracking (default 30 days)
+  - Active status flag
+  - Access tracking (count, last accessed, IP address)
+  - Offer acceptance tracking (timestamp, IP)
+  - Purpose field (matter_view, offer_acceptance)
+  - Tenant isolation with RLS policies
+- ✅ PostgreSQL functions
+  - `get_matter_by_portal_token()` - Validate token and return matter
+  - `log_portal_offer_acceptance()` - Track offer acceptance via portal
+  - `revoke_matter_portal_tokens()` - Revoke all tokens for a matter
+- ✅ Indexes for performance
+  - Token lookup (active tokens only)
+  - Expiry date filtering
+  - Matter/client/tenant relationships
+
+**TypeScript Types: types/purchase-workflow.ts additions** (65 lines)
+- ✅ `Client` type - Complete client table structure
+- ✅ `ClientPortalToken` type - Portal token with tracking fields
+- ✅ `TokenValidationResult` - Token validation response
+- ✅ `PortalMatterView` - Client-safe matter view with relations
+- ✅ `Task` type alias for convenience
+
+#### 12.7.2 Portal Token Service
+
+**portal-token.service.ts** (470 lines)
+- ✅ `generatePortalToken()` - Create secure access tokens
+  - UUID v4 token generation
+  - HMAC SHA-256 token hashing
+  - Configurable expiry (default 30 days)
+  - Purpose tracking
+  - Returns portal URL
+- ✅ `validatePortalToken()` - Validate and track access
+  - Token validation via database function
+  - Expiry checking
+  - Access count tracking
+  - IP address logging
+  - Returns matter with relations
+- ✅ `getPortalMatterView()` - Get client-safe matter data
+  - Verified documents only
+  - Current pending offer
+  - Workflow stage details
+  - Tenant branding
+- ✅ `acceptOfferViaPortal()` - Accept offer via portal
+  - Token validation
+  - Offer ownership verification
+  - Status validation
+  - IP address logging
+  - Activity logging
+- ✅ `revokePortalToken()` - Deactivate single token
+- ✅ `revokeMatterPortalTokens()` - Revoke all matter tokens
+- ✅ `getMatterPortalTokens()` - List all tokens for matter
+- ✅ `submitPortalContactForm()` - Handle contact messages
+  - Token validation
+  - Message activity logging
+  - Email notification placeholder
+
+#### 12.7.3 Portal API Routes
+
+**app/api/portal/[token]/route.ts** (40 lines)
+- ✅ GET endpoint - Fetch matter details
+  - Token validation
+  - IP address tracking
+  - Returns portal matter view
+
+**app/api/portal/[token]/accept-offer/route.ts** (95 lines)
+- ✅ POST endpoint - Accept offer
+  - Rate limiting (5 attempts per hour)
+  - Token validation
+  - Offer ID validation
+  - IP address tracking
+  - Success/error responses
+
+**app/api/portal/[token]/contact/route.ts** (90 lines)
+- ✅ POST endpoint - Submit contact form
+  - Rate limiting (10 messages per hour)
+  - Message length validation (max 5000 chars)
+  - Subject and message fields
+  - Success/error responses
+
+#### 12.7.4 Portal Pages & Components
+
+**app/(public)/portal/[token]/page.tsx** (65 lines)
+- ✅ Public portal route (no authentication required)
+- ✅ Token validation on server side
+- ✅ Error states for invalid/expired tokens
+- ✅ Passes validated data to client component
+
+**components/portal/portal-matter-view-client.tsx** (365 lines)
+- ✅ Tabbed interface (Overview, Documents, Contact)
+- ✅ Progress bar showing current stage (12 stages)
+- ✅ Matter status badge
+- ✅ Tenant branding (logo display)
+- ✅ Property details card
+  - Address with location icon
+  - Purchase price formatted
+  - Closing date with calendar icon
+  - Instruction date
+- ✅ Solicitor contact card
+  - Company name
+  - Phone (clickable tel: link)
+  - Email (clickable mailto: link)
+- ✅ Documents list
+  - Verified documents only
+  - File icons and metadata
+  - Upload dates
+  - Verification badges
+- ✅ Mobile responsive design
+
+**components/portal/portal-offer-acceptance.tsx** (180 lines)
+- ✅ Prominent offer acceptance card
+- ✅ Offer details display
+  - Property address
+  - Offer amount (large, bold)
+  - Closing date (formatted)
+  - Entry date (if applicable)
+  - Conditions (expandable text)
+- ✅ Confirmation dialog (AlertDialog)
+  - Double confirmation for security
+  - Clear acceptance language
+- ✅ Accept button with loading state
+- ✅ Success state with celebration icon
+- ✅ Error handling with user-friendly messages
+- ✅ Authorization notice
+
+**components/portal/portal-contact-form.tsx** (155 lines)
+- ✅ Subject field (optional, max 200 chars)
+- ✅ Message textarea (required, max 5000 chars)
+- ✅ Character counter
+- ✅ Loading state during submission
+- ✅ Success message (auto-dismiss after 5s)
+- ✅ Error handling
+- ✅ Information box explaining process
+- ✅ Validation (message required, trim whitespace)
+
+#### 12.7.5 Portal Email Templates
+
+**lib/emails/portal-access-template.ts** (285 lines)
+
+**Template 1: `generatePortalAccessEmail()`** (145 lines)
+- ✅ Purple gradient header
+- ✅ Matter number highlighted box
+- ✅ "What You Can Do" feature list
+- ✅ Large CTA button with link
+- ✅ Security notice box (yellow)
+  - Unique link warning
+  - Expiry information
+  - No password required note
+- ✅ Support contact information
+- ✅ Footer with firm branding
+
+**Template 2: `generateOfferReadyEmail()`** (140 lines)
+- ✅ Orange gradient header (urgent styling)
+- ✅ Offer details box
+  - Property address
+  - Offer amount (large, bold)
+  - Matter number
+- ✅ Next steps numbered list
+- ✅ Large CTA button
+- ✅ Time sensitive notice
+- ✅ Professional footer
+
+### Technical Details
+
+**Security Features:**
+- Token-based access (no passwords)
+- HMAC SHA-256 token hashing
+- Automatic token expiry (30 days)
+- IP address logging for all actions
+- Rate limiting on sensitive endpoints
+- RLS policies for data isolation
+- Access count tracking
+
+**Mobile Responsive:**
+- Responsive grid layouts (sm:grid-cols-2)
+- Mobile-first design
+- Touch-friendly buttons
+- Readable font sizes
+- Proper viewport meta tags
+
+**User Experience:**
+- Professional gradient designs
+- Clear visual hierarchy
+- Loading states for all async operations
+- Success and error feedback
+- Confirmation dialogs for critical actions
+- Auto-dismiss success messages
+- Character counters
+- Icon-based navigation
+
+### Code Statistics
+
+**Phase 7 Totals:**
+- Migration: 220 lines SQL
+- Service: 470 lines TypeScript
+- API Routes: 225 lines TypeScript
+- Pages: 65 lines TSX
+- Components: 700 lines TSX (3 components)
+- Email Templates: 285 lines TypeScript
+- Types: 65 lines TypeScript
+- **Total: 2,030 lines of code**
+
+**Cumulative (Phases 1-7):**
+- **23,359 lines across 7 phases**
+
+### Database Changes
+- 1 new table (`client_portal_tokens`)
+- 3 new PostgreSQL functions
+- 4 new indexes
+- 4 RLS policies
+
+### Files Changed
+- **New Files:** 10
+  - 1 migration
+  - 1 service
+  - 3 API routes
+  - 1 page
+  - 3 components
+  - 1 email template file
+- **Modified Files:** 1
+  - types/purchase-workflow.ts (added Client and portal types)
+
+---
+
 ## [2.5.0-purchase-workflow-reminders-notifications] - 2025-11-21
 
 **Phase 12 - Phase 6: Reminders & Notifications Complete** 🎯
