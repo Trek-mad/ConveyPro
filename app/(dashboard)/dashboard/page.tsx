@@ -15,6 +15,9 @@ import {
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
+import { OverdueTasksWidget } from '@/components/dashboard/overdue-tasks-widget'
+import { UpcomingDeadlinesWidget } from '@/components/dashboard/upcoming-deadlines-widget'
+import { MattersRequiringAttentionWidget } from '@/components/dashboard/matters-requiring-attention-widget'
 
 export const metadata: Metadata = {
   title: 'Dashboard | ConveyPro',
@@ -163,6 +166,13 @@ export default async function DashboardPage() {
             </div>
           </div>
         </Card>
+      </div>
+
+      {/* Alert Widgets */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <OverdueTasksWidget tenantId={membership.tenant_id} maxDisplay={3} />
+        <UpcomingDeadlinesWidget tenantId={membership.tenant_id} daysAhead={7} maxDisplay={3} />
+        <MattersRequiringAttentionWidget tenantId={membership.tenant_id} maxDisplay={3} />
       </div>
 
       {/* Insights Grid */}
