@@ -7,6 +7,188 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.7.0-purchase-workflow-reporting-analytics] - 2025-11-21
+
+**Phase 12 - Phase 8: Reporting & Analytics Complete** 📊
+
+### Context
+Built comprehensive reporting and analytics system for the Purchase Client Workflow. This phase implements executive metrics dashboard, detailed performance reporting, fee earner performance tracking, conversion rate analysis, CSV export functionality, and visual data representation. The system provides insights into pipeline value, stage distribution, conversion rates, completion times, and individual fee earner performance.
+
+### Added
+
+#### 12.8.1 Analytics Service Extensions
+
+**services/analytics.service.ts additions** (424 lines)
+- ✅ `getPurchaseMattersByStageReport()` - Stage distribution analysis
+  - Groups matters by current workflow stage
+  - Calculates count and percentage per stage
+  - Stage name formatting
+  - Percentage calculations
+  - Sorted by stage order
+- ✅ `getPurchaseConversionRateReport()` - Conversion metrics
+  - Quote to matter conversion
+  - Matter to offer conversion
+  - Offer to acceptance conversion
+  - Overall completion rate
+  - Date range filtering
+- ✅ `getPurchaseFeeEarnerPerformanceReport()` - Individual performance
+  - Active and completed matter counts
+  - Total pipeline value per fee earner
+  - Average completion time
+  - Task completion rates
+  - Document verification rates
+  - Sorted by total value
+- ✅ `getPurchaseExecutiveMetrics()` - High-level dashboard data
+  - Total, active, and completed matter counts
+  - Total pipeline value
+  - Average matter value
+  - Overall conversion rate
+  - Average time to completion
+  - Top stages breakdown
+  - 6-month trend analysis (matters started, completed, value)
+- ✅ `exportToCSV()` - CSV export utility
+  - Dynamic header extraction
+  - Proper CSV escaping
+  - Value formatting
+  - Download file generation
+
+**TypeScript Interfaces:**
+- ✅ `PurchaseMattersByStageReport` - Stage distribution data
+- ✅ `PurchaseConversionRateReport` - Conversion metrics
+- ✅ `PurchaseFeeEarnerPerformanceReport` - Performance data
+- ✅ `PurchaseExecutiveMetrics` - Executive dashboard data
+- ✅ `PurchaseMonthlyTrend` - Monthly trend data
+- ✅ `PurchaseReportFilters` - Optional filtering parameters
+
+#### 12.8.2 Purchase Reports Page
+
+**app/(dashboard)/purchase-reports/page.tsx** (48 lines)
+- ✅ Server component fetching all report data
+- ✅ Parallel data fetching with Promise.all
+- ✅ Fetches 4 report types:
+  - Matters by stage
+  - Conversion rates
+  - Fee earner performance
+  - Executive metrics
+- ✅ Passes data to client component
+- ✅ Requires active tenant membership
+
+#### 12.8.3 Purchase Reports Client Component
+
+**components/purchase-reports/purchase-reports-client.tsx** (370 lines)
+- ✅ Tabbed interface with 4 views
+  - Overview: Executive metrics and trends
+  - Pipeline Funnel: Stage distribution
+  - Conversion Rates: Conversion metrics
+  - Fee Earner Performance: Individual performance table
+- ✅ **Overview Tab:**
+  - 4 key metric cards (Total Matters, Pipeline Value, Conversion Rate, Avg Completion)
+  - Color-coded icons (blue, green, orange, purple)
+  - 6-month trend visualization
+    - Dual bar charts (started vs completed)
+    - Total value per month
+    - Month/year labels
+    - Responsive bar widths
+- ✅ **Pipeline Funnel Tab:**
+  - Horizontal bar chart showing matter distribution
+  - Percentage and count display
+  - Gradient blue bars
+  - Empty state handling
+  - CSV export button
+- ✅ **Conversion Rates Tab:**
+  - Progress bars for each conversion metric
+  - Color-coded by performance (green ≥75%, blue ≥50%, orange ≥25%, red <25%)
+  - Count and total display
+  - Large percentage indicators
+  - CSV export button
+- ✅ **Fee Earner Performance Tab:**
+  - Comprehensive data table
+  - Columns: Name, Active, Completed, Total Value, Avg Days, Task Rate, Doc Rate
+  - Badge indicators for completion rates
+  - Empty state with icon
+  - CSV export button
+- ✅ CSV export functionality
+  - Client-side download
+  - Timestamped filenames
+  - Blob creation and URL handling
+  - Auto-cleanup
+
+#### 12.8.4 Dashboard Metrics Widget
+
+**components/dashboard/purchase-workflow-metrics-widget.tsx** (150 lines)
+- ✅ Dashboard widget showing key metrics
+- ✅ Async data loading with loading state
+- ✅ 4 metric cards in responsive grid:
+  - Active Matters (blue icon)
+  - Pipeline Value (green icon, formatted in millions)
+  - Conversion Rate (orange icon, rounded percentage)
+  - Avg Completion Time (purple icon, days)
+- ✅ Top 3 stages display
+  - Stage name and count
+  - Percentage display
+  - Trending icon
+- ✅ "View Reports" button linking to full reports page
+- ✅ Error handling with null state
+- ✅ Loader animation during data fetch
+
+### Key Features
+
+**Data Aggregation:**
+- Efficient Supabase queries with joins
+- Map-based grouping and counting
+- Percentage calculations with proper null handling
+- Date range filtering support
+- Tenant isolation
+
+**Visualizations:**
+- Key metrics cards with icons and colors
+- 6-month trend charts with dual bars
+- Horizontal funnel bars with gradients
+- Progress bars with color coding
+- Performance table with badges
+- Empty state handling
+
+**Export Functionality:**
+- CSV export for all report types
+- Client-side processing (no server load)
+- Dynamic header extraction
+- Proper CSV escaping and formatting
+- Timestamped filenames
+
+**User Experience:**
+- Tabbed navigation for easy access
+- Responsive grid layouts
+- Color-coded performance indicators
+- Loading states for async operations
+- Empty state messages
+- Icon-based visual hierarchy
+- Clear data labels and units
+
+### Code Statistics
+
+**Phase 8 Totals:**
+- Service Extensions: 424 lines TypeScript
+- Reports Page: 48 lines TSX
+- Reports Client Component: 370 lines TSX
+- Metrics Widget: 150 lines TSX
+- **Total: 992 lines of code**
+
+**Cumulative (Phases 1-8):**
+- **24,351 lines across 8 phases**
+
+### Database Changes
+- No new tables (uses existing matters, offers, tasks, documents)
+- Leverages existing indexes for performance
+
+### Files Changed
+- **New Files:** 3
+  - 1 page (purchase-reports)
+  - 2 components (reports client, metrics widget)
+- **Modified Files:** 1
+  - services/analytics.service.ts (extended with Purchase analytics)
+
+---
+
 ## [2.6.0-purchase-workflow-client-portal] - 2025-11-21
 
 **Phase 12 - Phase 7: Client Portal Complete** 🌐
