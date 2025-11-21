@@ -1,0 +1,56 @@
+import { Suspense } from 'react'
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import ActivityLogViewer from '@/components/activity-log/activity-log-viewer'
+import { getActiveTenantMembership } from '@/services/membership.service'
+import { createClient } from '@/lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Activity Log | ConveyPro',
+  description: 'View matter activity history and audit trail'
+}
+
+async function getMatter(matterId: string, tenantId: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('matters')
+    .select('id, matter_number, property_address, status')
+    .eq('id', matterId)
+    .eq('tenant_id', tenantId)
+    .single()
+
+  if (error || !data) {
+    return null
+  }
+
+  return data
+}
+
+export default async function ActivityLogPage({
+  params
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const membership = await getActiveTenantMembership()
+
+  const matter = await getMatter(id, membership.tenant_id)
+
+  if (!matter) {
+    notFound()
+  }
+
+  return (
+    <div className="container mx-auto py-6">
+      <Suspense fallback={<div>Loading activity log...</div>}>
+        <ActivityLogViewer
+          matterId={id}
+          tenantId={membership.tenant_id}
+          matterNumber={matter.matter_number}
+          propertyAddress={matter.property_address}
+        />
+      </Suspense>
+    </div>
+  )
+}
