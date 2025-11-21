@@ -9,6 +9,50 @@ import { Database } from './database'
 type Json = Database['public']['Tables']['tenants']['Row']['subscription_tier']
 
 // ============================================================================
+// CLIENTS
+// ============================================================================
+
+export type Client = {
+  id: string
+  tenant_id: string
+  first_name: string
+  last_name: string
+  email: string | null
+  phone: string | null
+  mobile: string | null
+  title: string | null
+  company_name: string | null
+  address_line1: string | null
+  address_line2: string | null
+  city: string | null
+  postcode: string | null
+  country: string | null
+  client_type: 'individual' | 'couple' | 'company' | 'estate' | 'business' | null
+  life_stage: string | null
+  source: string | null
+  tags: string[] | null
+  notes: string | null
+  services_used: any
+  preferred_contact_method: 'email' | 'phone' | 'mobile'
+  date_of_birth: string | null
+  national_insurance_number: string | null
+  passport_number: string | null
+  created_at: string
+  updated_at: string
+  created_by: string | null
+  updated_by: string | null
+  deleted_at: string | null
+}
+
+export type ClientInsert = Omit<Client, 'id' | 'created_at' | 'updated_at'> & {
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type ClientUpdate = Partial<Omit<Client, 'id' | 'tenant_id' | 'created_at'>>
+
+// ============================================================================
 // MATTERS
 // ============================================================================
 
@@ -132,6 +176,9 @@ export type MatterTaskInsert = Omit<MatterTask, 'id' | 'created_at' | 'updated_a
 }
 
 export type MatterTaskUpdate = Partial<Omit<MatterTask, 'id' | 'matter_id' | 'tenant_id' | 'created_at'>>
+
+// Convenience alias
+export type Task = MatterTask
 
 // ============================================================================
 // DOCUMENTS
@@ -390,8 +437,8 @@ export type WorkflowStageKey =
 
 // Matter with related entities
 export type MatterWithRelations = Matter & {
-  primary_client?: Database['public']['Tables']['clients']['Row'] | null
-  secondary_client?: Database['public']['Tables']['clients']['Row'] | null
+  primary_client?: Client | null
+  secondary_client?: Client | null
   property?: Database['public']['Tables']['properties']['Row'] | null
   quote?: Database['public']['Tables']['quotes']['Row'] | null
   assigned_fee_earner?: Database['public']['Tables']['profiles']['Row'] | null
@@ -425,4 +472,60 @@ export type AffordabilityResult = {
   shortfall: number
   affordable: boolean
   warnings: string[]
+}
+
+// ============================================================================
+// CLIENT PORTAL TOKENS
+// ============================================================================
+
+export type ClientPortalToken = {
+  id: string
+  tenant_id: string
+  matter_id: string
+  client_id: string
+  token: string
+  token_hash: string
+  expires_at: string
+  is_active: boolean
+  last_accessed_at: string | null
+  access_count: number
+  last_ip_address: string | null
+  offer_accepted_at: string | null
+  offer_acceptance_ip: string | null
+  purpose: string
+  created_at: string
+  updated_at: string
+  created_by: string | null
+  updated_by: string | null
+  deleted_at: string | null
+}
+
+export type ClientPortalTokenInsert = Omit<ClientPortalToken, 'id' | 'created_at' | 'updated_at' | 'access_count'> & {
+  id?: string
+  created_at?: string
+  updated_at?: string
+  access_count?: number
+}
+
+export type ClientPortalTokenUpdate = Partial<Omit<ClientPortalToken, 'id' | 'tenant_id' | 'matter_id' | 'client_id' | 'created_at'>>
+
+// Token validation result
+export type TokenValidationResult = {
+  isValid: boolean
+  matter?: Matter
+  client?: Client
+  tenant?: Database['public']['Tables']['tenants']['Row']
+  token?: ClientPortalToken
+  error?: string
+}
+
+// Client portal matter view
+export type PortalMatterView = Matter & {
+  primary_client?: Client | null
+  secondary_client?: Client | null
+  property?: Database['public']['Tables']['properties']['Row'] | null
+  documents?: Document[] // Only client-visible documents
+  current_offer?: Offer | null
+  workflow_stage?: WorkflowStage | null
+  tenant?: Database['public']['Tables']['tenants']['Row']
 }
