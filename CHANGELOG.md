@@ -7,6 +7,297 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.5.0-purchase-workflow-reminders-notifications] - 2025-11-21
+
+**Phase 12 - Phase 6: Reminders & Notifications Complete** 🎯
+
+### Context
+Built comprehensive automated reminder and notification system for the Purchase Client Workflow. This phase implements intelligent reminder engine for tasks and closing dates, email notification templates, notification preferences management, dashboard alert widgets, and scheduled cron jobs. The system ensures users stay informed about overdue tasks, upcoming deadlines, and matters requiring attention.
+
+### Added
+
+#### 12.6.1 Reminder Engine Service
+
+**reminder.service.ts** (420 lines)
+- ✅ `getOverdueTasks()` - Query all overdue tasks for a tenant
+  - Tasks past due date
+  - Sorted by due date ascending
+  - Includes matter details
+  - Days overdue calculation
+- ✅ `getUpcomingTasks()` - Query upcoming tasks within specified days
+  - Configurable days ahead (default 7)
+  - Tasks not yet completed
+  - Days until due calculation
+  - Matter relationship included
+- ✅ `getUpcomingClosingDates()` - Query upcoming closing dates
+  - Active matters only
+  - Configurable days ahead
+  - Days until closing calculation
+  - Sorted by closing date
+- ✅ `getMattersRequiringAttention()` - Intelligent matter prioritization
+  - Unassigned fee earners (priority: 90)
+  - Overdue tasks (priority: 80)
+  - No activity in 7+ days (priority: 50)
+  - Closing soon but in early stage (priority: 95)
+  - High priority with no progress (priority: 70)
+  - Priority score-based sorting
+  - Multiple attention reasons per matter
+- ✅ `getAlertsSummary()` - Comprehensive alerts dashboard data
+  - Overdue tasks count and list
+  - Upcoming tasks count and list
+  - Upcoming closing dates count and list
+  - Matters requiring attention count and list
+  - Summary statistics object
+- ✅ `getTasksDueForReminder()` - Tasks due in 1, 3, or 7 days
+  - Filtered for reminder notifications
+  - Includes assigned user details
+  - Matter relationship
+- ✅ `getClosingDatesDueForReminder()` - Closing dates due in 1, 3, or 7 days
+  - Active matters only
+  - Filtered for reminder notifications
+
+#### 12.6.2 Notification Preferences Service
+
+**notification-preferences.service.ts** (280 lines)
+- ✅ `getNotificationPreferences()` - Fetch user notification settings
+  - Stored in profiles.metadata JSONB field
+  - Returns defaults if not configured
+  - Email enabled toggle
+  - Individual notification type toggles
+  - Reminder frequency (immediately/daily/weekly)
+  - Quiet hours configuration
+- ✅ `updateNotificationPreferences()` - Update user preferences
+  - Partial updates supported
+  - Merges with existing preferences
+  - Updates profiles.metadata
+  - User can only update own preferences
+- ✅ `resetNotificationPreferences()` - Reset to default settings
+  - Restores all defaults
+  - User authorization check
+- ✅ `isWithinQuietHours()` - Check if within quiet hours
+  - Configurable start/end times
+  - Handles midnight spanning
+  - Returns boolean
+- ✅ `isNotificationEnabled()` - Check if notification type enabled
+  - Email enabled check
+  - Specific notification type check
+  - Quiet hours check
+- ✅ `getUsersForNotificationType()` - Get eligible users for notifications
+  - Filters by tenant
+  - Checks notification preferences
+  - Excludes users in quiet hours
+  - Returns user details with preferences
+
+**NotificationPreferences Interface:**
+- email_enabled: boolean
+- task_reminders: boolean
+- closing_date_reminders: boolean
+- overdue_task_alerts: boolean
+- matter_assignment_notifications: boolean
+- offer_notifications: boolean
+- document_verification_notifications: boolean
+- reminder_frequency: 'daily' | 'immediately' | 'weekly'
+- reminder_days_before: number[] (e.g., [1, 3, 7])
+- quiet_hours_enabled: boolean
+- quiet_hours_start: string (e.g., "22:00")
+- quiet_hours_end: string (e.g., "08:00")
+
+#### 12.6.3 Email Templates
+
+**task-reminder-template.ts** (120 lines)
+- ✅ Task reminder email template
+  - User personalization
+  - Task details (title, description, due date)
+  - Matter information
+  - Priority badge
+  - Urgency text (tomorrow, in X days)
+  - View task CTA button
+  - Notification preferences link
+  - Professional HTML formatting
+  - Gradient header design
+
+**closing-date-reminder-template.ts** (135 lines)
+- ✅ Closing date reminder email template
+  - Matter details (number, stage, price)
+  - Closing date with urgency
+  - Priority badge
+  - Critical warning for 3 days or less
+  - View matter CTA button
+  - Professional HTML formatting
+  - Orange/red gradient header
+
+**overdue-task-alert-template.ts** (110 lines)
+- ✅ Overdue task alert email template
+  - Multiple tasks support (up to 10 shown)
+  - Days overdue calculation
+  - Task details with matter info
+  - Priority badges
+  - Red alert styling
+  - Critical warning banner
+  - View all overdue tasks CTA
+  - Shows count if more than 10 tasks
+
+#### 12.6.4 Dashboard Alert Widgets
+
+**overdue-tasks-widget.tsx** (190 lines)
+- ✅ Overdue tasks widget component
+  - Real-time overdue tasks query
+  - Days overdue calculation
+  - Priority color coding
+  - Matter number display
+  - Red border/background for urgency
+  - Link to matter detail page
+  - Empty state with success icon
+  - "View All" link
+  - Configurable max display count
+  - Loading state
+
+**upcoming-deadlines-widget.tsx** (240 lines)
+- ✅ Upcoming deadlines widget component
+  - Tabbed interface (tasks / closing dates)
+  - Upcoming tasks list (next 7 days)
+  - Upcoming closing dates list
+  - Days until due/closing display
+  - Urgency color coding (red/orange/blue)
+  - Priority badges
+  - Matter details
+  - Stage display for closing dates
+  - Purchase price display
+  - Configurable days ahead
+  - Empty states per tab
+  - Loading state
+
+**matters-requiring-attention-widget.tsx** (200 lines)
+- ✅ Matters requiring attention widget
+  - Priority score-based sorting
+  - Attention level classification:
+    - Critical (90+): Red with 🚨
+    - High (70-89): Orange with ⚠️
+    - Medium (50-69): Yellow with ⚡
+  - Reason display (multiple reasons per matter)
+  - Matter details (number, stage, value, closing date)
+  - Color-coded borders and backgrounds
+  - Link to matter detail page
+  - Empty state with success icon
+  - "View All" link
+  - Configurable max display count
+
+#### 12.6.5 Notification Preferences UI
+
+**notification-preferences-form.tsx** (370 lines)
+- ✅ Comprehensive notification settings form
+  - Master email toggle
+  - Individual notification type toggles:
+    - Task reminders
+    - Closing date reminders
+    - Overdue task alerts
+    - Matter assignment notifications
+    - Offer notifications
+    - Document verification notifications
+  - Reminder frequency dropdown (immediately/daily/weekly)
+  - Quiet hours toggle and time pickers
+  - Reset to defaults button
+  - React Hook Form + Zod validation
+  - Loading states
+  - Success/error toasts
+  - Info box with reminder details
+  - Professional card layout
+  - Icons for visual clarity
+
+#### 12.6.6 Dashboard Pages
+
+**app/(dashboard)/alerts/page.tsx** (120 lines)
+- ✅ Dedicated alerts & reminders page
+  - Summary cards (overdue, upcoming, attention, closing soon)
+  - Three-column widget grid
+  - OverdueTasksWidget integration
+  - UpcomingDeadlinesWidget integration
+  - MattersRequiringAttentionWidget integration
+  - Info box with alert descriptions
+  - Link to notification settings
+  - Metadata for SEO
+
+**app/(dashboard)/settings/notifications/page.tsx** (40 lines)
+- ✅ Notification settings page
+  - NotificationPreferencesForm integration
+  - Back to settings navigation
+  - Page header and description
+  - Metadata for SEO
+
+**app/(dashboard)/dashboard/page.tsx** (Updated)
+- ✅ Integrated alert widgets into main dashboard
+  - Three-column widget grid
+  - Positioned between stats and insights
+  - Compact display (max 3 items per widget)
+  - All three widgets included
+
+#### 12.6.7 Cron Job & Scheduled Function
+
+**app/api/cron/reminders/route.ts** (220 lines)
+- ✅ Automated reminder processing endpoint
+  - Runs daily at 9:00 AM (via Vercel Cron)
+  - Processes all tenants
+  - Queries tasks due for reminder (1, 3, 7 days)
+  - Queries closing dates due for reminder
+  - Queries overdue tasks
+  - Filters users by notification preferences
+  - Generates personalized emails
+  - Respects quiet hours
+  - Email service integration ready (TODO: add email provider)
+  - Results tracking and error handling
+  - Authorization via Bearer token (CRON_SECRET)
+  - Returns processing statistics
+
+**vercel.json** (Updated)
+- ✅ Added reminders cron job configuration
+  - Path: `/api/cron/reminders`
+  - Schedule: `0 9 * * *` (daily at 9:00 AM UTC)
+  - Runs alongside existing email queue cron
+
+### Technical Implementation
+
+- **Reminder Engine**: Intelligent query system with priority scoring
+- **Notification Preferences**: JSONB metadata storage in profiles table
+- **Email Templates**: Professional HTML templates with gradient designs
+- **Dashboard Widgets**: Real-time client-side components with loading states
+- **Cron Jobs**: Scheduled daily execution via Vercel Cron
+- **Quiet Hours**: Configurable do-not-disturb periods
+- **Priority Scoring**: Multi-factor scoring for matters requiring attention
+- **Urgency Classification**: Color-coded visual indicators (red/orange/yellow/blue/green)
+- **Responsive Design**: Mobile-optimized widgets and forms
+- **User Preferences**: Individual notification control per user
+- **Authorization**: Token-based cron job security
+
+### Code Statistics
+
+- **Total Lines**: ~2,685 lines
+- **Services**: 700 lines (2 services)
+- **Email Templates**: 365 lines (3 templates)
+- **Components**: 1,000 lines (4 widgets + 1 form)
+- **Pages**: 160 lines (2 pages)
+- **API Routes**: 220 lines (1 route)
+- **Config**: 2 lines (vercel.json update)
+- **Integration**: 5 lines (dashboard update)
+
+### Cumulative Statistics (Phases 1-6)
+
+- **Total Lines**: 21,329 lines
+- **Services**: 6 complete services
+- **Components**: 39+ components
+- **Pages**: 17+ pages
+- **API Routes**: Cron job infrastructure
+- **Email Templates**: Professional HTML templates
+- **Dashboard Integration**: Alert widgets on main dashboard
+
+### Branch & Tag
+
+- **Branch**: `claude/phase-12-phase-6-reminders-notifications-01LjLWBkSK2wZXJJ4Et81VWA`
+- **Tag**: `v2.5.0-phase-12-reminders-notifications`
+- **Based On**: Phase 5 (v2.4.0-phase-12-fee-earner-allocation)
+- **Build Strategy**: Sequential build from Phase 5 completion
+
+---
+
 ## [2.4.0-purchase-workflow-fee-earner-allocation] - 2025-11-21
 
 **Phase 12 - Phase 5: Fee Earner Allocation & Workload Management Complete** 🎯

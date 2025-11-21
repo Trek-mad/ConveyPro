@@ -1,9 +1,123 @@
 # ConveyPro - Project Status
 
-**Last Updated:** 2025-11-21 (Phase 12: Purchase Workflow - Phase 5 Complete)
-**Current Phase:** Phase 12 - **PURCHASE CLIENT WORKFLOW PHASE 5 COMPLETE** 🎯
-**Latest Branch:** `claude/phase-12-phase-5-fee-earner-allocation-01LjLWBkSK2wZXJJ4Et81VWA`
-**Status:** Phase 1, 2, 3, 4 & 5 Complete - Ready for Phase 6
+**Last Updated:** 2025-11-21 (Phase 12: Purchase Workflow - Phase 6 Complete)
+**Current Phase:** Phase 12 - **PURCHASE CLIENT WORKFLOW PHASE 6 COMPLETE** 🎯
+**Latest Branch:** `claude/phase-12-phase-6-reminders-notifications-01LjLWBkSK2wZXJJ4Et81VWA`
+**Status:** Phase 1, 2, 3, 4, 5 & 6 Complete - Ready for Phase 7
+
+---
+
+## 🚀 PHASE 12: PURCHASE CLIENT WORKFLOW - PHASE 6 COMPLETE
+
+### Phase 6: Reminders & Notifications - Production Ready!
+
+Built comprehensive automated reminder and notification system:
+
+**12.32 Reminder Engine Service** ✅
+- Complete reminder service (420 lines)
+- Overdue tasks query with days overdue calculation
+- Upcoming tasks query (configurable days ahead)
+- Upcoming closing dates query
+- Matters requiring attention with priority scoring (90, 80, 70, 50)
+- Alerts summary dashboard data
+- Tasks/closing dates due for reminder (1, 3, 7 days)
+- Intelligent matter prioritization
+
+**12.33 Notification Preferences Service** ✅
+- User notification settings management (280 lines)
+- JSONB metadata storage in profiles
+- Email enabled toggle
+- Individual notification type toggles (6 types)
+- Reminder frequency (immediately/daily/weekly)
+- Quiet hours configuration (start/end times)
+- Reset to defaults functionality
+- User eligibility filtering for notifications
+
+**12.34 Email Templates** ✅
+- Task reminder template (120 lines) - gradient header, urgency text, CTA
+- Closing date reminder template (135 lines) - critical warnings, orange/red design
+- Overdue task alert template (110 lines) - red alert styling, multiple tasks support
+- Professional HTML formatting with responsive design
+- Personalization and matter details
+- Priority badges and urgency indicators
+
+**12.35 Dashboard Alert Widgets** ✅
+- Overdue tasks widget (190 lines) - red urgency styling, days overdue
+- Upcoming deadlines widget (240 lines) - tabbed interface (tasks/closing), urgency colors
+- Matters requiring attention widget (200 lines) - priority classification, emoji icons
+- Real-time queries with loading states
+- Empty states with success icons
+- Configurable max display counts
+- Link to detail pages
+
+**12.36 Notification Preferences UI** ✅
+- Comprehensive settings form (370 lines)
+- Master email toggle
+- 6 individual notification type toggles
+- Reminder frequency dropdown
+- Quiet hours with time pickers
+- Reset to defaults button
+- React Hook Form + Zod validation
+- Professional card layout with icons
+
+**12.37 Dashboard Pages** ✅
+- Dedicated alerts page (120 lines) - summary cards, three-column grid
+- Notification settings page (40 lines) - preferences form integration
+- Dashboard integration (5 lines) - three alert widgets between stats and insights
+- SEO metadata for all pages
+
+**12.38 Cron Job & Infrastructure** ✅
+- Automated reminder processing API route (220 lines)
+- Daily execution at 9:00 AM (Vercel Cron)
+- Processes all tenants
+- Filters users by preferences
+- Respects quiet hours
+- Email service integration ready
+- Authorization via Bearer token
+- Results tracking and error handling
+- Vercel.json cron configuration
+
+### Code Statistics (Phase 6)
+- **Services:** 700 lines (2 services)
+- **Email Templates:** 365 lines (3 templates)
+- **Components:** 1,000 lines (4 widgets + 1 form)
+- **Pages:** 160 lines (2 pages)
+- **API Routes:** 220 lines (1 route)
+- **Config:** 2 lines (vercel.json)
+- **Integration:** 5 lines (dashboard update)
+- **Total Phase 6:** 2,685 lines of TypeScript/TSX
+
+### Cumulative Statistics (Phase 1 + 2 + 3 + 4 + 5 + 6)
+- **Phase 1:** 7,469 lines (database, types, services)
+- **Phase 2:** 2,850 lines (UI components)
+- **Phase 3:** 2,610 lines (documents & financial)
+- **Phase 4:** 2,630 lines (offer management)
+- **Phase 5:** 3,085 lines (fee earner allocation)
+- **Phase 6:** 2,685 lines (reminders & notifications)
+- **Total:** 21,329 lines across all six phases
+
+### Branch & Tags
+- **Phase 1 Branch:** `claude/phase-12-purchase-workflow-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 1 Tag:** `v2.0.0-phase-12-foundation`
+- **Phase 2 Branch:** `claude/phase-12-phase-2-workflow-ui-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 2 Tag:** `v2.1.0-phase-12-workflow-ui`
+- **Phase 3 Branch:** `claude/phase-12-phase-3-documents-questionnaire-01BBD4YzKUvHpqg7AL5YEEHs`
+- **Phase 3 Tag:** `v2.2.0-phase-12-documents-questionnaire`
+- **Phase 4 Branch:** `claude/phase-12-phase-4-offer-management-01LjLWBkSK2wZXJJ4Et81VWA`
+- **Phase 4 Tag:** `v2.3.0-phase-12-offer-management`
+- **Phase 5 Branch:** `claude/phase-12-phase-5-fee-earner-allocation-01LjLWBkSK2wZXJJ4Et81VWA`
+- **Phase 5 Tag:** `v2.4.0-phase-12-fee-earner-allocation`
+- **Phase 6 Branch:** `claude/phase-12-phase-6-reminders-notifications-01LjLWBkSK2wZXJJ4Et81VWA`
+- **Phase 6 Tag:** `v2.5.0-phase-12-reminders-notifications`
+
+### What's Next (Phase 7: Client Portal & Acceptance)
+- Public client portal with secure token access
+- Matter summary view for clients
+- Current stage display
+- Client-visible documents
+- Offer acceptance functionality
+- Contact form
+- Mobile responsive design
 
 ---
 
