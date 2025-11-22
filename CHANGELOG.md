@@ -7,6 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.9.1-database-types-regeneration] - 2025-11-22
+
+**Database Type Safety Enhancement** 🔧
+
+### Context
+Regenerated comprehensive TypeScript type definitions for all 51 database tables. The previous types file only included 16 tables from early development phases. This update adds complete type coverage for all tables created during the Purchase Workflow implementation (Phases 1-10), plus Form Builder, Go-to-Market System, and other features.
+
+### Changed
+
+#### Enhanced Type Definitions
+
+**types/database.ts** (3,053 lines, +2,121 lines)
+- ✅ **Updated clients table** - Added 8 new columns:
+  - `title` - Client title (Mr, Mrs, Ms, Dr, etc.)
+  - `company_name` - Company name for business clients
+  - `mobile` - Mobile phone number
+  - `preferred_contact_method` - 'email' | 'phone' | 'mobile'
+  - `date_of_birth` - For ID verification
+  - `national_insurance_number` - UK NI number
+  - `passport_number` - For ID verification
+  - `updated_by` - Track who last updated the record
+  - Enhanced `client_type` enum: 'individual' | 'couple' | 'company' | 'estate' | 'business'
+
+- ✅ **Added 35 missing table definitions:**
+
+**Purchase Workflow Tables (9):**
+- `matters` - Core purchase matter tracking with workflow stages
+- `workflow_stages` - Configurable workflow stage definitions
+- `matter_tasks` - Task management and dependencies
+- `documents` - Document storage with versioning
+- `offers` - Property offer management and approval workflow
+- `financial_questionnaires` - Client financial information
+- `fee_earner_settings` - Fee earner configuration and capacity
+- `fee_earner_availability` - Capacity and availability tracking
+- `matter_activities` - Complete audit trail and activity log
+
+**Client Portal (1):**
+- `client_portal_tokens` - Secure tokenized client access
+
+**Search System (2):**
+- `saved_searches` - User saved search queries
+- `recent_searches` - Search history tracking
+
+**Form Builder (10):**
+- `form_templates` - Dynamic form definitions
+- `form_steps` - Multi-step form configuration
+- `form_fields` - Field definitions with validation
+- `form_field_options` - Dropdown and select options
+- `form_pricing_rules` - Dynamic pricing calculation logic
+- `form_pricing_tiers` - Tiered pricing structures
+- `form_instances` - Tenant-specific form instances
+- `form_instance_pricing` - Custom pricing overrides
+- `lbtt_rates` - Scottish LBTT tax rate tables
+- `form_submissions` - Form submission tracking
+
+**Go-to-Market System (13):**
+- `subscription_plans` - SaaS subscription tier definitions
+- `tenant_subscriptions` - Active tenant subscriptions
+- `payment_methods` - Stored payment method details
+- `invoices` - Billing and invoice management
+- `usage_events` - Usage tracking for metered billing
+- `tenant_onboarding` - Onboarding progress tracking
+- `onboarding_walkthroughs` - Interactive user guides
+- `demo_requests` - Sales lead management
+- `testimonials` - Customer testimonial management
+- `support_tickets` - Support ticket system
+- `support_ticket_messages` - Ticket conversation threads
+- `knowledge_base_articles` - Help documentation
+- `feature_requests` - Feature request voting and tracking
+
+### Fixed
+- ✅ Fixed TypeScript destructuring syntax error in fee-earners/[id]/page.tsx
+- ✅ All database queries now have proper type checking across 51 tables
+- ✅ Eliminated ~200+ type errors from missing table definitions
+
+### Technical Details
+- Each table includes Row, Insert, Update, and Relationships types
+- All enum types properly defined with TypeScript literal unions
+- Follows existing Supabase type generation patterns
+- Complete type safety for all database operations
+- File size: 932 lines → 3,053 lines (+227% increase)
+
+### Impact
+- TypeScript can now validate all database queries across the entire application
+- Autocomplete works for all table names and column names
+- Type errors caught at compile time instead of runtime
+- Improved developer experience with full IntelliSense support
+
+---
+
 ## [2.9.0-purchase-workflow-activity-log-viewer] - 2025-11-21
 
 **Phase 12 - Phase 10: Activity Log Viewer Complete** 📋
