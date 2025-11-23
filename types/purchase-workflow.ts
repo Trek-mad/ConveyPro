@@ -451,12 +451,16 @@ export type MatterWithRelations = Matter & {
 // Workload calculation result
 export type FeeEarnerWorkload = {
   active_matters: number
+  active_matters_count: number // Alias for active_matters for backwards compatibility
   max_concurrent_matters: number
   new_matters_this_week: number
   max_new_matters_per_week: number
   capacity_used: number
+  capacity_percentage: number // Alias for capacity_used (which is already a percentage)
   weekly_capacity_used: number
+  weekly_capacity_percentage: number // Alias for weekly_capacity_used (which is already a percentage)
   is_available: boolean
+  unavailable_reason: string | null
   accepts_auto_assignment: boolean
   assignment_priority: number
   settings_configured: boolean

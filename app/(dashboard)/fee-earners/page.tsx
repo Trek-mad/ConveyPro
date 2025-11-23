@@ -43,34 +43,30 @@ export default async function FeeEarnersPage() {
   // Fetch all fee earners for this tenant
   const { data: feeEarners, error } = await supabase
     .from('tenant_memberships')
-    .select(
-      `
-      id,
-      user_id,
-      role,
-      profiles:user_id (
-        id,
-        first_name,
-        last_name,
-        full_name,
-        job_title
-      )
-    `
-    )
+    .select('id, user_id, role')
     .eq('tenant_id', membership.tenant_id)
     .eq('role', 'member')
-    .order('profiles(first_name)')
 
   if (error) {
     console.error('Error fetching fee earners:', error)
   }
 
-  // Calculate workload for each fee earner
+  // Calculate workload for each fee earner and fetch their profiles
   const feeEarnersWithWorkload = await Promise.all(
     (feeEarners || []).map(async (feeEarner) => {
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, full_name, job_title')
+        .eq('id', feeEarner.user_id)
+        .single()
+
+      // Calculate workload
       const workloadResult = await calculateFeeEarnerWorkload(feeEarner.user_id)
+
       return {
         ...feeEarner,
+        profiles: profile,
         workload: 'workload' in workloadResult ? workloadResult.workload : null,
       }
     })
@@ -142,7 +138,7 @@ export default async function FeeEarnersPage() {
               <p className="text-2xl font-bold text-gray-900">
                 {
                   feeEarnersWithWorkload.filter(
-                    (fe) => fe.workload?.is_available && fe.workload?.capacity_percentage < 80
+                    (fe) => fe.workload?.is_available && (fe.workload?.capacity_percentage ?? 0) < 80
                   ).length
                 }
               </p>
@@ -161,8 +157,8 @@ export default async function FeeEarnersPage() {
                 {
                   feeEarnersWithWorkload.filter(
                     (fe) =>
-                      fe.workload?.capacity_percentage >= 80 &&
-                      fe.workload?.capacity_percentage < 100
+                      (fe.workload?.capacity_percentage ?? 0) >= 80 &&
+                      (fe.workload?.capacity_percentage ?? 0) < 100
                   ).length
                 }
               </p>
@@ -180,7 +176,7 @@ export default async function FeeEarnersPage() {
               <p className="text-2xl font-bold text-gray-900">
                 {
                   feeEarnersWithWorkload.filter(
-                    (fe) => fe.workload?.capacity_percentage >= 100
+                    (fe) => (fe.workload?.capacity_percentage ?? 0) >= 100
                   ).length
                 }
               </p>
@@ -218,7 +214,9 @@ export default async function FeeEarnersPage() {
                         <h3 className="text-lg font-semibold text-gray-900">
                           {profile?.full_name || 'Unknown'}
                         </h3>
-                        <p className="text-sm text-gray-600">{profile?.email}</p>
+                        {profile?.job_title && (
+                          <p className="text-sm text-gray-600">{profile.job_title}</p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {workload?.is_available ? (

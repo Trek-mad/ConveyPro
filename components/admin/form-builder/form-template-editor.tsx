@@ -533,7 +533,7 @@ export function FormTemplateEditor({ formId, initialData }: FormTemplateEditorPr
                       <Label>Required Field</Label>
                       <Switch
                         checked={field.is_required}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: boolean) =>
                           updateField(field.id, { is_required: checked })
                         }
                       />
@@ -548,7 +548,7 @@ export function FormTemplateEditor({ formId, initialData }: FormTemplateEditorPr
                       </div>
                       <Switch
                         checked={field.affects_pricing}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: boolean) =>
                           updateField(field.id, { affects_pricing: checked })
                         }
                       />

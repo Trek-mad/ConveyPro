@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         // Get tasks due for reminder (1, 3, 7 days before)
         const tasksResult = await getTasksDueForReminder(tenant.id)
 
-        if ('tasks' in tasksResult && tasksResult.tasks.length > 0) {
+        if ('tasks' in tasksResult && tasksResult.tasks && tasksResult.tasks.length > 0) {
           for (const task of tasksResult.tasks) {
             // Get users who should receive task reminders
             const usersResult = await getUsersForNotificationType(
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
               'task_reminders'
             )
 
-            if ('users' in usersResult) {
+            if ('users' in usersResult && usersResult.users) {
               for (const user of usersResult.users) {
                 // Calculate days until due
                 const dueDate = new Date(task.due_date!)
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
         // Get closing dates due for reminder (1, 3, 7 days before)
         const closingDatesResult = await getClosingDatesDueForReminder(tenant.id)
 
-        if ('matters' in closingDatesResult && closingDatesResult.matters.length > 0) {
+        if ('matters' in closingDatesResult && closingDatesResult.matters && closingDatesResult.matters.length > 0) {
           for (const matter of closingDatesResult.matters) {
             // Get users who should receive closing date reminders
             const usersResult = await getUsersForNotificationType(
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
               'closing_date_reminders'
             )
 
-            if ('users' in usersResult) {
+            if ('users' in usersResult && usersResult.users) {
               for (const user of usersResult.users) {
                 // Calculate days until closing
                 const closingDate = new Date(matter.closing_date!)
@@ -162,14 +162,14 @@ export async function GET(request: NextRequest) {
         // Get overdue tasks
         const overdueTasksResult = await getOverdueTasks(tenant.id)
 
-        if ('tasks' in overdueTasksResult && overdueTasksResult.tasks.length > 0) {
+        if ('tasks' in overdueTasksResult && overdueTasksResult.tasks && overdueTasksResult.tasks.length > 0) {
           // Get users who should receive overdue task alerts
           const usersResult = await getUsersForNotificationType(
             tenant.id,
             'overdue_task_alerts'
           )
 
-          if ('users' in usersResult) {
+          if ('users' in usersResult && usersResult.users) {
             for (const user of usersResult.users) {
               // Group overdue tasks by assigned user
               const userTasks = overdueTasksResult.tasks.filter(

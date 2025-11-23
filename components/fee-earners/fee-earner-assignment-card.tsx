@@ -9,7 +9,7 @@ import { AssignmentDialog } from './assignment-dialog'
 
 interface FeeEarner {
   full_name: string
-  email: string
+  job_title?: string | null
 }
 
 interface FeeEarnerAssignmentCardProps {
@@ -49,7 +49,9 @@ export function FeeEarnerAssignmentCard({
                   <p className="text-lg font-semibold text-gray-900">
                     {currentFeeEarner.full_name}
                   </p>
-                  <p className="text-xs text-gray-500">{currentFeeEarner.email}</p>
+                  {currentFeeEarner.job_title && (
+                    <p className="text-xs text-gray-500">{currentFeeEarner.job_title}</p>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">

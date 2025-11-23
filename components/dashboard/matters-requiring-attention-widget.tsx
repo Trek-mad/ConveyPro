@@ -34,7 +34,7 @@ export function MattersRequiringAttentionWidget({
     setIsLoading(true)
     const result = await getMattersRequiringAttention(tenantId)
 
-    if ('matters' in result) {
+    if ('matters' in result && result.matters) {
       setMatters(result.matters)
     }
     setIsLoading(false)

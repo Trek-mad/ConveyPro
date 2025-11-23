@@ -33,7 +33,7 @@ export function OverdueTasksWidget({
     setIsLoading(true)
     const result = await getOverdueTasks(tenantId)
 
-    if ('tasks' in result) {
+    if ('tasks' in result && result.tasks) {
       setTasks(result.tasks)
     }
     setIsLoading(false)

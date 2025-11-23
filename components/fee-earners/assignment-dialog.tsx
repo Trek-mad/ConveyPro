@@ -6,7 +6,22 @@ import {
   manuallyAssignMatter,
   autoAssignMatter,
 } from '@/services/fee-earner-allocation.service'
-import type { AssignmentRecommendation } from '@/types'
+// Type for assignment recommendations
+type AssignmentRecommendation = {
+  feeEarner: {
+    id: string
+    full_name: string
+    email: string
+  }
+  score: number
+  reason: string
+  workload: any
+  // Aliases for backwards compatibility
+  fee_earner_id?: never
+  fee_earner?: never
+  match_score?: never
+  recommendation_reason?: never
+}
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -73,7 +88,7 @@ export function AssignmentDialog({
       setRecommendations(result.recommendations)
       // Auto-select the top recommendation if available
       if (result.recommendations.length > 0) {
-        setSelectedFeeEarnerId(result.recommendations[0].fee_earner_id)
+        setSelectedFeeEarnerId(result.recommendations[0].feeEarner.id)
       }
     } else {
       toast({
@@ -90,10 +105,10 @@ export function AssignmentDialog({
 
     const result = await autoAssignMatter(matterId, matterType, transactionValue)
 
-    if ('assignment' in result) {
+    if ('feeEarnerId' in result) {
       toast({
         title: 'Success',
-        description: `Matter automatically assigned to ${result.assignment.fee_earner?.first_name} ${result.assignment.fee_earner?.last_name}`,
+        description: `Matter automatically assigned to ${result.feeEarnerName}`,
       })
       onOpenChange(false)
       router.refresh()
@@ -125,10 +140,10 @@ export function AssignmentDialog({
 
     if ('success' in result) {
       const selectedRec = recommendations.find(
-        (r) => r.fee_earner_id === selectedFeeEarnerId
+        (r) => r.feeEarner.id === selectedFeeEarnerId
       )
       const feeEarnerName = selectedRec
-        ? `${selectedRec.fee_earner?.first_name} ${selectedRec.fee_earner?.last_name}`
+        ? selectedRec.feeEarner.full_name
         : 'the selected fee earner'
 
       toast({
@@ -239,14 +254,14 @@ export function AssignmentDialog({
               ) : (
                 <div className="space-y-3">
                   {recommendations.map((rec, index) => {
-                    const isSelected = selectedFeeEarnerId === rec.fee_earner_id
-                    const feeEarner = rec.fee_earner
+                    const isSelected = selectedFeeEarnerId === rec.feeEarner.id
+                    const feeEarner = rec.feeEarner
 
                     return (
                       <button
-                        key={rec.fee_earner_id}
+                        key={rec.feeEarner.id}
                         type="button"
-                        onClick={() => setSelectedFeeEarnerId(rec.fee_earner_id)}
+                        onClick={() => setSelectedFeeEarnerId(rec.feeEarner.id)}
                         className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
                           isSelected
                             ? 'border-blue-500 bg-blue-50'
@@ -261,18 +276,18 @@ export function AssignmentDialog({
                                 <Award className="h-4 w-4 text-yellow-500" />
                               )}
                               <h4 className="font-semibold text-gray-900">
-                                {feeEarner?.first_name} {feeEarner?.last_name}
+                                {feeEarner.full_name}
                               </h4>
                               {isSelected && (
                                 <CheckCircle className="h-4 w-4 text-blue-600" />
                               )}
                             </div>
-                            <p className="text-xs text-gray-600">{feeEarner?.email}</p>
+                            <p className="text-xs text-gray-600">{feeEarner.email}</p>
                           </div>
                           <div className="text-right">
-                            {getScoreBadge(rec.match_score)}
+                            {getScoreBadge(rec.score)}
                             <p className="mt-1 text-xs text-gray-600">
-                              Score: {rec.match_score}/100
+                              Score: {rec.score}/100
                             </p>
                           </div>
                         </div>
@@ -343,10 +358,10 @@ export function AssignmentDialog({
                         </div>
 
                         {/* Recommendation Reason */}
-                        {rec.recommendation_reason && (
+                        {rec.reason && (
                           <div className="mt-3 rounded bg-gray-50 p-2">
                             <p className="text-xs text-gray-700">
-                              {rec.recommendation_reason}
+                              {rec.reason}
                             </p>
                           </div>
                         )}
@@ -362,7 +377,7 @@ export function AssignmentDialog({
               <div>
                 {(() => {
                   const selectedRec = recommendations.find(
-                    (r) => r.fee_earner_id === selectedFeeEarnerId
+                    (r) => r.feeEarner.id === selectedFeeEarnerId
                   )
                   if (!selectedRec) return null
 

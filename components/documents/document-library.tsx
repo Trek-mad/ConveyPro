@@ -150,7 +150,7 @@ export function DocumentLibrary({
       uploaded: 'bg-blue-100 text-blue-800',
       verified: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
-      pending_review: 'bg-yellow-100 text-yellow-800',
+      archived: 'bg-gray-100 text-gray-800',
     }
     return (
       <Badge className={variants[status]}>
@@ -280,7 +280,7 @@ export function DocumentLibrary({
             <Card key={doc.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  {getFileIcon(doc.mime_type)}
+                  {getFileIcon(doc.mime_type || 'application/octet-stream')}
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="font-medium text-gray-900">{doc.title}</h4>
@@ -290,7 +290,7 @@ export function DocumentLibrary({
                       <span>{DOCUMENT_TYPE_LABELS[doc.document_type]}</span>
                       <span>•</span>
                       <span>
-                        {(doc.file_size / 1024 / 1024).toFixed(2)} MB
+                        {((doc.file_size || 0) / 1024 / 1024).toFixed(2)} MB
                       </span>
                       <span>•</span>
                       <span>
@@ -351,7 +351,7 @@ export function DocumentLibrary({
             <Card key={doc.id} className="p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between">
-                  {getFileIcon(doc.mime_type)}
+                  {getFileIcon(doc.mime_type || 'application/octet-stream')}
                   {getStatusBadge(doc.status)}
                 </div>
 
@@ -361,7 +361,7 @@ export function DocumentLibrary({
                     {DOCUMENT_TYPE_LABELS[doc.document_type]}
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
-                    {(doc.file_size / 1024 / 1024).toFixed(2)} MB •{' '}
+                    {((doc.file_size || 0) / 1024 / 1024).toFixed(2)} MB •{' '}
                     {formatDistanceToNow(new Date(doc.created_at), {
                       addSuffix: true,
                     })}

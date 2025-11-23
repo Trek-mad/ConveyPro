@@ -133,10 +133,16 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
 
   function openEditDialog(block: FeeEarnerAvailability) {
     setEditingBlock(block)
+    // Only use availability types that are valid for the form
+    const validTypes: Array<'holiday' | 'sick' | 'training' | 'reduced_capacity'> = ['holiday', 'sick', 'training', 'reduced_capacity']
+    const availabilityType = validTypes.includes(block.availability_type as any)
+      ? (block.availability_type as 'holiday' | 'sick' | 'training' | 'reduced_capacity')
+      : 'holiday'
+
     form.reset({
       start_date: block.start_date,
       end_date: block.end_date,
-      availability_type: block.availability_type,
+      availability_type: availabilityType,
       notes: block.notes || '',
     })
     setIsDialogOpen(true)
@@ -175,7 +181,7 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
           fee_earner_id: feeEarnerId,
           start_date: values.start_date,
           end_date: values.end_date,
-          availability_type: values.availability_type,
+          availability_type: values.availability_type as 'holiday' | 'sick' | 'training' | 'reduced_capacity',
           notes: values.notes || null,
         })
 

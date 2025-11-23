@@ -15,7 +15,16 @@ async function getMatter(matterId: string, tenantId: string) {
 
   const { data, error } = await supabase
     .from('matters')
-    .select('id, matter_number, property_address, status')
+    .select(`
+      id,
+      matter_number,
+      status,
+      properties:property_id (
+        address_line1,
+        city,
+        postcode
+      )
+    `)
     .eq('id', matterId)
     .eq('tenant_id', tenantId)
     .single()
@@ -45,6 +54,11 @@ export default async function ActivityLogPage({
     notFound()
   }
 
+  const property = matter.properties as any
+  const propertyAddress = property
+    ? `${property.address_line1 || ''}, ${property.city || ''}, ${property.postcode || ''}`.replace(/^,\s*|,\s*,/g, ',').trim()
+    : 'No property linked'
+
   return (
     <div className="container mx-auto py-6">
       <Suspense fallback={<div>Loading activity log...</div>}>
@@ -52,7 +66,7 @@ export default async function ActivityLogPage({
           matterId={id}
           tenantId={membership.tenantId}
           matterNumber={matter.matter_number}
-          propertyAddress={matter.property_address}
+          propertyAddress={propertyAddress}
         />
       </Suspense>
     </div>

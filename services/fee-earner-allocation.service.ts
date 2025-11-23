@@ -301,12 +301,16 @@ export async function calculateFeeEarnerWorkload(
       return {
         workload: {
           active_matters: 0,
+          active_matters_count: 0,
           max_concurrent_matters: 0,
           new_matters_this_week: 0,
           max_new_matters_per_week: 0,
           capacity_used: 0,
+          capacity_percentage: 0,
           weekly_capacity_used: 0,
+          weekly_capacity_percentage: 0,
           is_available: false,
+          unavailable_reason: 'No settings configured',
           accepts_auto_assignment: false,
           assignment_priority: 0,
           settings_configured: false,
@@ -355,6 +359,9 @@ export async function calculateFeeEarnerWorkload(
       .single()
 
     const isCurrentlyAvailable = !availability
+    const unavailableReason = availability
+      ? availability.reason || availability.notes || `Unavailable (${availability.availability_type})`
+      : null
 
     const capacityUsed =
       settings.max_concurrent_matters > 0
@@ -366,14 +373,22 @@ export async function calculateFeeEarnerWorkload(
         ? ((newMattersThisWeek || 0) / settings.max_new_matters_per_week) * 100
         : 0
 
+    const capacityPercentage = Math.round(capacityUsed)
+    const weeklyCapacityPercentage = Math.round(weeklyCapacityUsed)
+    const activeMattersCount = activeMatters || 0
+
     const workload: FeeEarnerWorkload = {
-      active_matters: activeMatters || 0,
+      active_matters: activeMattersCount,
+      active_matters_count: activeMattersCount,
       max_concurrent_matters: settings.max_concurrent_matters,
       new_matters_this_week: newMattersThisWeek || 0,
       max_new_matters_per_week: settings.max_new_matters_per_week,
-      capacity_used: Math.round(capacityUsed),
-      weekly_capacity_used: Math.round(weeklyCapacityUsed),
+      capacity_used: capacityPercentage,
+      capacity_percentage: capacityPercentage,
+      weekly_capacity_used: weeklyCapacityPercentage,
+      weekly_capacity_percentage: weeklyCapacityPercentage,
       is_available: isCurrentlyAvailable,
+      unavailable_reason: unavailableReason,
       accepts_auto_assignment: settings.accepts_auto_assignment,
       assignment_priority: settings.assignment_priority,
       settings_configured: true,

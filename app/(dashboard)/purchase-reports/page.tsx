@@ -21,6 +21,10 @@ export const metadata: Metadata = {
 export default async function PurchaseReportsPage() {
   const membership = await getActiveTenantMembership()
 
+  if (!membership) {
+    return null
+  }
+
   // Fetch all reports data
   const [mattersByStageResult, conversionRateResult, feeEarnerPerformanceResult, executiveMetricsResult] =
     await Promise.all([

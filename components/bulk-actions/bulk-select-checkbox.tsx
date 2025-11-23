@@ -16,8 +16,8 @@ export default function BulkSelectCheckbox({
   return (
     <Checkbox
       checked={checked}
-      onCheckedChange={(checkedState) => onCheckedChange(id, checkedState === true)}
-      onClick={(e) => e.stopPropagation()}
+      onCheckedChange={(checkedState: boolean | 'indeterminate') => onCheckedChange(id, checkedState === true)}
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
     />
   )
 }

@@ -35,7 +35,7 @@ export default async function ClientAcceptancePage({ params }: PageProps) {
   // Get matter details
   const { data: matter } = await supabase
     .from('matters')
-    .select('matter_number, property:properties(address_line1, address_line2, city, postcode)')
+    .select('matter_number, properties:property_id(address_line1, address_line2, city, postcode)')
     .eq('id', offer.matter_id)
     .single()
 
@@ -45,12 +45,13 @@ export default async function ClientAcceptancePage({ params }: PageProps) {
 
   // Format property address
   let propertyAddress = ''
-  if (matter.property) {
+  const property = matter.properties as any
+  if (property) {
     const parts = [
-      matter.property.address_line1,
-      matter.property.address_line2,
-      matter.property.city,
-      matter.property.postcode,
+      property.address_line1,
+      property.address_line2,
+      property.city,
+      property.postcode,
     ].filter(Boolean)
     propertyAddress = parts.join(', ')
   }

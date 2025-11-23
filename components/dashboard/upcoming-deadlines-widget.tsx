@@ -47,11 +47,11 @@ export function UpcomingDeadlinesWidget({
       getUpcomingClosingDates(tenantId, daysAhead),
     ])
 
-    if ('tasks' in tasksResult) {
+    if ('tasks' in tasksResult && tasksResult.tasks) {
       setTasks(tasksResult.tasks)
     }
 
-    if ('closingDates' in closingDatesResult) {
+    if ('closingDates' in closingDatesResult && closingDatesResult.closingDates) {
       setClosingDates(closingDatesResult.closingDates)
     }
 
