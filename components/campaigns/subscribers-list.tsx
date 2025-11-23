@@ -12,8 +12,11 @@ interface Subscriber {
   enrolled_at: string
   unsubscribed_at: string | null
   client?: {
-    full_name: string
+    id: string
+    first_name: string
+    last_name: string
     email: string
+    life_stage: string
   }
   _count?: {
     emails_sent: number
@@ -110,7 +113,9 @@ export function SubscribersList({ subscribers, canEdit }: SubscribersListProps) 
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h3 className="text-sm font-semibold text-gray-900">
-                    {subscriber.client?.full_name || 'Unknown Client'}
+                    {subscriber.client
+                      ? `${subscriber.client.first_name} ${subscriber.client.last_name}`
+                      : 'Unknown Client'}
                   </h3>
                   {getStatusBadge(subscriber.status)}
                 </div>
