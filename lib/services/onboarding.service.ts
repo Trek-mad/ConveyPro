@@ -200,7 +200,7 @@ export async function getOnboardingWalkthroughs() {
     return { error: error.message, walkthroughs: [] }
   }
 
-  return { walkthroughs: data as OnboardingWalkthrough[], error: null }
+  return { walkthroughs: data as unknown as OnboardingWalkthrough[], error: null }
 }
 
 export async function getOnboardingWalkthrough(slug: string) {
@@ -217,7 +217,7 @@ export async function getOnboardingWalkthrough(slug: string) {
     return { error: error.message, walkthrough: null }
   }
 
-  return { walkthrough: data as OnboardingWalkthrough, error: null }
+  return { walkthrough: data as unknown as OnboardingWalkthrough, error: null }
 }
 
 // =====================================================

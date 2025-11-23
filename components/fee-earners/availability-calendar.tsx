@@ -141,7 +141,7 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
 
     form.reset({
       start_date: block.start_date,
-      end_date: block.end_date,
+      end_date: block.end_date || block.start_date,
       availability_type: availabilityType,
       notes: block.notes || '',
     })
@@ -241,7 +241,8 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
     loadBlocks()
   }
 
-  function formatDate(dateString: string) {
+  function formatDate(dateString: string | null) {
+    if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'short',
@@ -249,9 +250,9 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
     })
   }
 
-  function calculateDuration(startDate: string, endDate: string) {
+  function calculateDuration(startDate: string, endDate: string | null) {
     const start = new Date(startDate)
-    const end = new Date(endDate)
+    const end = endDate ? new Date(endDate) : start
     const diffTime = Math.abs(end.getTime() - start.getTime())
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1 // +1 to include both start and end days
     return diffDays
@@ -265,7 +266,7 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const startDate = new Date(block.start_date)
-    const endDate = new Date(block.end_date)
+    const endDate = block.end_date ? new Date(block.end_date) : startDate
     return startDate <= today && endDate >= today
   }
 

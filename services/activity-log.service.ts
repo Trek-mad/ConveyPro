@@ -65,11 +65,12 @@ export async function logActivity(data: {
       .insert({
         tenant_id: data.tenant_id,
         matter_id: data.matter_id || null,
-        user_id: data.user_id,
+        actor_id: data.user_id,
+        title: data.activity_type,
         activity_type: data.activity_type,
         description: data.description,
         metadata: data.metadata || {}
-      })
+      } as any)
 
     if (error) throw error
 
@@ -102,12 +103,12 @@ export async function getActivities(
         id,
         tenant_id,
         matter_id,
-        user_id,
+        actor_id,
         activity_type,
         description,
         metadata,
         created_at,
-        profiles:user_id(first_name, last_name, email),
+        profiles:actor_id(first_name, last_name, email),
         matters:matter_id(matter_number, property_address)
       `, { count: 'exact' })
       .eq('tenant_id', tenant_id)
@@ -118,7 +119,7 @@ export async function getActivities(
     }
 
     if (filters?.user_id) {
-      query = query.eq('user_id', filters.user_id)
+      query = query.eq('actor_id', filters.user_id)
     }
 
     if (filters?.activity_type) {
@@ -152,7 +153,7 @@ export async function getActivities(
       id: activity.id,
       tenant_id: activity.tenant_id,
       matter_id: activity.matter_id,
-      user_id: activity.user_id,
+      user_id: activity.actor_id,
       activity_type: activity.activity_type,
       description: activity.description,
       metadata: activity.metadata,
@@ -163,7 +164,7 @@ export async function getActivities(
       user_email: (activity.profiles as any)?.email || null,
       matter_number: (activity.matters as any)?.matter_number || null,
       property_address: (activity.matters as any)?.property_address || null
-    }))
+    })) as any
 
     return {
       success: true,
@@ -289,10 +290,10 @@ export async function getUserActivitySummary(
     let query = supabase
       .from('matter_activities')
       .select(`
-        user_id,
+        actor_id,
         activity_type,
         created_at,
-        profiles:user_id(first_name, last_name, email)
+        profiles:actor_id(first_name, last_name, email)
       `)
       .eq('tenant_id', tenant_id)
 
@@ -312,7 +313,8 @@ export async function getUserActivitySummary(
     const userMap = new Map<string, UserActivitySummary>()
 
     for (const activity of data || []) {
-      const userId = activity.user_id
+      const userId = activity.actor_id
+      if (!userId) continue
 
       if (!userMap.has(userId)) {
         userMap.set(userId, {
@@ -338,7 +340,7 @@ export async function getUserActivitySummary(
 
     // Calculate activity type counts per user
     for (const [userId, summary] of userMap.entries()) {
-      const userActivities = (data || []).filter(a => a.user_id === userId)
+      const userActivities = (data || []).filter(a => a.actor_id === userId)
       const typeMap = new Map<string, number>()
 
       for (const activity of userActivities) {

@@ -8,7 +8,7 @@ import { User, UserPlus, UserCheck } from 'lucide-react'
 import { AssignmentDialog } from './assignment-dialog'
 
 interface FeeEarner {
-  full_name: string
+  full_name: string | null
   job_title?: string | null
 }
 
@@ -47,7 +47,7 @@ export function FeeEarnerAssignmentCard({
               {currentFeeEarner ? (
                 <div>
                   <p className="text-lg font-semibold text-gray-900">
-                    {currentFeeEarner.full_name}
+                    {currentFeeEarner.full_name || 'Unknown'}
                   </p>
                   {currentFeeEarner.job_title && (
                     <p className="text-xs text-gray-500">{currentFeeEarner.job_title}</p>

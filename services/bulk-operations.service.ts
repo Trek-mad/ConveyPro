@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { logActivity } from './activity.service'
+import { logActivity } from './activity-log.service'
 
 // ============================================================================
 // TYPES
@@ -197,9 +197,9 @@ export async function bulkUpdateMatterStatus(
         const { error: updateError } = await supabase
           .from('matters')
           .update({
-            status: data.new_status,
+            status: data.new_status as any,
             updated_at: new Date().toISOString()
-          })
+          } as any)
           .eq('id', matter_id)
           .eq('tenant_id', data.tenant_id)
 
@@ -247,14 +247,14 @@ export async function bulkExportMatters(
       .from('matters')
       .select(`
         matter_number,
-        property_address,
         purchase_price,
         status,
         closing_date,
         created_at,
         workflow_stages(stage_name),
         clients(first_name, last_name, email),
-        profiles:fee_earner_id(first_name, last_name, email)
+        profiles:assigned_fee_earner_id(first_name, last_name, email),
+        properties:property_id(address_line1, address_line2, city, postcode)
       `)
       .in('id', matter_ids)
       .eq('tenant_id', tenant_id)
@@ -264,7 +264,7 @@ export async function bulkExportMatters(
     // Transform data for CSV export
     const exportData = data?.map(m => ({
       matter_number: m.matter_number,
-      property_address: m.property_address,
+      property_address: (m.properties as any)?.address_line1 || '',
       purchase_price: m.purchase_price,
       status: m.status,
       stage: (m.workflow_stages as any)?.stage_name || 'Unknown',
@@ -320,13 +320,14 @@ export async function bulkCreateTasks(
             tenant_id: data.tenant_id,
             matter_id,
             title: data.title,
+            task_key: `TASK-${Date.now()}`,
             description: data.description,
             due_date: data.due_date,
             assigned_to: data.assigned_to,
-            priority: data.priority || 'medium',
-            status: 'pending',
+            priority: (data.priority || 'normal') as any,
+            status: 'pending' as any,
             created_by: data.created_by
-          })
+          } as any)
           .select()
           .single()
 

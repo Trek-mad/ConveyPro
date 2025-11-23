@@ -234,7 +234,7 @@ export type Offer = {
   closing_date: string | null
   entry_date: string | null
   conditions: string | null
-  survey_required: boolean
+  survey_required: boolean | null
   drafted_by: string | null
   drafted_at: string | null
   solicitor_approved_by: string | null
@@ -258,10 +258,39 @@ export type Offer = {
   deleted_at: string | null
 }
 
-export type OfferInsert = Omit<Offer, 'id' | 'created_at' | 'updated_at'> & {
+export type OfferInsert = {
   id?: string
+  tenant_id: string
+  matter_id: string
+  offer_number: string
+  offer_type: 'verbal' | 'written'
+  offer_amount: number
+  offer_status?: 'draft' | 'pending_solicitor' | 'pending_negotiator' | 'pending_client' | 'submitted' | 'accepted' | 'rejected' | 'withdrawn'
+  closing_date?: string | null
+  entry_date?: string | null
+  conditions?: string | null
+  survey_required?: boolean | null
+  drafted_by?: string | null
+  drafted_at?: string | null
+  solicitor_approved_by?: string | null
+  solicitor_approved_at?: string | null
+  negotiator_approved_by?: string | null
+  negotiator_approved_at?: string | null
+  client_accepted_at?: string | null
+  client_acceptance_ip?: string | null
+  submitted_to_agent_at?: string | null
+  submitted_by?: string | null
+  agent_response?: 'accepted' | 'rejected' | 'counter_offer' | null
+  agent_response_date?: string | null
+  agent_notes?: string | null
+  rejection_reason?: string | null
+  counter_offer_amount?: number | null
+  document_id?: string | null
+  notes?: string | null
+  metadata?: any
   created_at?: string
   updated_at?: string
+  deleted_at?: string | null
 }
 
 export type OfferUpdate = Partial<Omit<Offer, 'id' | 'tenant_id' | 'matter_id' | 'created_at'>>
@@ -365,11 +394,11 @@ export type FeeEarnerAvailability = {
   tenant_id: string
   fee_earner_id: string
   start_date: string
-  end_date: string
+  end_date: string | null
   availability_type: 'available' | 'holiday' | 'sick' | 'training' | 'blocked' | 'reduced_capacity'
   is_available: boolean
   max_new_matters_per_week: number | null
-  current_workload: number
+  current_workload: number | null
   reason: string | null
   notes: string | null
   is_recurring: boolean
@@ -380,10 +409,24 @@ export type FeeEarnerAvailability = {
   deleted_at: string | null
 }
 
-export type FeeEarnerAvailabilityInsert = Omit<FeeEarnerAvailability, 'id' | 'created_at' | 'updated_at'> & {
+export type FeeEarnerAvailabilityInsert = {
   id?: string
+  tenant_id: string
+  fee_earner_id: string
+  start_date: string
+  end_date?: string | null
+  availability_type: 'available' | 'holiday' | 'sick' | 'training' | 'blocked' | 'reduced_capacity'
+  is_available?: boolean
+  max_new_matters_per_week?: number | null
+  current_workload?: number | null
+  reason?: string | null
+  notes?: string | null
+  is_recurring?: boolean
+  recurrence_pattern?: any | null
   created_at?: string
   updated_at?: string
+  created_by?: string | null
+  deleted_at?: string | null
 }
 
 export type FeeEarnerAvailabilityUpdate = Partial<Omit<FeeEarnerAvailability, 'id' | 'tenant_id' | 'fee_earner_id' | 'created_at'>>

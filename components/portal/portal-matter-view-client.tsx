@@ -76,17 +76,12 @@ export function PortalMatterViewClient({
         <div className="mx-auto max-w-6xl px-4 py-6">
           <div className="flex items-start justify-between">
             <div>
-              {tenant?.branding_logo_url ? (
-                <img
-                  src={tenant.branding_logo_url}
-                  alt={tenant.company_name || 'Logo'}
-                  className="mb-4 h-12 w-auto"
-                />
-              ) : (
-                <Building2 className="mb-4 h-12 w-12 text-primary" />
-              )}
+              <Building2 className="mb-4 h-12 w-12 text-primary" />
               <h1 className="text-3xl font-bold text-gray-900">Your Matter Details</h1>
               <p className="mt-1 text-lg text-gray-600">{matter.matter_number}</p>
+              {tenant && (
+                <p className="text-sm text-gray-500">{tenant.name}</p>
+              )}
             </div>
             <Badge
               className={
@@ -216,10 +211,10 @@ export function PortalMatterViewClient({
                 Your Solicitor
               </h2>
               <div className="space-y-3">
-                {tenant?.company_name && (
+                {tenant?.name && (
                   <div className="flex items-center gap-3">
                     <Building2 className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{tenant.company_name}</span>
+                    <span className="text-gray-900">{tenant.name}</span>
                   </div>
                 )}
                 {tenant?.phone && (

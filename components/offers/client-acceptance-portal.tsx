@@ -100,8 +100,8 @@ export function ClientAcceptancePortal({
               </div>
               <h2 className="text-2xl font-bold text-green-900">Offer Already Accepted</h2>
               <p className="mt-2 text-green-700">
-                You accepted this offer on{' '}
-                {new Date(offer.client_accepted_at).toLocaleDateString('en-GB', {
+                You accepted this offer{offer.client_accepted_at ? ' on ' : ''}
+                {offer.client_accepted_at && new Date(offer.client_accepted_at).toLocaleDateString('en-GB', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',

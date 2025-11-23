@@ -227,7 +227,7 @@ export async function createFormTemplate(template: Partial<FormTemplate>) {
 
   const { data, error } = await supabase
     .from('form_templates')
-    .insert(template)
+    .insert(template as any)
     .select()
     .single()
 
@@ -303,7 +303,7 @@ export async function createFormStep(step: Partial<FormStep>) {
 
   const { data, error } = await supabase
     .from('form_steps')
-    .insert(step)
+    .insert(step as any)
     .select()
     .single()
 
@@ -376,7 +376,7 @@ export async function createFormField(field: Partial<FormField>) {
 
   const { data, error } = await supabase
     .from('form_fields')
-    .insert(field)
+    .insert(field as any)
     .select()
     .single()
 
@@ -449,7 +449,7 @@ export async function createFormFieldOption(option: Partial<FormFieldOption>) {
 
   const { data, error } = await supabase
     .from('form_field_options')
-    .insert(option)
+    .insert(option as any)
     .select()
     .single()
 
@@ -488,7 +488,7 @@ export async function createFormPricingRule(rule: Partial<FormPricingRule>) {
 
   const { data, error } = await supabase
     .from('form_pricing_rules')
-    .insert(rule)
+    .insert(rule as any)
     .select()
     .single()
 
@@ -508,7 +508,7 @@ export async function updateFormPricingRule(
 
   const { data, error } = await supabase
     .from('form_pricing_rules')
-    .update(updates)
+    .update(updates as any)
     .eq('id', id)
     .select()
     .single()
@@ -548,7 +548,7 @@ export async function createFormPricingTier(tier: Partial<FormPricingTier>) {
 
   const { data, error } = await supabase
     .from('form_pricing_tiers')
-    .insert(tier)
+    .insert(tier as any)
     .select()
     .single()
 
@@ -606,7 +606,7 @@ export async function createLBTTRate(rate: Partial<LBTTRate>) {
 
   const { data, error } = await supabase
     .from('lbtt_rates')
-    .insert(rate)
+    .insert(rate as any)
     .select()
     .single()
 

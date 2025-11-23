@@ -60,7 +60,7 @@ export function MatterStageTransition({
     {
       onStageTransition: handleStageTransition,
       onTaskComplete: handleTaskComplete,
-    }
+    } as any
   )
 
   return <>{childrenWithProps}</>
