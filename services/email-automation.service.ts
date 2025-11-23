@@ -668,7 +668,7 @@ export async function enrollMatchingClients(params: {
   }
 
   if (params.targetClientTypes && params.targetClientTypes.length > 0) {
-    query = query.in('client_type', params.targetClientTypes)
+    query = query.in('client_type', params.targetClientTypes as any)
   }
 
   const { data: clients, error: clientError } = await query

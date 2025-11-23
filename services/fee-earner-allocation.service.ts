@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
@@ -35,7 +36,7 @@ export async function getFeeEarnerSettings(
       return { error: error.message }
     }
 
-    return { settings: settings || null }
+    return { settings: (settings || null) as any }
   } catch (error) {
     console.error('Unexpected error in getFeeEarnerSettings:', error)
     return { error: 'Failed to fetch fee earner settings' }

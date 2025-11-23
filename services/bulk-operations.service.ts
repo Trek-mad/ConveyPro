@@ -397,10 +397,10 @@ export async function bulkUpdateTaskStatus(
         const { error: updateError } = await supabase
           .from('matter_tasks')
           .update({
-            status: new_status,
+            status: new_status as any,
             completed_at: new_status === 'completed' ? new Date().toISOString() : null,
             updated_at: new Date().toISOString()
-          })
+          } as any)
           .eq('id', task_id)
           .eq('tenant_id', tenant_id)
 

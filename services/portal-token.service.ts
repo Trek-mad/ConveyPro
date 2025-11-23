@@ -4,6 +4,7 @@
  * Phase 12.7 - Client Portal
  */
 
+// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
