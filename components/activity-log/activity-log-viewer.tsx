@@ -21,7 +21,7 @@ import {
   type ActivityLog
 } from '@/services/activity-log.service'
 import ActivityTimeline from './activity-timeline'
-import { exportToCSV } from '@/services/analytics.service'
+import { exportToCSV } from '@/lib/utils/csv'
 
 interface ActivityLogViewerProps {
   matterId: string
