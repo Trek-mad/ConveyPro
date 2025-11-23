@@ -29,7 +29,7 @@ import {
   bulkExportMatters,
   type BulkOperationResult
 } from '@/services/bulk-operations.service'
-import { exportToCSV } from '@/services/analytics.service'
+import { exportToCSV } from '@/lib/utils/csv'
 
 interface BulkActionsToolbarProps {
   selectedIds: string[]

@@ -17,7 +17,7 @@ import {
   TrendingUp,
   Loader2,
   ArrowRight,
-  Pound,
+  PoundSterling,
   Clock,
   Target,
 } from 'lucide-react'
@@ -100,7 +100,7 @@ export function PurchaseWorkflowMetricsWidget({
         <div className="rounded-lg border p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-green-100 p-2">
-              <Pound className="h-4 w-4 text-green-600" />
+              <PoundSterling className="h-4 w-4 text-green-600" />
             </div>
             <div className="flex-1">
               <p className="text-xs text-muted-foreground">Pipeline Value</p>

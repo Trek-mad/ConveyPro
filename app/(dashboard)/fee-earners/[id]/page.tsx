@@ -107,7 +107,7 @@ export default async function FeeEarnerDetailPage({ params }: PageProps) {
         <div>
           <WorkloadDashboard
             feeEarnerId={feeEarnerId}
-            feeEarnerName={profile.full_name}
+            feeEarnerName={profile.full_name || 'Fee Earner'}
           />
         </div>
       </div>
