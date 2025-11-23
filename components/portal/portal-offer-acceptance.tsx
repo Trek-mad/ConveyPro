@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { CheckCircle, Home, Calendar, Pound, AlertCircle, Loader2, PartyPopper } from 'lucide-react'
+import { CheckCircle, Home, Calendar, PoundSterling, AlertCircle, Loader2, PartyPopper } from 'lucide-react'
 
 interface PortalOfferAcceptanceProps {
   token: string
@@ -99,7 +99,7 @@ export function PortalOfferAcceptance({ token, matter, offer }: PortalOfferAccep
         </div>
 
         <div className="flex items-start gap-3">
-          <Pound className="mt-1 h-5 w-5 text-gray-400" />
+          <PoundSterling className="mt-1 h-5 w-5 text-gray-400" />
           <div>
             <p className="text-sm font-medium text-gray-600">Offer Amount</p>
             <p className="text-xl font-bold text-gray-900">

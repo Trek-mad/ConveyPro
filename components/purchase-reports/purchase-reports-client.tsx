@@ -22,7 +22,7 @@ import {
   Gauge,
   Download,
   Calendar,
-  Pound,
+  PoundSterling,
   Clock,
   Target,
 } from 'lucide-react'
@@ -116,7 +116,7 @@ export function PurchaseReportsClient({
                     </h3>
                   </div>
                   <div className="rounded-full bg-green-100 p-3">
-                    <Pound className="h-6 w-6 text-green-600" />
+                    <PoundSterling className="h-6 w-6 text-green-600" />
                   </div>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground">

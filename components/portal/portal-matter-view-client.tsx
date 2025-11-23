@@ -22,7 +22,7 @@ import {
   Phone,
   Mail,
   Calendar,
-  Pound,
+  PoundSterling,
   User,
   Building2,
 } from 'lucide-react'
@@ -170,7 +170,7 @@ export function PortalMatterViewClient({
                 )}
                 {matter.purchase_price && (
                   <div className="flex items-start gap-3">
-                    <Pound className="mt-1 h-5 w-5 text-gray-400" />
+                    <PoundSterling className="mt-1 h-5 w-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Purchase Price</p>
                       <p className="text-lg font-semibold text-gray-900">
