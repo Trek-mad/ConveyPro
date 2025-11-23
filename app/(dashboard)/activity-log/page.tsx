@@ -11,12 +11,20 @@ export const metadata: Metadata = {
 export default async function GlobalActivityLogPage() {
   const membership = await getActiveTenantMembership()
 
+  if (!membership) {
+    return (
+      <div className="container mx-auto py-6">
+        <p>Unable to load activity log. Please log in.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto py-6">
       <Suspense fallback={<div>Loading activity log...</div>}>
         <GlobalActivityLogViewer
-          tenantId={membership.tenant_id}
-          userId={membership.user_id}
+          tenantId={membership.tenantId}
+          userId={membership.userId}
         />
       </Suspense>
     </div>

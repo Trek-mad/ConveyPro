@@ -35,7 +35,11 @@ export default async function ActivityLogPage({
   const { id } = await params
   const membership = await getActiveTenantMembership()
 
-  const matter = await getMatter(id, membership.tenant_id)
+  if (!membership) {
+    notFound()
+  }
+
+  const matter = await getMatter(id, membership.tenantId)
 
   if (!matter) {
     notFound()
@@ -46,7 +50,7 @@ export default async function ActivityLogPage({
       <Suspense fallback={<div>Loading activity log...</div>}>
         <ActivityLogViewer
           matterId={id}
-          tenantId={membership.tenant_id}
+          tenantId={membership.tenantId}
           matterNumber={matter.matter_number}
           propertyAddress={matter.property_address}
         />
