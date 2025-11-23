@@ -51,7 +51,7 @@ export default async function FeeEarnerDetailPage({ params }: PageProps) {
 
   // Verify this user is a member of the tenant
   const { data: feeEarnerMembership, error: membershipError } = await supabase
-    .from('tenant_members')
+    .from('tenant_memberships')
     .select('*')
     .eq('user_id', feeEarnerId)
     .eq('tenant_id', membership.tenant_id)
