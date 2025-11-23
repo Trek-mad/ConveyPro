@@ -7,6 +7,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.9.2-typescript-build-fixes] - 2025-11-23
+
+**TypeScript Build Fixes & Lucide React Migration** 🔧
+
+### Context
+Comprehensive TypeScript compilation fixes to resolve all build errors following dependency updates. Updated Lucide React icons to v1.x (breaking change: `Pound` → `PoundSterling`) and fixed database schema mismatches throughout the codebase.
+
+### Fixed
+
+#### Icon Updates (Lucide React v1.x Breaking Changes)
+- ✅ Updated `Pound` icon to `PoundSterling` across 4 files:
+  - components/portal/portal-matter-view-client.tsx
+  - components/portal/portal-offer-acceptance.tsx
+  - components/purchase-reports/purchase-reports-client.tsx
+  - components/dashboard/purchase-workflow-metrics-widget.tsx
+
+#### Database Table Name Fixes
+- ✅ Fixed `tenant_members` → `tenant_memberships` references:
+  - app/(dashboard)/fee-earners/page.tsx
+  - app/(dashboard)/fee-earners/[id]/page.tsx
+  - services/notification-preferences.service.ts
+
+#### Type Definition Corrections
+- ✅ Updated `FeeEarner` type to allow nullable `full_name: string | null`
+- ✅ Fixed `FeeEarnerWorkload` type with missing properties:
+  - Added `capacity_percentage` (alias for `capacity_used`)
+  - Added `weekly_capacity_percentage` (alias for `weekly_capacity_used`)
+  - Added `active_matters_count` (alias for `active_matters`)
+  - Added `unavailable_reason: string | null`
+- ✅ Fixed `Offer` and `OfferInsert` types to match database schema
+- ✅ Fixed `FeeEarnerAvailability` type with nullable `end_date` and `current_workload`
+
+#### Service Layer Fixes
+- ✅ Created missing `services/membership.service.ts` with `getActiveTenantMembership()`
+- ✅ Updated `services/fee-earner-allocation.service.ts` to return all required workload properties
+- ✅ Fixed `matter_activities` table references: `user_id` → `actor_id`
+- ✅ Made `isWithinQuietHours()` async in notification-preferences.service.ts
+
+#### CSV Export Fixes
+- ✅ Created `lib/utils/csv.ts` to extract CSV utility from server-only service
+- ✅ Updated client component imports to use new CSV utility:
+  - components/activity-log/global-activity-log-viewer.tsx
+  - components/activity-log/activity-log-viewer.tsx
+  - components/purchase-reports/purchase-reports-client.tsx
+  - components/bulk-actions/bulk-actions-toolbar.tsx
+
+#### Missing UI Components
+- ✅ Created missing Radix UI components:
+  - components/ui/dialog.tsx (Radix UI Dialog)
+  - components/ui/tabs.tsx (Radix UI Tabs)
+  - components/ui/checkbox.tsx (Radix UI Checkbox)
+  - components/ui/toast.tsx (Radix UI Toast)
+  - hooks/use-toast.ts (Toast hook)
+
+#### Null Safety & Type Guards
+- ✅ Added null checks for `getActiveTenantMembership()` in:
+  - app/(dashboard)/activity-log/page.tsx
+  - app/(dashboard)/search/page.tsx
+  - app/(dashboard)/purchase-matters/[id]/activity-log/page.tsx
+  - app/(dashboard)/purchase-reports/page.tsx
+  - app/api/cron/reminders/route.ts
+- ✅ Fixed profile property references (removed non-existent `email` field):
+  - app/(dashboard)/fee-earners/[id]/page.tsx (replaced with `job_title`)
+  - app/(dashboard)/fee-earners/page.tsx (removed `email`, added `job_title`)
+  - services/notification-preferences.service.ts (removed `email` and `metadata`)
+
+#### Subscriber Type Fixes
+- ✅ Updated `Subscriber` interface to match database schema:
+  - Changed `full_name` to `first_name` + `last_name`
+  - components/campaigns/subscribers-list.tsx
+
+#### Fee Earner Component Fixes
+- ✅ Fixed function name imports:
+  - components/fee-earners/assignment-dialog.tsx: `assignMatterToFeeEarner()` → `manuallyAssignMatter()`
+  - components/fee-earners/availability-calendar.tsx: `getAvailabilityBlocks()` → `getFeeEarnerAvailability()`
+- ✅ Fixed property references and null handling across fee earner components
+
+### Added
+- ✅ Installed required Radix UI dependencies:
+  - @radix-ui/react-alert-dialog
+  - @radix-ui/react-dialog
+  - @radix-ui/react-progress
+  - @radix-ui/react-switch
+  - @radix-ui/react-tabs
+
+### Impact
+- ✅ **Build Status**: All TypeScript errors resolved - build now passes successfully
+- ✅ **Type Safety**: Complete type coverage with zero compilation errors
+- ✅ **Icon Compatibility**: Updated to Lucide React v1.x
+- ✅ **Database Alignment**: All queries aligned with actual database schema
+
+---
+
 ## [2.9.1-database-types-regeneration] - 2025-11-22
 
 **Database Type Safety Enhancement** 🔧
