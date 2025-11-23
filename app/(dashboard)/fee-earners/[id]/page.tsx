@@ -79,7 +79,9 @@ export default async function FeeEarnerDetailPage({ params }: PageProps) {
 
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{profile.full_name}</h1>
-          <p className="mt-2 text-gray-600">{profile.email}</p>
+          {profile.job_title && (
+            <p className="mt-2 text-gray-600">{profile.job_title}</p>
+          )}
         </div>
       </div>
 
