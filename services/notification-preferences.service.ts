@@ -202,16 +202,14 @@ export async function getUsersForNotificationType(
 
   // Get all users in the tenant
   const { data: members, error } = await supabase
-    .from('tenant_members')
+    .from('tenant_memberships')
     .select(
       `
       user_id,
       profiles:user_id (
         id,
-        email,
         first_name,
-        last_name,
-        metadata
+        last_name
       )
     `
     )
