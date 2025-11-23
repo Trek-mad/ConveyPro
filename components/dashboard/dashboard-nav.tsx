@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, FileText, Building2, Users, Settings } from 'lucide-react'
+import { Home, FileText, Building2, Users, Settings, BarChart3, UserCircle2, Mail, LayoutTemplate, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -14,12 +14,27 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Campaigns', href: '/campaigns', icon: Mail },
   { name: 'Quotes', href: '/quotes', icon: FileText },
+  { name: 'Clients', href: '/clients', icon: UserCircle2 },
   { name: 'Properties', href: '/properties', icon: Building2 },
   {
     name: 'Team',
     href: '/team',
     icon: Users,
+    roles: ['owner', 'admin'],
+  },
+  {
+    name: 'Form Builder',
+    href: '/admin/forms',
+    icon: LayoutTemplate,
+    roles: ['owner', 'admin'],
+  },
+  {
+    name: 'LBTT Rates',
+    href: '/admin/lbtt-rates',
+    icon: TrendingUp,
     roles: ['owner', 'admin'],
   },
   {
@@ -43,10 +58,13 @@ export function DashboardNav({ tenantId, role }: DashboardNavProps) {
     (item) => !item.roles || item.roles.includes(role)
   )
 
+  // Phase 3: Campaigns feature enabled
+
   return (
     <nav className="flex w-64 flex-col border-r bg-white">
       <div className="flex h-16 items-center border-b px-6">
         <span className="text-lg font-semibold text-gray-900">ConveyPro</span>
+        <span className="ml-2 text-xs text-green-600">v3</span>
       </div>
 
       <div className="flex-1 space-y-1 p-4">
