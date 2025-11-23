@@ -8,7 +8,7 @@ import {
   createAvailabilityBlock,
   updateAvailabilityBlock,
   deleteAvailabilityBlock,
-  getAvailabilityBlocks,
+  getFeeEarnerAvailability,
 } from '@/services/fee-earner-allocation.service'
 import type { FeeEarnerAvailability } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -106,10 +106,10 @@ export function AvailabilityCalendar({ feeEarnerId, tenantId }: AvailabilityCale
 
   async function loadBlocks() {
     setIsLoading(true)
-    const result = await getAvailabilityBlocks(feeEarnerId)
+    const result = await getFeeEarnerAvailability(feeEarnerId)
 
-    if ('blocks' in result) {
-      setBlocks(result.blocks)
+    if ('availability' in result) {
+      setBlocks(result.availability)
     } else {
       toast({
         title: 'Error',

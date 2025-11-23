@@ -140,7 +140,7 @@ export async function resetNotificationPreferences(userId?: string) {
 /**
  * Check if notifications should be sent based on quiet hours
  */
-export function isWithinQuietHours(preferences: NotificationPreferences): boolean {
+export async function isWithinQuietHours(preferences: NotificationPreferences): Promise<boolean> {
   if (!preferences.quiet_hours_enabled) {
     return false
   }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import {
   getAssignmentRecommendations,
-  assignMatterToFeeEarner,
+  manuallyAssignMatter,
   autoAssignMatter,
 } from '@/services/fee-earner-allocation.service'
 import type { AssignmentRecommendation } from '@/types'
@@ -121,9 +121,9 @@ export function AssignmentDialog({
 
     setIsAssigning(true)
 
-    const result = await assignMatterToFeeEarner(matterId, selectedFeeEarnerId)
+    const result = await manuallyAssignMatter(matterId, selectedFeeEarnerId)
 
-    if ('assignment' in result) {
+    if ('success' in result) {
       const selectedRec = recommendations.find(
         (r) => r.fee_earner_id === selectedFeeEarnerId
       )

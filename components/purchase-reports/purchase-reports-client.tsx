@@ -26,7 +26,7 @@ import {
   Clock,
   Target,
 } from 'lucide-react'
-import { exportToCSV } from '@/services/analytics.service'
+import { exportToCSV } from '@/lib/utils/csv'
 
 interface PurchaseReportsClientProps {
   mattersByStage: PurchaseMattersByStageReport[]
