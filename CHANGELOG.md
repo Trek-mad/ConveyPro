@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.9.3-database-migrations] - 2025-11-23
+
+**Database Migration Tools & Documentation** 📋
+
+### Context
+Created comprehensive migration tools and documentation to help users apply the Purchase Workflow (Phase 12) database schema to their Supabase instances. The application was building successfully but encountering runtime database errors because the required tables didn't exist.
+
+### Added
+
+#### Migration Documentation
+- ✅ Created `MIGRATION_GUIDE.md` - Complete step-by-step guide for applying Purchase Workflow migrations
+  - Method 1: Apply via Supabase Dashboard (recommended)
+  - Method 2: Using Supabase CLI (if available)
+  - Troubleshooting section
+  - Migration status checklist
+  - Verification queries
+
+#### Consolidated Migration Script
+- ✅ Created `APPLY_PURCHASE_WORKFLOW_MIGRATIONS.sql` - Single file combining all 9 migrations:
+  1. `20251120000001_enhance_clients_for_purchase_workflow.sql` - Adds fields to clients table
+  2. `20251120000002_create_matters_table.sql` - Creates matters table
+  3. `20251120000003_create_workflow_stages.sql` - Creates workflow stages
+  4. `20251120000004_create_matter_tasks.sql` - Creates matter tasks
+  5. `20251120000005_create_documents_table.sql` - Creates documents table
+  6. `20251120000006_create_offers_table.sql` - Creates offers table
+  7. `20251120000007_create_financial_questionnaires.sql` - Creates financial questionnaires
+  8. `20251120000008_create_fee_earner_tables.sql` - Creates fee earner tables
+  9. `20251120000009_create_matter_activities.sql` - Creates activity log
+
+### Tables Created
+These migrations create 9 tables required for the Purchase Workflow:
+- **matters**: Purchase transaction cases with client, property, and financial details
+- **workflow_stages**: 12-stage workflow configuration (client entry → conveyancing allocation)
+- **matter_tasks**: Automated checklist tasks for each workflow stage
+- **matter_activities**: Full audit trail and activity timeline
+- **documents**: Secure document storage and verification tracking
+- **offers**: Property offer creation and approval workflow
+- **financial_questionnaires**: Client financial assessment forms
+- **fee_earner_settings**: Capacity management and workload balancing
+- **fee_earner_availability**: Calendar-based availability tracking
+
+### Features
+- ✅ All migrations are idempotent (safe to run multiple times)
+- ✅ Row Level Security (RLS) policies for tenant data isolation
+- ✅ Comprehensive audit fields (created_at, updated_at, created_by, etc.)
+- ✅ Soft deletes (deleted_at) on all main tables
+- ✅ Performance indexes on frequently queried columns
+- ✅ Foreign key constraints for data integrity
+- ✅ Auto-generated triggers for updated_at timestamps
+- ✅ Helper functions for matter number generation and activity logging
+
+### Runtime Errors Addressed
+These migrations fix the following runtime errors:
+- ❌ `Could not find the table 'public.tasks'` → ✅ Creates `matter_tasks` table
+- ❌ `Could not find the table 'public.matters'` → ✅ Creates `matters` table
+- ❌ Missing workflow, documents, offers tables → ✅ Creates all required tables
+
+### Instructions
+**To apply these migrations:**
+1. See `MIGRATION_GUIDE.md` for detailed instructions
+2. Quick method: Run `APPLY_PURCHASE_WORKFLOW_MIGRATIONS.sql` in Supabase SQL Editor
+3. Verify tables exist with the verification query in the guide
+4. Restart your dev server and refresh browser
+
+### Impact
+- ✅ **Database Schema**: Complete Purchase Workflow database schema ready to use
+- ✅ **Application Functionality**: Resolves all runtime database table errors
+- ✅ **Documentation**: Clear migration path for all users
+- ✅ **Maintenance**: Idempotent migrations support safe re-runs
+
+---
+
 ## [2.9.2-typescript-build-fixes] - 2025-11-23
 
 **TypeScript Build Fixes & Lucide React Migration** 🔧
