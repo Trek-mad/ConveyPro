@@ -42,7 +42,7 @@ export default async function FeeEarnersPage() {
 
   // Fetch all fee earners for this tenant
   const { data: feeEarners, error } = await supabase
-    .from('tenant_members')
+    .from('tenant_memberships')
     .select(
       `
       id,
@@ -50,10 +50,10 @@ export default async function FeeEarnersPage() {
       role,
       profiles:user_id (
         id,
-        email,
         first_name,
         last_name,
-        full_name
+        full_name,
+        job_title
       )
     `
     )
